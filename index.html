@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🚐 Winter Campervan — Munich Loop</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    :root {
+      --bg: #0d1b2a;
+      --panel: rgba(10, 20, 35, 0.94);
+      --accent: #4299e1;
+      --ferry: #f6ad55;
+      --start: #68d391;
+      --text: #e2e8f0;
+      --muted: #718096;
+      --border: rgba(66, 153, 225, 0.18);
+      --shadow: 0 8px 40px rgba(0,0,0,0.55);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      height: 100dvh;
+      overflow: hidden;
+      color: var(--text);
+    }
+
+    #map { width: 100%; height: 100%; }
+
+    /* ── Header ── */
+    #header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: linear-gradient(180deg, rgba(10,20,35,0.92) 0%, rgba(10,20,35,0.5) 70%, transparent 100%);
+      padding: 18px 20px 56px;
+      pointer-events: none;
+    }
+
+    .h-row { display: flex; align-items: center; gap: 12px; }
+    .h-icon { font-size: 2rem; }
+    .h-title { font-size: 1.05rem; font-weight: 700; color: #fff; letter-spacing: 0.3px; }
+    .h-sub { font-size: 0.68rem; color: var(--accent); margin-top: 3px; letter-spacing: 0.4px; }
+
+    /* ── Stats bar ── */
+    #stats {
+      position: absolute;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 11px 28px;
+      display: flex;
+      gap: 28px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
+      white-space: nowrap;
+    }
+
+    .stat { text-align: center; }
+    .stat-val { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+    .stat-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Fullscreen button ── */
+    #btn-fs {
+      position: absolute;
+      top: 20px; right: 56px;
+      z-index: 1000;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      font-size: 0.85rem;
+      color: var(--muted);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    #btn-fs:hover { color: #fff; border-color: var(--accent); }
+
+    /* ── Replay button ── */
+    #btn-replay {
+      position: absolute;
+      top: 60px; right: 56px;
+      z-index: 1000;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      font-size: 0.85rem;
+      color: var(--muted);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    #btn-replay:hover { color: #fff; border-color: var(--accent); }
+
+    /* ── Stop panel ── */
+    #panel {
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: min(380px, 100vw);
+      background: var(--panel);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-left: 1px solid var(--border);
+      z-index: 1001;
+      transform: translateX(102%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: -8px 0 40px rgba(0,0,0,0.4);
+    }
+
+    #panel.open { transform: translateX(0); }
+
+    .panel-head {
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .p-emoji { font-size: 2.6rem; flex-shrink: 0; line-height: 1; margin-top: 2px; }
+
+    .p-info { flex: 1; min-width: 0; }
+    .p-num { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); }
+    .p-name { font-size: 1.25rem; font-weight: 700; color: #fff; margin: 5px 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p-country { font-size: 0.78rem; color: var(--accent); }
+
+    .p-close {
+      font-size: 1.5rem;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0 4px;
+      transition: color 0.2s;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .p-close:hover { color: #fff; }
+
+    .panel-body { padding: 20px; flex: 1; overflow-y: auto; }
+
+    .p-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 14px;
+    }
+
+    .badge-drive  { background: rgba(66,153,225,0.12); color: var(--accent); border: 1px solid rgba(66,153,225,0.25); }
+    .badge-ferry  { background: rgba(246,173,85,0.12); color: var(--ferry); border: 1px solid rgba(246,173,85,0.25); }
+    .badge-start  { background: rgba(104,211,145,0.12); color: var(--start); border: 1px solid rgba(104,211,145,0.25); }
+    .badge-end    { background: rgba(104,211,145,0.12); color: var(--start); border: 1px solid rgba(104,211,145,0.25); }
+
+    .p-desc {
+      font-size: 0.88rem;
+      line-height: 1.65;
+      color: #a0aec0;
+      margin-bottom: 20px;
+    }
+
+    .p-km-card {
+      background: rgba(66,153,225,0.06);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 16px;
+    }
+
+    .p-km-item { flex: 1; }
+    .p-km-val { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+    .p-km-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-top: 2px; }
+
+    /* Progress bar */
+    .p-progress {
+      margin-top: 16px;
+    }
+
+    .p-progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .p-progress-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .p-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #667eea);
+      border-radius: 4px;
+      transition: width 0.6s ease;
+    }
+
+    .panel-nav {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      padding: 10px 8px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(66,153,225,0.06);
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-align: center;
+      transition: background 0.2s, border-color 0.2s;
+      user-select: none;
+    }
+    .nav-btn:hover:not([disabled]) { background: rgba(66,153,225,0.15); border-color: var(--accent); }
+    .nav-btn[disabled] { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
+
+    /* ── Custom markers ── */
+    .marker-wrap {
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+
+    .marker-pin {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 800;
+      border: 2px solid rgba(255,255,255,0.45);
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+
+    .marker-pin.type-start,
+    .marker-pin.type-end {
+      background: #1c4532;
+      color: var(--start);
+      border-color: var(--start);
+      box-shadow: 0 0 0 4px rgba(104,211,145,0.2), 0 4px 14px rgba(0,0,0,0.5);
+    }
+
+    .marker-pin.type-ferry {
+      background: #5a3010;
+      color: var(--ferry);
+      border-color: var(--ferry);
+      box-shadow: 0 0 0 4px rgba(246,173,85,0.2), 0 4px 14px rgba(0,0,0,0.5);
+    }
+
+    .marker-pin.type-drive {
+      background: #1a365d;
+      color: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(66,153,225,0.15), 0 4px 14px rgba(0,0,0,0.5);
+    }
+
+    .marker-pin.active {
+      transform: scale(1.25);
+      z-index: 999;
+    }
+
+    .marker-pin.type-start.active,
+    .marker-pin.type-end.active {
+      box-shadow: 0 0 0 6px rgba(104,211,145,0.35), 0 6px 20px rgba(0,0,0,0.6);
+    }
+
+    .marker-pin.type-ferry.active {
+      box-shadow: 0 0 0 6px rgba(246,173,85,0.35), 0 6px 20px rgba(0,0,0,0.6);
+    }
+
+    .marker-pin.type-drive.active {
+      box-shadow: 0 0 0 6px rgba(66,153,225,0.35), 0 6px 20px rgba(0,0,0,0.6);
+    }
+
+    /* Pulse on start */
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(104,211,145,0.5), 0 4px 14px rgba(0,0,0,0.5); }
+      70%  { box-shadow: 0 0 0 10px rgba(104,211,145,0), 0 4px 14px rgba(0,0,0,0.5); }
+      100% { box-shadow: 0 0 0 0 rgba(104,211,145,0), 0 4px 14px rgba(0,0,0,0.5); }
+    }
+
+    .marker-pin.type-start {
+      animation: pulse 2s infinite;
+    }
+
+    /* ── Leaflet overrides ── */
+    .leaflet-control-zoom a {
+      background: var(--panel) !important;
+      border-color: var(--border) !important;
+      color: var(--muted) !important;
+      backdrop-filter: blur(16px) !important;
+    }
+    .leaflet-control-zoom a:hover { color: #fff !important; }
+    .leaflet-control-attribution {
+      background: rgba(10,20,35,0.7) !important;
+      color: var(--muted) !important;
+      backdrop-filter: blur(8px) !important;
+    }
+    .leaflet-control-attribution a { color: var(--accent) !important; }
+
+    /* ── Mobile ── */
+    @media (max-width: 600px) {
+      #stats {
+        left: 12px; right: 12px;
+        transform: none;
+        border-radius: 16px;
+        justify-content: space-between;
+        gap: 0;
+        padding: 10px 18px;
+        bottom: 16px;
+      }
+
+      .stat-val { font-size: 0.95rem; }
+
+      #panel {
+        top: auto;
+        height: 62vh;
+        width: 100%;
+        transform: translateY(105%);
+        border-left: none;
+        border-top: 1px solid var(--border);
+        border-radius: 18px 18px 0 0;
+        box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+      }
+
+      #panel.open { transform: translateY(0); }
+
+      #btn-fs, #btn-replay { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<div id="header">
+  <div class="h-row">
+    <div class="h-icon">🚐</div>
+    <div>
+      <div class="h-title">Winter Campervan — Munich Loop</div>
+      <div class="h-sub">26 stops &nbsp;·&nbsp; 3 ferries &nbsp;·&nbsp; 6 countries &nbsp;·&nbsp; ~8,500 km</div>
+    </div>
+  </div>
+</div>
+
+<div id="stats">
+  <div class="stat"><div class="stat-val">26</div><div class="stat-label">Stops</div></div>
+  <div class="stat"><div class="stat-val">6</div><div class="stat-label">Countries</div></div>
+  <div class="stat"><div class="stat-val">3</div><div class="stat-label">Ferries</div></div>
+  <div class="stat"><div class="stat-val" id="km-counter">0</div><div class="stat-label">km driven</div></div>
+</div>
+
+<div id="btn-fs" title="Fullscreen">⛶</div>
+<div id="btn-replay" title="Replay animation">↺</div>
+
+<div id="panel">
+  <div class="panel-head">
+    <div class="p-emoji" id="p-emoji">🏔</div>
+    <div class="p-info">
+      <div class="p-num" id="p-num">Stop #1 of 26</div>
+      <div class="p-name" id="p-name">Munich</div>
+      <div class="p-country" id="p-country">🇩🇪 Germany</div>
+    </div>
+    <div class="p-close" id="p-close">×</div>
+  </div>
+  <div class="panel-body">
+    <span class="p-badge badge-start" id="p-badge">Start</span>
+    <p class="p-desc" id="p-desc"></p>
+    <div class="p-km-card">
+      <div class="p-km-item">
+        <div class="p-km-val" id="p-km">0 km</div>
+        <div class="p-km-label">from Munich</div>
+      </div>
+      <div class="p-km-item">
+        <div class="p-km-val" id="p-pct">0%</div>
+        <div class="p-km-label">of total trip</div>
+      </div>
+    </div>
+    <div class="p-progress">
+      <div class="p-progress-label">
+        <span>Munich</span><span id="p-prog-pct">0%</span>
+      </div>
+      <div class="p-progress-bar">
+        <div class="p-progress-fill" id="p-prog-bar" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel-nav">
+    <div class="nav-btn" id="btn-prev">← Previous</div>
+    <div class="nav-btn" id="btn-next">Next →</div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const STOPS = [
+  {n:1,  name:'Munich',             lat:48.1351, lng:11.5820, type:'start'},
+  {n:2,  name:'Innsbruck',          lat:47.2692, lng:11.4041, type:'drive'},
+  {n:3,  name:'Verona',             lat:45.4384, lng:10.9916, type:'drive'},
+  {n:4,  name:'Florence',           lat:43.7696, lng:11.2558, type:'drive'},
+  {n:5,  name:'Rome',               lat:41.9028, lng:12.4964, type:'drive'},
+  {n:6,  name:'Naples',             lat:40.8518, lng:14.2681, type:'drive'},
+  {n:7,  name:'Villa San Giovanni', lat:38.2167, lng:15.6333, type:'ferry'},
+  {n:8,  name:'Messina',            lat:38.1938, lng:15.5540, type:'ferry'},
+  {n:9,  name:'Catania / Etna',     lat:37.5079, lng:15.0830, type:'drive'},
+  {n:10, name:'Palermo',            lat:38.1157, lng:13.3615, type:'ferry'},
+  {n:11, name:'Cagliari',           lat:39.2238, lng:9.1217,  type:'ferry'},
+  {n:12, name:'Olbia',              lat:40.9236, lng:9.4964,  type:'ferry'},
+  {n:13, name:'Livorno',            lat:43.5485, lng:10.3106, type:'ferry'},
+  {n:14, name:'Genoa',              lat:44.4056, lng:8.9463,  type:'drive'},
+  {n:15, name:'Nice',               lat:43.7102, lng:7.2620,  type:'drive'},
+  {n:16, name:'Montpellier',        lat:43.6119, lng:3.8772,  type:'drive'},
+  {n:17, name:'Barcelona',          lat:41.3851, lng:2.1734,  type:'drive'},
+  {n:18, name:'Valencia',           lat:39.4699, lng:-0.3763, type:'drive'},
+  {n:19, name:'Murcia',             lat:37.9922, lng:-1.1307, type:'drive'},
+  {n:20, name:'Granada',            lat:37.1773, lng:-3.5986, type:'drive'},
+  {n:21, name:'Málaga',             lat:36.7213, lng:-4.4214, type:'drive'},
+  {n:22, name:'Seville',            lat:37.3891, lng:-5.9845, type:'drive'},
+  {n:23, name:'Zaragoza',           lat:41.6488, lng:-0.8891, type:'drive'},
+  {n:24, name:'Lyon',               lat:45.7640, lng:4.8357,  type:'drive'},
+  {n:25, name:'Strasbourg',         lat:48.5734, lng:7.7521,  type:'drive'},
+  {n:26, name:'Munich',             lat:48.1351, lng:11.5820, type:'end'},
+];
+
+// 0-indexed segment pairs that are ferries
+const FERRY_SEGS = new Set(['6-7','9-10','11-12']);
+
+const DETAILS = {
+  1:  {emoji:'🏔', flag:'🇩🇪', country:'Germany',  km:0,    desc:'Bavarian capital — world-class beer gardens, the vibrant Marienplatz and the Alps shimmering on the southern horizon.'},
+  2:  {emoji:'🎿', flag:'🇦🇹', country:'Austria',  km:150,  desc:'Tyrolean alpine gem — the glittering Golden Roof, crisp mountain air and legendary ski resorts all within arm\'s reach.'},
+  3:  {emoji:'💌', flag:'🇮🇹', country:'Italy',    km:400,  desc:'City of Romeo & Juliet — a 2,000-year-old Roman arena that still fills with opera-goers under the summer stars.'},
+  4:  {emoji:'🎨', flag:'🇮🇹', country:'Italy',    km:650,  desc:'Cradle of the Renaissance — Botticelli in the Uffizi, Brunelleschi\'s terracotta Duomo and endless rolling Tuscan hills.'},
+  5:  {emoji:'🏛', flag:'🇮🇹', country:'Italy',    km:930,  desc:'The Eternal City — the Colosseum at golden hour, Vatican Museums at dawn and the obligatory coin tossed in Trevi Fountain.'},
+  6:  {emoji:'🍕', flag:'🇮🇹', country:'Italy',    km:1150, desc:'Birthplace of pizza — gateway to steaming Pompeii, the clifftop Amalfi Coast and Vesuvius brooding on the horizon.'},
+  7:  {emoji:'⛴',  flag:'🇮🇹', country:'Italy',    km:1580, desc:'The narrow Strait of Messina — the legendary whirlpool of Charybdis supposedly lurks here. Ferry crossing to Sicily begins.'},
+  8:  {emoji:'⚓',  flag:'🇮🇹', country:'Italy',    km:1583, desc:'First taste of Sicily — arrival in the city guarding the strait, ancient mosaics and a famous swordfish market.'},
+  9:  {emoji:'🌋', flag:'🇮🇹', country:'Italy',    km:1685, desc:'Europe\'s highest active volcano — Mt Etna\'s lava fields loom over this Greek-founded port city full of baroque piazzas.'},
+  10: {emoji:'🌊', flag:'🇮🇹', country:'Italy',    km:1820, desc:'Sicily\'s vibrant capital — Arab-Norman cathedrals, the chaotic Ballaró street market and a ferry west towards Sardinia.'},
+  11: {emoji:'🏝', flag:'🇮🇹', country:'Italy',    km:2120, desc:'Sardinia\'s sun-bleached capital arrived via an overnight ferry — Roman ruins, pink flamingos and some of Italy\'s best pasta.'},
+  12: {emoji:'🏖', flag:'🇮🇹', country:'Italy',    km:2395, desc:'Northern Sardinian port town — the impossibly turquoise Costa Smeralda is just a short drive from here.'},
+  13: {emoji:'⛵',  flag:'🇮🇹', country:'Italy',    km:2725, desc:'Back on the Italian mainland — city of ten fortresses, the Leaning Tower a short hop away and superb seafood.'},
+  14: {emoji:'🛳', flag:'🇮🇹', country:'Italy',    km:2895, desc:'Italy\'s largest port and birthplace of Christopher Columbus, basil pesto and a celebrated annual boat show.'},
+  15: {emoji:'🌴', flag:'🇫🇷', country:'France',   km:3070, desc:'The French Riviera — Promenade des Anglais bathed in eternal sunshine, Monaco just 20 km east along the coast.'},
+  16: {emoji:'☀️', flag:'🇫🇷', country:'France',   km:3390, desc:'Southern France at its liveliest — a thriving university city with a medieval historic centre and beaches minutes away.'},
+  17: {emoji:'🏗', flag:'🇪🇸', country:'Spain',    km:3710, desc:'Gaudí\'s playground — Sagrada Família under perpetual construction, Park Güell mosaics and tapas on every corner of La Barceloneta.'},
+  18: {emoji:'🥘', flag:'🇪🇸', country:'Spain',    km:4075, desc:'City of Arts & Sciences — birthplace of paella, a stunning medieval old town and a half-hour drive from the Mar Menor.'},
+  19: {emoji:'🌿', flag:'🇪🇸', country:'Spain',    km:4335, desc:'Warm Mediterranean city famous for its ornate baroque cathedral, the spring flower-carpet festival and excellent tapas culture.'},
+  20: {emoji:'🏰', flag:'🇪🇸', country:'Spain',    km:4610, desc:'The incomparable Alhambra fortress palace — intricate Nasrid tile-work and reflecting pools set against snow-capped Sierra Nevada.'},
+  21: {emoji:'🎨', flag:'🇪🇸', country:'Spain',    km:4740, desc:'Picasso\'s birthplace on the Costa del Sol — 320 days of sunshine a year, a renovated historic centre and perfect beaches.'},
+  22: {emoji:'💃', flag:'🇪🇸', country:'Spain',    km:4960, desc:'The soul of flamenco — the Alcázar palace, the soaring Giralda tower and some of Europe\'s finest tapas bars in the Triana quarter.'},
+  23: {emoji:'🕌', flag:'🇪🇸', country:'Spain',    km:5815, desc:'Northern Spain\'s crossroads — the dazzling twin-towered Basilica del Pilar mirrors perfectly in the Ebro river below.'},
+  24: {emoji:'🍷', flag:'🇫🇷', country:'France',   km:6440, desc:'Gastronomic capital of France — Paul Bocuse\'s legacy lives at the confluence of the Rhône and Saône, Lyon\'s lights shimmer at night.'},
+  25: {emoji:'🎄', flag:'🇫🇷', country:'France',   km:6925, desc:'Christmas capital of Europe — the half-timbered Alsatian old town, the EU quarter and a Gothic cathedral that took 400 years to build.'},
+  26: {emoji:'🏠', flag:'🇩🇪', country:'Germany',  km:7325, desc:'Back home in Munich — 7,325 km across 6 countries, 3 sea crossings and memories that will last a lifetime.'},
+};
+
+const TOTAL_KM = 7325;
+
+// ── Map init ──────────────────────────────────────────────────
+const map = L.map('map', {
+  center: [44, 8],
+  zoom: 5,
+  zoomControl: false,
+  preferCanvas: false,
+});
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  subdomains: 'abcd',
+  maxZoom: 19,
+}).addTo(map);
+
+L.control.zoom({ position: 'topright' }).addTo(map);
+
+// ── State ─────────────────────────────────────────────────────
+const drawnLines  = [];
+const markerObjs  = [];
+let   animIndex   = 0;
+let   animTimer   = null;
+let   activePanelIdx = -1;
+
+// ── Route animation ───────────────────────────────────────────
+function buildIcon(stop) {
+  return L.divIcon({
+    className: '',
+    html: `<div class="marker-wrap"><div class="marker-pin type-${stop.type}" id="mp-${stop.n}">${stop.n}</div></div>`,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17],
+  });
+}
+
+function drawNextStep() {
+  if (animIndex >= STOPS.length) {
+    onAnimComplete();
+    return;
+  }
+
+  const stop = STOPS[animIndex];
+  const isFerry = animIndex > 0 && FERRY_SEGS.has(`${animIndex - 1}-${animIndex}`);
+
+  if (animIndex > 0) {
+    const prev = STOPS[animIndex - 1];
+    // glow layer
+    L.polyline([[prev.lat, prev.lng], [stop.lat, stop.lng]], {
+      color: isFerry ? '#f6ad55' : '#4299e1',
+      weight: isFerry ? 10 : 8,
+      opacity: 0.08,
+      lineCap: 'round',
+    }).addTo(map);
+
+    // main line
+    const pl = L.polyline([[prev.lat, prev.lng], [stop.lat, stop.lng]], {
+      color: isFerry ? '#f6ad55' : '#4299e1',
+      weight: isFerry ? 2.5 : 2.5,
+      opacity: 0.85,
+      dashArray: isFerry ? '9 7' : null,
+      lineCap: 'round',
+    }).addTo(map);
+    drawnLines.push(pl);
+  }
+
+  const marker = L.marker([stop.lat, stop.lng], { icon: buildIcon(stop), zIndexOffset: stop.n })
+    .addTo(map);
+  marker.on('click', () => openPanel(animIndex));
+  markerObjs.push(marker);
+
+  animIndex++;
+  animTimer = setTimeout(drawNextStep, 230);
+}
+
+function onAnimComplete() {
+  animTimer = null;
+  countUpKm(TOTAL_KM);
+  const bounds = L.latLngBounds(STOPS.map(s => [s.lat, s.lng]));
+  setTimeout(() => map.fitBounds(bounds, { padding: [70, 70], animate: true, duration: 1.2 }), 300);
+}
+
+function resetAnimation() {
+  if (animTimer) clearTimeout(animTimer);
+  drawnLines.forEach(l => map.removeLayer(l));
+  drawnLines.length = 0;
+  markerObjs.forEach(m => map.removeLayer(m));
+  markerObjs.length = 0;
+  animIndex = 0;
+  document.getElementById('km-counter').textContent = '0';
+  closePanel();
+  map.setView([44, 8], 5, { animate: true });
+  setTimeout(drawNextStep, 600);
+}
+
+// ── KM counter ────────────────────────────────────────────────
+function countUpKm(target) {
+  const el = document.getElementById('km-counter');
+  let cur = 0;
+  const step = Math.ceil(target / 80);
+  const t = setInterval(() => {
+    cur = Math.min(cur + step, target);
+    el.textContent = cur.toLocaleString();
+    if (cur >= target) clearInterval(t);
+  }, 20);
+}
+
+// ── Panel ─────────────────────────────────────────────────────
+function openPanel(idx) {
+  activePanelIdx = idx;
+  const stop = STOPS[idx];
+  const d    = DETAILS[stop.n];
+  const pct  = Math.round((d.km / TOTAL_KM) * 100);
+
+  document.getElementById('p-emoji').textContent  = d.emoji;
+  document.getElementById('p-num').textContent     = `Stop #${stop.n} of 26`;
+  document.getElementById('p-name').textContent    = stop.name;
+  document.getElementById('p-country').textContent = `${d.flag} ${d.country}`;
+  document.getElementById('p-desc').textContent    = d.desc;
+  document.getElementById('p-km').textContent      = `${d.km.toLocaleString()} km`;
+  document.getElementById('p-pct').textContent     = `${pct}%`;
+  document.getElementById('p-prog-pct').textContent = `${pct}%`;
+
+  const bar = document.getElementById('p-prog-bar');
+  requestAnimationFrame(() => { bar.style.width = pct + '%'; });
+
+  const badge = document.getElementById('p-badge');
+  const typeLabel = stop.type === 'ferry' ? '⛴ Ferry port' : stop.type === 'start' ? '🏠 Start' : stop.type === 'end' ? '🏠 End' : '🚐 Drive';
+  badge.textContent = typeLabel;
+  badge.className   = `p-badge badge-${stop.type}`;
+
+  document.getElementById('btn-prev').toggleAttribute('disabled', idx === 0);
+  document.getElementById('btn-next').toggleAttribute('disabled', idx === STOPS.length - 1);
+
+  document.getElementById('panel').classList.add('open');
+
+  // Highlight active marker
+  document.querySelectorAll('.marker-pin').forEach(el => el.classList.remove('active'));
+  const pin = document.getElementById(`mp-${stop.n}`);
+  if (pin) pin.classList.add('active');
+
+  map.panTo([stop.lat, stop.lng], { animate: true, duration: 0.6 });
+}
+
+function closePanel() {
+  document.getElementById('panel').classList.remove('open');
+  document.querySelectorAll('.marker-pin').forEach(el => el.classList.remove('active'));
+  activePanelIdx = -1;
+}
+
+document.getElementById('p-close').addEventListener('click', closePanel);
+
+document.getElementById('btn-prev').addEventListener('click', () => {
+  if (activePanelIdx > 0) openPanel(activePanelIdx - 1);
+});
+document.getElementById('btn-next').addEventListener('click', () => {
+  if (activePanelIdx < STOPS.length - 1) openPanel(activePanelIdx + 1);
+});
+
+// close panel on map click
+map.on('click', () => closePanel());
+
+// ── Fullscreen ────────────────────────────────────────────────
+document.getElementById('btn-fs').addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+});
+
+document.addEventListener('fullscreenchange', () => {
+  document.getElementById('btn-fs').textContent = document.fullscreenElement ? '✕' : '⛶';
+});
+
+// ── Replay ────────────────────────────────────────────────────
+document.getElementById('btn-replay').addEventListener('click', resetAnimation);
+
+// ── Start ─────────────────────────────────────────────────────
+setTimeout(drawNextStep, 900);
+</script>
+
+</body>
+</html>
