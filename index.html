@@ -571,9 +571,10 @@ function drawNextStep() {
     drawnLines.push(pl);
   }
 
+  const markerIdx = animIndex;
   const marker = L.marker([stop.lat, stop.lng], { icon: buildIcon(stop), zIndexOffset: stop.n })
     .addTo(map);
-  marker.on('click', () => openPanel(animIndex));
+  marker.on('click', () => openPanel(markerIdx));
   markerObjs.push(marker);
 
   animIndex++;
