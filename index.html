@@ -243,6 +243,26 @@
     .nav-btn:hover:not([disabled]) { background: rgba(66,153,225,0.15); border-color: var(--accent); }
     .nav-btn[disabled] { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
 
+    .wiki-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: 100%;
+      margin-top: 14px;
+      padding: 11px 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.03);
+      color: #90cdf4;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+    .wiki-btn:hover { background: rgba(66,153,225,0.1); border-color: var(--accent); color: #fff; }
+    .wiki-btn svg { flex-shrink: 0; opacity: 0.7; }
+
     /* ── Custom markers ── */
     .marker-wrap {
       width: 34px; height: 34px;
@@ -412,6 +432,10 @@
         <div class="p-progress-fill" id="p-prog-bar" style="width:0%"></div>
       </div>
     </div>
+    <a class="wiki-btn" id="p-wiki" href="#" target="_blank" rel="noopener noreferrer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Read on Wikipedia
+    </a>
   </div>
   <div class="panel-nav">
     <div class="nav-btn" id="btn-prev">← Previous</div>
@@ -454,32 +478,32 @@ const STOPS = [
 const FERRY_SEGS = new Set(['6-7','9-10','11-12']);
 
 const DETAILS = {
-  1:  {emoji:'🏔', flag:'🇩🇪', country:'Germany',  km:0,    desc:'Bavarian capital — world-class beer gardens, the vibrant Marienplatz and the Alps shimmering on the southern horizon.'},
-  2:  {emoji:'🎿', flag:'🇦🇹', country:'Austria',  km:150,  desc:'Tyrolean alpine gem — the glittering Golden Roof, crisp mountain air and legendary ski resorts all within arm\'s reach.'},
-  3:  {emoji:'💌', flag:'🇮🇹', country:'Italy',    km:400,  desc:'City of Romeo & Juliet — a 2,000-year-old Roman arena that still fills with opera-goers under the summer stars.'},
-  4:  {emoji:'🎨', flag:'🇮🇹', country:'Italy',    km:650,  desc:'Cradle of the Renaissance — Botticelli in the Uffizi, Brunelleschi\'s terracotta Duomo and endless rolling Tuscan hills.'},
-  5:  {emoji:'🏛', flag:'🇮🇹', country:'Italy',    km:930,  desc:'The Eternal City — the Colosseum at golden hour, Vatican Museums at dawn and the obligatory coin tossed in Trevi Fountain.'},
-  6:  {emoji:'🍕', flag:'🇮🇹', country:'Italy',    km:1150, desc:'Birthplace of pizza — gateway to steaming Pompeii, the clifftop Amalfi Coast and Vesuvius brooding on the horizon.'},
-  7:  {emoji:'⛴',  flag:'🇮🇹', country:'Italy',    km:1580, desc:'The narrow Strait of Messina — the legendary whirlpool of Charybdis supposedly lurks here. Ferry crossing to Sicily begins.'},
-  8:  {emoji:'⚓',  flag:'🇮🇹', country:'Italy',    km:1583, desc:'First taste of Sicily — arrival in the city guarding the strait, ancient mosaics and a famous swordfish market.'},
-  9:  {emoji:'🌋', flag:'🇮🇹', country:'Italy',    km:1685, desc:'Europe\'s highest active volcano — Mt Etna\'s lava fields loom over this Greek-founded port city full of baroque piazzas.'},
-  10: {emoji:'🌊', flag:'🇮🇹', country:'Italy',    km:1820, desc:'Sicily\'s vibrant capital — Arab-Norman cathedrals, the chaotic Ballaró street market and a ferry west towards Sardinia.'},
-  11: {emoji:'🏝', flag:'🇮🇹', country:'Italy',    km:2120, desc:'Sardinia\'s sun-bleached capital arrived via an overnight ferry — Roman ruins, pink flamingos and some of Italy\'s best pasta.'},
-  12: {emoji:'🏖', flag:'🇮🇹', country:'Italy',    km:2395, desc:'Northern Sardinian port town — the impossibly turquoise Costa Smeralda is just a short drive from here.'},
-  13: {emoji:'⛵',  flag:'🇮🇹', country:'Italy',    km:2725, desc:'Back on the Italian mainland — city of ten fortresses, the Leaning Tower a short hop away and superb seafood.'},
-  14: {emoji:'🛳', flag:'🇮🇹', country:'Italy',    km:2895, desc:'Italy\'s largest port and birthplace of Christopher Columbus, basil pesto and a celebrated annual boat show.'},
-  15: {emoji:'🌴', flag:'🇫🇷', country:'France',   km:3070, desc:'The French Riviera — Promenade des Anglais bathed in eternal sunshine, Monaco just 20 km east along the coast.'},
-  16: {emoji:'☀️', flag:'🇫🇷', country:'France',   km:3390, desc:'Southern France at its liveliest — a thriving university city with a medieval historic centre and beaches minutes away.'},
-  17: {emoji:'🏗', flag:'🇪🇸', country:'Spain',    km:3710, desc:'Gaudí\'s playground — Sagrada Família under perpetual construction, Park Güell mosaics and tapas on every corner of La Barceloneta.'},
-  18: {emoji:'🥘', flag:'🇪🇸', country:'Spain',    km:4075, desc:'City of Arts & Sciences — birthplace of paella, a stunning medieval old town and a half-hour drive from the Mar Menor.'},
-  19: {emoji:'🌿', flag:'🇪🇸', country:'Spain',    km:4335, desc:'Warm Mediterranean city famous for its ornate baroque cathedral, the spring flower-carpet festival and excellent tapas culture.'},
-  20: {emoji:'🏰', flag:'🇪🇸', country:'Spain',    km:4610, desc:'The incomparable Alhambra fortress palace — intricate Nasrid tile-work and reflecting pools set against snow-capped Sierra Nevada.'},
-  21: {emoji:'🎨', flag:'🇪🇸', country:'Spain',    km:4740, desc:'Picasso\'s birthplace on the Costa del Sol — 320 days of sunshine a year, a renovated historic centre and perfect beaches.'},
-  22: {emoji:'💃', flag:'🇪🇸', country:'Spain',    km:4960, desc:'The soul of flamenco — the Alcázar palace, the soaring Giralda tower and some of Europe\'s finest tapas bars in the Triana quarter.'},
-  23: {emoji:'🕌', flag:'🇪🇸', country:'Spain',    km:5815, desc:'Northern Spain\'s crossroads — the dazzling twin-towered Basilica del Pilar mirrors perfectly in the Ebro river below.'},
-  24: {emoji:'🍷', flag:'🇫🇷', country:'France',   km:6440, desc:'Gastronomic capital of France — Paul Bocuse\'s legacy lives at the confluence of the Rhône and Saône, Lyon\'s lights shimmer at night.'},
-  25: {emoji:'🎄', flag:'🇫🇷', country:'France',   km:6925, desc:'Christmas capital of Europe — the half-timbered Alsatian old town, the EU quarter and a Gothic cathedral that took 400 years to build.'},
-  26: {emoji:'🏠', flag:'🇩🇪', country:'Germany',  km:7325, desc:'Back home in Munich — 7,325 km across 6 countries, 3 sea crossings and memories that will last a lifetime.'},
+  1:  {emoji:'🏔', flag:'🇩🇪', country:'Germany',  km:0,    wiki:'https://en.wikipedia.org/wiki/Munich',              desc:'Bavarian capital — world-class beer gardens, the vibrant Marienplatz and the Alps shimmering on the southern horizon.'},
+  2:  {emoji:'🎿', flag:'🇦🇹', country:'Austria',  km:150,  wiki:'https://en.wikipedia.org/wiki/Innsbruck',            desc:'Tyrolean alpine gem — the glittering Golden Roof, crisp mountain air and legendary ski resorts all within arm\'s reach.'},
+  3:  {emoji:'💌', flag:'🇮🇹', country:'Italy',    km:400,  wiki:'https://en.wikipedia.org/wiki/Verona',               desc:'City of Romeo & Juliet — a 2,000-year-old Roman arena that still fills with opera-goers under the summer stars.'},
+  4:  {emoji:'🎨', flag:'🇮🇹', country:'Italy',    km:650,  wiki:'https://en.wikipedia.org/wiki/Florence',             desc:'Cradle of the Renaissance — Botticelli in the Uffizi, Brunelleschi\'s terracotta Duomo and endless rolling Tuscan hills.'},
+  5:  {emoji:'🏛', flag:'🇮🇹', country:'Italy',    km:930,  wiki:'https://en.wikipedia.org/wiki/Rome',                 desc:'The Eternal City — the Colosseum at golden hour, Vatican Museums at dawn and the obligatory coin tossed in Trevi Fountain.'},
+  6:  {emoji:'🍕', flag:'🇮🇹', country:'Italy',    km:1150, wiki:'https://en.wikipedia.org/wiki/Naples',               desc:'Birthplace of pizza — gateway to steaming Pompeii, the clifftop Amalfi Coast and Vesuvius brooding on the horizon.'},
+  7:  {emoji:'⛴',  flag:'🇮🇹', country:'Italy',    km:1580, wiki:'https://en.wikipedia.org/wiki/Villa_San_Giovanni',   desc:'The narrow Strait of Messina — the legendary whirlpool of Charybdis supposedly lurks here. Ferry crossing to Sicily begins.'},
+  8:  {emoji:'⚓',  flag:'🇮🇹', country:'Italy',    km:1583, wiki:'https://en.wikipedia.org/wiki/Messina',              desc:'First taste of Sicily — arrival in the city guarding the strait, ancient mosaics and a famous swordfish market.'},
+  9:  {emoji:'🌋', flag:'🇮🇹', country:'Italy',    km:1685, wiki:'https://en.wikipedia.org/wiki/Catania',              desc:'Europe\'s highest active volcano — Mt Etna\'s lava fields loom over this Greek-founded port city full of baroque piazzas.'},
+  10: {emoji:'🌊', flag:'🇮🇹', country:'Italy',    km:1820, wiki:'https://en.wikipedia.org/wiki/Palermo',              desc:'Sicily\'s vibrant capital — Arab-Norman cathedrals, the chaotic Ballaró street market and a ferry west towards Sardinia.'},
+  11: {emoji:'🏝', flag:'🇮🇹', country:'Italy',    km:2120, wiki:'https://en.wikipedia.org/wiki/Cagliari',             desc:'Sardinia\'s sun-bleached capital arrived via an overnight ferry — Roman ruins, pink flamingos and some of Italy\'s best pasta.'},
+  12: {emoji:'🏖', flag:'🇮🇹', country:'Italy',    km:2395, wiki:'https://en.wikipedia.org/wiki/Olbia',                desc:'Northern Sardinian port town — the impossibly turquoise Costa Smeralda is just a short drive from here.'},
+  13: {emoji:'⛵',  flag:'🇮🇹', country:'Italy',    km:2725, wiki:'https://en.wikipedia.org/wiki/Livorno',              desc:'Back on the Italian mainland — city of ten fortresses, the Leaning Tower a short hop away and superb seafood.'},
+  14: {emoji:'🛳', flag:'🇮🇹', country:'Italy',    km:2895, wiki:'https://en.wikipedia.org/wiki/Genoa',                desc:'Italy\'s largest port and birthplace of Christopher Columbus, basil pesto and a celebrated annual boat show.'},
+  15: {emoji:'🌴', flag:'🇫🇷', country:'France',   km:3070, wiki:'https://en.wikipedia.org/wiki/Nice',                 desc:'The French Riviera — Promenade des Anglais bathed in eternal sunshine, Monaco just 20 km east along the coast.'},
+  16: {emoji:'☀️', flag:'🇫🇷', country:'France',   km:3390, wiki:'https://en.wikipedia.org/wiki/Montpellier',          desc:'Southern France at its liveliest — a thriving university city with a medieval historic centre and beaches minutes away.'},
+  17: {emoji:'🏗', flag:'🇪🇸', country:'Spain',    km:3710, wiki:'https://en.wikipedia.org/wiki/Barcelona',            desc:'Gaudí\'s playground — Sagrada Família under perpetual construction, Park Güell mosaics and tapas on every corner of La Barceloneta.'},
+  18: {emoji:'🥘', flag:'🇪🇸', country:'Spain',    km:4075, wiki:'https://en.wikipedia.org/wiki/Valencia',             desc:'City of Arts & Sciences — birthplace of paella, a stunning medieval old town and a half-hour drive from the Mar Menor.'},
+  19: {emoji:'🌿', flag:'🇪🇸', country:'Spain',    km:4335, wiki:'https://en.wikipedia.org/wiki/Murcia',               desc:'Warm Mediterranean city famous for its ornate baroque cathedral, the spring flower-carpet festival and excellent tapas culture.'},
+  20: {emoji:'🏰', flag:'🇪🇸', country:'Spain',    km:4610, wiki:'https://en.wikipedia.org/wiki/Granada',              desc:'The incomparable Alhambra fortress palace — intricate Nasrid tile-work and reflecting pools set against snow-capped Sierra Nevada.'},
+  21: {emoji:'🎨', flag:'🇪🇸', country:'Spain',    km:4740, wiki:'https://en.wikipedia.org/wiki/M%C3%A1laga',          desc:'Picasso\'s birthplace on the Costa del Sol — 320 days of sunshine a year, a renovated historic centre and perfect beaches.'},
+  22: {emoji:'💃', flag:'🇪🇸', country:'Spain',    km:4960, wiki:'https://en.wikipedia.org/wiki/Seville',              desc:'The soul of flamenco — the Alcázar palace, the soaring Giralda tower and some of Europe\'s finest tapas bars in the Triana quarter.'},
+  23: {emoji:'🕌', flag:'🇪🇸', country:'Spain',    km:5815, wiki:'https://en.wikipedia.org/wiki/Zaragoza',             desc:'Northern Spain\'s crossroads — the dazzling twin-towered Basilica del Pilar mirrors perfectly in the Ebro river below.'},
+  24: {emoji:'🍷', flag:'🇫🇷', country:'France',   km:6440, wiki:'https://en.wikipedia.org/wiki/Lyon',                 desc:'Gastronomic capital of France — Paul Bocuse\'s legacy lives at the confluence of the Rhône and Saône, Lyon\'s lights shimmer at night.'},
+  25: {emoji:'🎄', flag:'🇫🇷', country:'France',   km:6925, wiki:'https://en.wikipedia.org/wiki/Strasbourg',           desc:'Christmas capital of Europe — the half-timbered Alsatian old town, the EU quarter and a Gothic cathedral that took 400 years to build.'},
+  26: {emoji:'🏠', flag:'🇩🇪', country:'Germany',  km:7325, wiki:'https://en.wikipedia.org/wiki/Munich',              desc:'Back home in Munich — 7,325 km across 6 countries, 3 sea crossings and memories that will last a lifetime.'},
 };
 
 const TOTAL_KM = 7325;
@@ -603,6 +627,7 @@ function openPanel(idx) {
   document.getElementById('p-km').textContent      = `${d.km.toLocaleString()} km`;
   document.getElementById('p-pct').textContent     = `${pct}%`;
   document.getElementById('p-prog-pct').textContent = `${pct}%`;
+  document.getElementById('p-wiki').href = d.wiki;
 
   const bar = document.getElementById('p-prog-bar');
   requestAnimationFrame(() => { bar.style.width = pct + '%'; });
