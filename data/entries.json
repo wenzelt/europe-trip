@@ -38,8 +38,45 @@
         "Feste Unterkünfte statt Campervan",
         "Blogeinträge erscheinen automatisch auf der Karte"
       ],
-      "tags": ["Planung", "Roadtrip"],
+      "tags": [
+        "Planung",
+        "Roadtrip"
+      ],
       "cover_image": null,
+      "gallery": [],
+      "links": []
+    },
+    {
+      "id": "klettern-flintsbach-2026-08-28",
+      "title": "Klettern in Flintsbach",
+      "date": "2026-08-28",
+      "status": "besucht",
+      "published": true,
+      "route_order": 2,
+      "location": {
+        "name": "Flintsbach am Inn",
+        "region": "Bayern",
+        "country": "Deutschland",
+        "country_code": "DE",
+        "lat": 47.7257,
+        "lng": 12.1237
+      },
+      "summary": "Heute waren wir in Flintsbach am Inn klettern – ein gemeinsamer Nachmittag am grauen Fels, eingerahmt von Bäumen und spätsommerlichem Licht.",
+      "body": [
+        "Heute ging es für uns nach Flintsbach am Inn zum Klettern. Zwischen Bäumen und grauem Fels suchten wir uns unsere Linie nach oben und genossen die gemeinsame Zeit draußen.",
+        "Das Foto hält den Moment fest, in dem wir nebeneinander über die geneigte Felsplatte klettern. Ein schöner erster Erlebnisbericht in unserem neuen Roadtrip-Journal."
+      ],
+      "highlights": [
+        "Gemeinsam am Fels",
+        "Spätsommerlicht zwischen den Bäumen",
+        "Erster Erlebnisbericht im neuen Journal"
+      ],
+      "tags": [
+        "Klettern",
+        "Flintsbach",
+        "Bayern"
+      ],
+      "cover_image": "assets/posts/klettern-flintsbach-2026-08-28/klettern-flintsbach-2026-08-28.jpeg",
       "gallery": [],
       "links": []
     }
