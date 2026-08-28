@@ -1,693 +1,605 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🚐 Winter Campervan — Munich Loop</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Unser Europa-Roadtrip mit dem Auto – Orte, Geschichten und Pläne auf einer interaktiven Karte.">
+  <title>Europa Roadtrip Journal</title>
+  <link rel="preconnect" href="https://unpkg.com">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     :root {
-      --bg: #0d1b2a;
-      --panel: rgba(10, 20, 35, 0.94);
-      --accent: #4299e1;
-      --ferry: #f6ad55;
-      --start: #68d391;
-      --text: #e2e8f0;
-      --muted: #718096;
-      --border: rgba(66, 153, 225, 0.18);
-      --shadow: 0 8px 40px rgba(0,0,0,0.55);
+      color-scheme: light;
+      --ink: #17352f;
+      --muted: #6c7c76;
+      --paper: #f7f3eb;
+      --card: #fffdf8;
+      --line: #ded8cc;
+      --green: #215f50;
+      --green-soft: #d9e9df;
+      --terracotta: #c86445;
+      --sun: #e8b44f;
+      --shadow: 0 18px 50px rgba(27, 52, 45, .11);
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
     body {
-      background: var(--bg);
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      height: 100dvh;
-      overflow: hidden;
-      color: var(--text);
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
+    button, input { font: inherit; }
+    button { color: inherit; }
 
-    #map { width: 100%; height: 100%; }
-
-    /* ── Header ── */
-    #header {
+    .site-header {
+      min-height: 210px;
+      padding: 36px clamp(20px, 5vw, 72px) 32px;
+      color: #fff;
+      background:
+        radial-gradient(circle at 80% 20%, rgba(232,180,79,.35), transparent 28%),
+        linear-gradient(125deg, #163f36, #26705d 58%, #3f816f);
+      position: relative;
+      overflow: hidden;
+    }
+    .site-header::after {
+      content: "";
       position: absolute;
-      top: 0; left: 0; right: 0;
-      z-index: 1000;
-      background: linear-gradient(180deg, rgba(10,20,35,0.92) 0%, rgba(10,20,35,0.5) 70%, transparent 100%);
-      padding: 18px 20px 56px;
+      inset: auto -5% -54px;
+      height: 100px;
+      background: var(--paper);
+      transform: rotate(-2deg);
+      transform-origin: left;
+    }
+    .header-inner { position: relative; z-index: 1; max-width: 1300px; margin: 0 auto; }
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      margin: 0 0 14px;
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: #d9eadf;
+    }
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.35rem, 5.4vw, 5rem);
+      font-weight: 500;
+      line-height: .98;
+      letter-spacing: -.045em;
+    }
+    .subtitle { max-width: 660px; margin: 18px 0 0; color: #deebe6; font-size: clamp(.95rem, 1.5vw, 1.12rem); line-height: 1.55; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(340px, 480px) minmax(420px, 1fr);
+      gap: 22px;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 16px clamp(16px, 3vw, 44px) 44px;
+    }
+    .journal { min-width: 0; }
+    .map-shell {
+      position: sticky;
+      top: 18px;
+      height: calc(100vh - 36px);
+      min-height: 560px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      background: #d7ddd6;
+    }
+    #map { width: 100%; height: 100%; }
+    .map-title {
+      position: absolute;
+      z-index: 500;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
       pointer-events: none;
     }
-
-    .h-row { display: flex; align-items: center; gap: 12px; }
-    .h-icon { font-size: 2rem; }
-    .h-title { font-size: 1.05rem; font-weight: 700; color: #fff; letter-spacing: 0.3px; }
-    .h-sub { font-size: 0.68rem; color: var(--accent); margin-top: 3px; letter-spacing: 0.4px; }
-
-    /* ── Stats bar ── */
-    #stats {
-      position: absolute;
-      bottom: 24px; left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 50px;
-      padding: 11px 28px;
-      display: flex;
-      gap: 28px;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: var(--shadow);
-      white-space: nowrap;
+    .map-badge {
+      padding: 10px 14px;
+      border: 1px solid rgba(255,255,255,.75);
+      border-radius: 999px;
+      background: rgba(255,253,248,.92);
+      box-shadow: 0 6px 22px rgba(23,53,47,.14);
+      backdrop-filter: blur(10px);
+      color: var(--green);
+      font-size: .78rem;
+      font-weight: 800;
     }
 
-    .stat { text-align: center; }
-    .stat-val { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
-    .stat-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-top: 2px; }
-
-    /* ── Fullscreen button ── */
-    #btn-fs {
-      position: absolute;
-      top: 20px; right: 56px;
-      z-index: 1000;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      width: 34px; height: 34px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      font-size: 0.85rem;
-      color: var(--muted);
-      transition: color 0.2s, border-color 0.2s;
+    .toolbar {
+      margin-bottom: 16px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,253,248,.74);
     }
-    #btn-fs:hover { color: #fff; border-color: var(--accent); }
-
-    /* ── Replay button ── */
-    #btn-replay {
-      position: absolute;
-      top: 60px; right: 56px;
-      z-index: 1000;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      width: 34px; height: 34px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      font-size: 0.85rem;
-      color: var(--muted);
-      transition: color 0.2s, border-color 0.2s;
-    }
-    #btn-replay:hover { color: #fff; border-color: var(--accent); }
-
-    /* ── Stop panel ── */
-    #panel {
-      position: absolute;
-      top: 0; right: 0; bottom: 0;
-      width: min(380px, 100vw);
-      background: var(--panel);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border-left: 1px solid var(--border);
-      z-index: 1001;
-      transform: translateX(102%);
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      flex-direction: column;
-      box-shadow: -8px 0 40px rgba(0,0,0,0.4);
-    }
-
-    #panel.open { transform: translateX(0); }
-
-    .panel-head {
-      padding: 22px 20px 18px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-    }
-
-    .p-emoji { font-size: 2.6rem; flex-shrink: 0; line-height: 1; margin-top: 2px; }
-
-    .p-info { flex: 1; min-width: 0; }
-    .p-num { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); }
-    .p-name { font-size: 1.25rem; font-weight: 700; color: #fff; margin: 5px 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .p-country { font-size: 0.78rem; color: var(--accent); }
-
-    .p-close {
-      font-size: 1.5rem;
-      color: var(--muted);
-      cursor: pointer;
-      padding: 0 4px;
-      transition: color 0.2s;
-      line-height: 1;
-      flex-shrink: 0;
-    }
-    .p-close:hover { color: #fff; }
-
-    .panel-body { padding: 20px; flex: 1; overflow-y: auto; }
-
-    .p-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 14px;
-    }
-
-    .badge-drive  { background: rgba(66,153,225,0.12); color: var(--accent); border: 1px solid rgba(66,153,225,0.25); }
-    .badge-ferry  { background: rgba(246,173,85,0.12); color: var(--ferry); border: 1px solid rgba(246,173,85,0.25); }
-    .badge-start  { background: rgba(104,211,145,0.12); color: var(--start); border: 1px solid rgba(104,211,145,0.25); }
-    .badge-end    { background: rgba(104,211,145,0.12); color: var(--start); border: 1px solid rgba(104,211,145,0.25); }
-
-    .p-desc {
-      font-size: 0.88rem;
-      line-height: 1.65;
-      color: #a0aec0;
-      margin-bottom: 20px;
-    }
-
-    .p-km-card {
-      background: rgba(66,153,225,0.06);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
-      display: flex;
-      gap: 16px;
-    }
-
-    .p-km-item { flex: 1; }
-    .p-km-val { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
-    .p-km-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-top: 2px; }
-
-    /* Progress bar */
-    .p-progress {
-      margin-top: 16px;
-    }
-
-    .p-progress-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.62rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .p-progress-bar {
-      height: 4px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .p-progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), #667eea);
-      border-radius: 4px;
-      transition: width 0.6s ease;
-    }
-
-    .panel-nav {
-      padding: 16px 20px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 8px;
-    }
-
-    .nav-btn {
-      flex: 1;
-      padding: 10px 8px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: rgba(66,153,225,0.06);
-      color: var(--accent);
-      cursor: pointer;
-      font-size: 0.78rem;
-      font-weight: 600;
-      text-align: center;
-      transition: background 0.2s, border-color 0.2s;
-      user-select: none;
-    }
-    .nav-btn:hover:not([disabled]) { background: rgba(66,153,225,0.15); border-color: var(--accent); }
-    .nav-btn[disabled] { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
-
-    .wiki-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
+    .search {
       width: 100%;
-      margin-top: 14px;
-      padding: 11px 16px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: rgba(255,255,255,0.03);
-      color: #90cdf4;
-      text-decoration: none;
-      font-size: 0.8rem;
-      font-weight: 600;
-      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      outline: none;
+      background: #fff;
+      color: var(--ink);
     }
-    .wiki-btn:hover { background: rgba(66,153,225,0.1); border-color: var(--accent); color: #fff; }
-    .wiki-btn svg { flex-shrink: 0; opacity: 0.7; }
-
-    /* ── Custom markers ── */
-    .marker-wrap {
-      width: 34px; height: 34px;
-      display: flex; align-items: center; justify-content: center;
+    .search:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(33,95,80,.12); }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .filter {
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
       cursor: pointer;
+      font-size: .78rem;
+      font-weight: 700;
     }
+    .filter:hover, .filter[aria-pressed="true"] { border-color: var(--green); background: var(--green); color: #fff; }
 
-    .marker-pin {
-      width: 32px; height: 32px;
+    .summary-row { display: flex; gap: 10px; margin: 0 0 16px; }
+    .summary-item {
+      flex: 1;
+      padding: 13px 14px;
+      border-left: 3px solid var(--terracotta);
+      background: rgba(255,255,255,.5);
+    }
+    .summary-value { display: block; font-family: Georgia, serif; font-size: 1.35rem; }
+    .summary-label { color: var(--muted); font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+
+    .entry-list { display: grid; gap: 14px; }
+    .entry-card {
+      width: 100%;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--card);
+      box-shadow: 0 8px 28px rgba(23,53,47,.06);
+      text-align: left;
+      cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .entry-card:hover, .entry-card:focus-visible { transform: translateY(-2px); border-color: #b8c7c0; box-shadow: var(--shadow); outline: none; }
+    .card-image { display: block; width: 100%; aspect-ratio: 16/8; object-fit: cover; background: #dce6df; }
+    .card-body { padding: 18px; }
+    .card-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; color: var(--muted); font-size: .74rem; font-weight: 700; }
+    .status { padding: 4px 8px; border-radius: 999px; background: var(--green-soft); color: var(--green); text-transform: capitalize; }
+    .status-unterwegs { background: #fff0cc; color: #79530b; }
+    .status-besucht { background: #e3e8f5; color: #384d83; }
+    .status-idee { background: #f0e6f4; color: #71477e; }
+    .card-title { margin: 0 0 9px; font-family: Georgia, serif; font-size: 1.5rem; font-weight: 600; line-height: 1.14; }
+    .card-summary { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.55; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 15px; color: var(--green); font-size: .78rem; font-weight: 800; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag { color: var(--muted); font-size: .7rem; font-weight: 650; }
+
+    .empty, .error {
+      padding: 28px;
+      border: 1px dashed var(--line);
+      border-radius: 18px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .error { border-color: #d7a497; background: #fff6f3; color: #7e3927; }
+
+    dialog {
+      width: min(720px, calc(100vw - 28px));
+      max-height: calc(100vh - 28px);
+      padding: 0;
+      overflow: auto;
+      border: 0;
+      border-radius: 24px;
+      background: var(--card);
+      color: var(--ink);
+      box-shadow: 0 30px 90px rgba(12,36,30,.35);
+    }
+    dialog::backdrop { background: rgba(11,35,29,.6); backdrop-filter: blur(5px); }
+    .dialog-close {
+      position: sticky;
+      z-index: 2;
+      top: 14px;
+      float: right;
+      margin: 14px 14px -58px 0;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255,255,255,.8);
       border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; font-weight: 800;
-      border: 2px solid rgba(255,255,255,0.45);
-      transition: transform 0.2s, box-shadow 0.2s;
-      position: relative;
+      background: rgba(255,253,248,.94);
+      cursor: pointer;
+      font-size: 1.25rem;
     }
+    .article-cover { display: block; width: 100%; max-height: 390px; object-fit: cover; background: var(--green-soft); }
+    .article { padding: clamp(24px, 5vw, 52px); }
+    .article h2 { margin: 8px 0 16px; font-family: Georgia, serif; font-size: clamp(2rem, 5vw, 3.7rem); font-weight: 500; line-height: 1.03; letter-spacing: -.035em; }
+    .article-location { color: var(--terracotta); font-weight: 800; }
+    .article p { color: #445b54; line-height: 1.75; }
+    .article h3 { margin-top: 30px; font-family: Georgia, serif; font-size: 1.25rem; }
+    .article ul { padding-left: 20px; color: #445b54; line-height: 1.7; }
+    .article-links { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 26px; }
+    .article-links a { padding: 9px 12px; border-radius: 10px; background: var(--green-soft); color: var(--green); font-weight: 750; text-decoration: none; }
+    .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 24px; }
+    .gallery img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 12px; }
 
-    .marker-pin.type-start,
-    .marker-pin.type-end {
-      background: #1c4532;
-      color: var(--start);
-      border-color: var(--start);
-      box-shadow: 0 0 0 4px rgba(104,211,145,0.2), 0 4px 14px rgba(0,0,0,0.5);
+    .route-marker {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 3px solid #fff;
+      border-radius: 50% 50% 50% 10%;
+      transform: rotate(-45deg);
+      background: var(--terracotta);
+      box-shadow: 0 6px 16px rgba(23,53,47,.28);
+      color: #fff;
+      font-weight: 900;
     }
+    .route-marker span { transform: rotate(45deg); font-size: .72rem; }
+    .leaflet-popup-content-wrapper { border-radius: 14px; box-shadow: var(--shadow); }
+    .popup-title { display: block; margin-bottom: 4px; color: var(--ink); font-weight: 850; }
+    .popup-meta { color: var(--muted); font-size: .75rem; }
 
-    .marker-pin.type-ferry {
-      background: #5a3010;
-      color: var(--ferry);
-      border-color: var(--ferry);
-      box-shadow: 0 0 0 4px rgba(246,173,85,0.2), 0 4px 14px rgba(0,0,0,0.5);
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .map-shell { position: relative; top: auto; grid-row: 1; height: 55vh; min-height: 420px; }
+      .journal { grid-row: 2; }
     }
-
-    .marker-pin.type-drive {
-      background: #1a365d;
-      color: var(--accent);
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(66,153,225,0.15), 0 4px 14px rgba(0,0,0,0.5);
+    @media (max-width: 520px) {
+      .site-header { min-height: 190px; padding-top: 26px; }
+      .layout { padding-inline: 10px; }
+      .map-shell { height: 48vh; min-height: 350px; border-radius: 18px; }
+      .summary-row { gap: 4px; }
+      .summary-item { padding-inline: 10px; }
+      .gallery { grid-template-columns: 1fr; }
     }
-
-    .marker-pin.active {
-      transform: scale(1.25);
-      z-index: 999;
-    }
-
-    .marker-pin.type-start.active,
-    .marker-pin.type-end.active {
-      box-shadow: 0 0 0 6px rgba(104,211,145,0.35), 0 6px 20px rgba(0,0,0,0.6);
-    }
-
-    .marker-pin.type-ferry.active {
-      box-shadow: 0 0 0 6px rgba(246,173,85,0.35), 0 6px 20px rgba(0,0,0,0.6);
-    }
-
-    .marker-pin.type-drive.active {
-      box-shadow: 0 0 0 6px rgba(66,153,225,0.35), 0 6px 20px rgba(0,0,0,0.6);
-    }
-
-    /* Pulse on start */
-    @keyframes pulse {
-      0%   { box-shadow: 0 0 0 0 rgba(104,211,145,0.5), 0 4px 14px rgba(0,0,0,0.5); }
-      70%  { box-shadow: 0 0 0 10px rgba(104,211,145,0), 0 4px 14px rgba(0,0,0,0.5); }
-      100% { box-shadow: 0 0 0 0 rgba(104,211,145,0), 0 4px 14px rgba(0,0,0,0.5); }
-    }
-
-    .marker-pin.type-start {
-      animation: pulse 2s infinite;
-    }
-
-    /* ── Leaflet overrides ── */
-    .leaflet-control-zoom a {
-      background: var(--panel) !important;
-      border-color: var(--border) !important;
-      color: var(--muted) !important;
-      backdrop-filter: blur(16px) !important;
-    }
-    .leaflet-control-zoom a:hover { color: #fff !important; }
-    .leaflet-control-attribution {
-      background: rgba(10,20,35,0.7) !important;
-      color: var(--muted) !important;
-      backdrop-filter: blur(8px) !important;
-    }
-    .leaflet-control-attribution a { color: var(--accent) !important; }
-
-    /* ── Mobile ── */
-    @media (max-width: 600px) {
-      #stats {
-        left: 12px; right: 12px;
-        transform: none;
-        border-radius: 16px;
-        justify-content: space-between;
-        gap: 0;
-        padding: 10px 18px;
-        bottom: 16px;
-      }
-
-      .stat-val { font-size: 0.95rem; }
-
-      #panel {
-        top: auto;
-        height: 62vh;
-        width: 100%;
-        transform: translateY(105%);
-        border-left: none;
-        border-top: 1px solid var(--border);
-        border-radius: 18px 18px 0 0;
-        box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
-      }
-
-      #panel.open { transform: translateY(0); }
-
-      #btn-fs, #btn-replay { display: none; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
     }
   </style>
 </head>
 <body>
-
-<div id="map"></div>
-
-<div id="header">
-  <div class="h-row">
-    <div class="h-icon">🚐</div>
-    <div>
-      <div class="h-title">Winter Campervan — Munich Loop</div>
-      <div class="h-sub">26 stops &nbsp;·&nbsp; 3 ferries &nbsp;·&nbsp; 6 countries &nbsp;·&nbsp; ~8,500 km</div>
+  <header class="site-header">
+    <div class="header-inner">
+      <p class="eyebrow">🚗 Auto · 🏡 Airbnbs · 📍 Europa</p>
+      <h1 id="trip-title">Europa Roadtrip Journal</h1>
+      <p class="subtitle" id="trip-subtitle">Orte, Geschichten und Pläne auf einer interaktiven Karte.</p>
     </div>
-  </div>
-</div>
+  </header>
 
-<div id="stats">
-  <div class="stat"><div class="stat-val">26</div><div class="stat-label">Stops</div></div>
-  <div class="stat"><div class="stat-val">6</div><div class="stat-label">Countries</div></div>
-  <div class="stat"><div class="stat-val">3</div><div class="stat-label">Ferries</div></div>
-  <div class="stat"><div class="stat-val" id="km-counter">0</div><div class="stat-label">km driven</div></div>
-</div>
-
-<div id="btn-fs" title="Fullscreen">⛶</div>
-<div id="btn-replay" title="Replay animation">↺</div>
-
-<div id="panel">
-  <div class="panel-head">
-    <div class="p-emoji" id="p-emoji">🏔</div>
-    <div class="p-info">
-      <div class="p-num" id="p-num">Stop #1 of 26</div>
-      <div class="p-name" id="p-name">Munich</div>
-      <div class="p-country" id="p-country">🇩🇪 Germany</div>
-    </div>
-    <div class="p-close" id="p-close">×</div>
-  </div>
-  <div class="panel-body">
-    <span class="p-badge badge-start" id="p-badge">Start</span>
-    <p class="p-desc" id="p-desc"></p>
-    <div class="p-km-card">
-      <div class="p-km-item">
-        <div class="p-km-val" id="p-km">0 km</div>
-        <div class="p-km-label">from Munich</div>
+  <main class="layout">
+    <section class="journal" aria-label="Reisetagebuch">
+      <div class="toolbar">
+        <label for="search" class="eyebrow" style="color:var(--green); margin-bottom:9px">Journal durchsuchen</label>
+        <input class="search" id="search" type="search" placeholder="Ort, Land, Tag oder Text …" autocomplete="off">
+        <div class="filters" id="filters" aria-label="Nach Status filtern">
+          <button class="filter" type="button" data-filter="alle" aria-pressed="true">Alle</button>
+          <button class="filter" type="button" data-filter="idee" aria-pressed="false">Ideen</button>
+          <button class="filter" type="button" data-filter="geplant" aria-pressed="false">Geplant</button>
+          <button class="filter" type="button" data-filter="unterwegs" aria-pressed="false">Unterwegs</button>
+          <button class="filter" type="button" data-filter="besucht" aria-pressed="false">Besucht</button>
+        </div>
       </div>
-      <div class="p-km-item">
-        <div class="p-km-val" id="p-pct">0%</div>
-        <div class="p-km-label">of total trip</div>
+
+      <div class="summary-row" aria-label="Reisestatistik">
+        <div class="summary-item"><strong class="summary-value" id="place-count">–</strong><span class="summary-label">Orte</span></div>
+        <div class="summary-item"><strong class="summary-value" id="country-count">–</strong><span class="summary-label">Länder</span></div>
+        <div class="summary-item"><strong class="summary-value" id="entry-count">–</strong><span class="summary-label">Einträge</span></div>
       </div>
-    </div>
-    <div class="p-progress">
-      <div class="p-progress-label">
-        <span>Munich</span><span id="p-prog-pct">0%</span>
+
+      <div class="entry-list" id="entry-list" aria-live="polite">
+        <p class="empty">Einträge werden geladen …</p>
       </div>
-      <div class="p-progress-bar">
-        <div class="p-progress-fill" id="p-prog-bar" style="width:0%"></div>
-      </div>
-    </div>
-    <a class="wiki-btn" id="p-wiki" href="#" target="_blank" rel="noopener noreferrer">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      Read on Wikipedia
-    </a>
-  </div>
-  <div class="panel-nav">
-    <div class="nav-btn" id="btn-prev">← Previous</div>
-    <div class="nav-btn" id="btn-next">Next →</div>
-  </div>
-</div>
+    </section>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-const STOPS = [
-  {n:1,  name:'Munich',             lat:48.1351, lng:11.5820, type:'start'},
-  {n:2,  name:'Innsbruck',          lat:47.2692, lng:11.4041, type:'drive'},
-  {n:3,  name:'Verona',             lat:45.4384, lng:10.9916, type:'drive'},
-  {n:4,  name:'Florence',           lat:43.7696, lng:11.2558, type:'drive'},
-  {n:5,  name:'Rome',               lat:41.9028, lng:12.4964, type:'drive'},
-  {n:6,  name:'Naples',             lat:40.8518, lng:14.2681, type:'drive'},
-  {n:7,  name:'Villa San Giovanni', lat:38.2167, lng:15.6333, type:'ferry'},
-  {n:8,  name:'Messina',            lat:38.1938, lng:15.5540, type:'ferry'},
-  {n:9,  name:'Catania / Etna',     lat:37.5079, lng:15.0830, type:'drive'},
-  {n:10, name:'Palermo',            lat:38.1157, lng:13.3615, type:'ferry'},
-  {n:11, name:'Cagliari',           lat:39.2238, lng:9.1217,  type:'ferry'},
-  {n:12, name:'Olbia',              lat:40.9236, lng:9.4964,  type:'ferry'},
-  {n:13, name:'Livorno',            lat:43.5485, lng:10.3106, type:'ferry'},
-  {n:14, name:'Genoa',              lat:44.4056, lng:8.9463,  type:'drive'},
-  {n:15, name:'Nice',               lat:43.7102, lng:7.2620,  type:'drive'},
-  {n:16, name:'Montpellier',        lat:43.6119, lng:3.8772,  type:'drive'},
-  {n:17, name:'Barcelona',          lat:41.3851, lng:2.1734,  type:'drive'},
-  {n:18, name:'Valencia',           lat:39.4699, lng:-0.3763, type:'drive'},
-  {n:19, name:'Murcia',             lat:37.9922, lng:-1.1307, type:'drive'},
-  {n:20, name:'Granada',            lat:37.1773, lng:-3.5986, type:'drive'},
-  {n:21, name:'Málaga',             lat:36.7213, lng:-4.4214, type:'drive'},
-  {n:22, name:'Seville',            lat:37.3891, lng:-5.9845, type:'drive'},
-  {n:23, name:'Zaragoza',           lat:41.6488, lng:-0.8891, type:'drive'},
-  {n:24, name:'Lyon',               lat:45.7640, lng:4.8357,  type:'drive'},
-  {n:25, name:'Strasbourg',         lat:48.5734, lng:7.7521,  type:'drive'},
-  {n:26, name:'Munich',             lat:48.1351, lng:11.5820, type:'end'},
-];
+    <aside class="map-shell" aria-label="Interaktive Karte der Reise">
+      <div class="map-title"><span class="map-badge" id="map-badge">Route & Orte</span></div>
+      <div id="map"></div>
+    </aside>
+  </main>
 
-// 0-indexed segment pairs that are ferries
-const FERRY_SEGS = new Set(['6-7','9-10','11-12']);
+  <dialog id="entry-dialog" aria-labelledby="article-title">
+    <button class="dialog-close" id="dialog-close" type="button" aria-label="Artikel schließen">×</button>
+    <div id="article-content"></div>
+  </dialog>
 
-const DETAILS = {
-  1:  {emoji:'🏔', flag:'🇩🇪', country:'Germany',  km:0,    wiki:'https://en.wikipedia.org/wiki/Munich',              desc:'Bavarian capital — world-class beer gardens, the vibrant Marienplatz and the Alps shimmering on the southern horizon.'},
-  2:  {emoji:'🎿', flag:'🇦🇹', country:'Austria',  km:150,  wiki:'https://en.wikipedia.org/wiki/Innsbruck',            desc:'Tyrolean alpine gem — the glittering Golden Roof, crisp mountain air and legendary ski resorts all within arm\'s reach.'},
-  3:  {emoji:'💌', flag:'🇮🇹', country:'Italy',    km:400,  wiki:'https://en.wikipedia.org/wiki/Verona',               desc:'City of Romeo & Juliet — a 2,000-year-old Roman arena that still fills with opera-goers under the summer stars.'},
-  4:  {emoji:'🎨', flag:'🇮🇹', country:'Italy',    km:650,  wiki:'https://en.wikipedia.org/wiki/Florence',             desc:'Cradle of the Renaissance — Botticelli in the Uffizi, Brunelleschi\'s terracotta Duomo and endless rolling Tuscan hills.'},
-  5:  {emoji:'🏛', flag:'🇮🇹', country:'Italy',    km:930,  wiki:'https://en.wikipedia.org/wiki/Rome',                 desc:'The Eternal City — the Colosseum at golden hour, Vatican Museums at dawn and the obligatory coin tossed in Trevi Fountain.'},
-  6:  {emoji:'🍕', flag:'🇮🇹', country:'Italy',    km:1150, wiki:'https://en.wikipedia.org/wiki/Naples',               desc:'Birthplace of pizza — gateway to steaming Pompeii, the clifftop Amalfi Coast and Vesuvius brooding on the horizon.'},
-  7:  {emoji:'⛴',  flag:'🇮🇹', country:'Italy',    km:1580, wiki:'https://en.wikipedia.org/wiki/Villa_San_Giovanni',   desc:'The narrow Strait of Messina — the legendary whirlpool of Charybdis supposedly lurks here. Ferry crossing to Sicily begins.'},
-  8:  {emoji:'⚓',  flag:'🇮🇹', country:'Italy',    km:1583, wiki:'https://en.wikipedia.org/wiki/Messina',              desc:'First taste of Sicily — arrival in the city guarding the strait, ancient mosaics and a famous swordfish market.'},
-  9:  {emoji:'🌋', flag:'🇮🇹', country:'Italy',    km:1685, wiki:'https://en.wikipedia.org/wiki/Catania',              desc:'Europe\'s highest active volcano — Mt Etna\'s lava fields loom over this Greek-founded port city full of baroque piazzas.'},
-  10: {emoji:'🌊', flag:'🇮🇹', country:'Italy',    km:1820, wiki:'https://en.wikipedia.org/wiki/Palermo',              desc:'Sicily\'s vibrant capital — Arab-Norman cathedrals, the chaotic Ballaró street market and a ferry west towards Sardinia.'},
-  11: {emoji:'🏝', flag:'🇮🇹', country:'Italy',    km:2120, wiki:'https://en.wikipedia.org/wiki/Cagliari',             desc:'Sardinia\'s sun-bleached capital arrived via an overnight ferry — Roman ruins, pink flamingos and some of Italy\'s best pasta.'},
-  12: {emoji:'🏖', flag:'🇮🇹', country:'Italy',    km:2395, wiki:'https://en.wikipedia.org/wiki/Olbia',                desc:'Northern Sardinian port town — the impossibly turquoise Costa Smeralda is just a short drive from here.'},
-  13: {emoji:'⛵',  flag:'🇮🇹', country:'Italy',    km:2725, wiki:'https://en.wikipedia.org/wiki/Livorno',              desc:'Back on the Italian mainland — city of ten fortresses, the Leaning Tower a short hop away and superb seafood.'},
-  14: {emoji:'🛳', flag:'🇮🇹', country:'Italy',    km:2895, wiki:'https://en.wikipedia.org/wiki/Genoa',                desc:'Italy\'s largest port and birthplace of Christopher Columbus, basil pesto and a celebrated annual boat show.'},
-  15: {emoji:'🌴', flag:'🇫🇷', country:'France',   km:3070, wiki:'https://en.wikipedia.org/wiki/Nice',                 desc:'The French Riviera — Promenade des Anglais bathed in eternal sunshine, Monaco just 20 km east along the coast.'},
-  16: {emoji:'☀️', flag:'🇫🇷', country:'France',   km:3390, wiki:'https://en.wikipedia.org/wiki/Montpellier',          desc:'Southern France at its liveliest — a thriving university city with a medieval historic centre and beaches minutes away.'},
-  17: {emoji:'🏗', flag:'🇪🇸', country:'Spain',    km:3710, wiki:'https://en.wikipedia.org/wiki/Barcelona',            desc:'Gaudí\'s playground — Sagrada Família under perpetual construction, Park Güell mosaics and tapas on every corner of La Barceloneta.'},
-  18: {emoji:'🥘', flag:'🇪🇸', country:'Spain',    km:4075, wiki:'https://en.wikipedia.org/wiki/Valencia',             desc:'City of Arts & Sciences — birthplace of paella, a stunning medieval old town and a half-hour drive from the Mar Menor.'},
-  19: {emoji:'🌿', flag:'🇪🇸', country:'Spain',    km:4335, wiki:'https://en.wikipedia.org/wiki/Murcia',               desc:'Warm Mediterranean city famous for its ornate baroque cathedral, the spring flower-carpet festival and excellent tapas culture.'},
-  20: {emoji:'🏰', flag:'🇪🇸', country:'Spain',    km:4610, wiki:'https://en.wikipedia.org/wiki/Granada',              desc:'The incomparable Alhambra fortress palace — intricate Nasrid tile-work and reflecting pools set against snow-capped Sierra Nevada.'},
-  21: {emoji:'🎨', flag:'🇪🇸', country:'Spain',    km:4740, wiki:'https://en.wikipedia.org/wiki/M%C3%A1laga',          desc:'Picasso\'s birthplace on the Costa del Sol — 320 days of sunshine a year, a renovated historic centre and perfect beaches.'},
-  22: {emoji:'💃', flag:'🇪🇸', country:'Spain',    km:4960, wiki:'https://en.wikipedia.org/wiki/Seville',              desc:'The soul of flamenco — the Alcázar palace, the soaring Giralda tower and some of Europe\'s finest tapas bars in the Triana quarter.'},
-  23: {emoji:'🕌', flag:'🇪🇸', country:'Spain',    km:5815, wiki:'https://en.wikipedia.org/wiki/Zaragoza',             desc:'Northern Spain\'s crossroads — the dazzling twin-towered Basilica del Pilar mirrors perfectly in the Ebro river below.'},
-  24: {emoji:'🍷', flag:'🇫🇷', country:'France',   km:6440, wiki:'https://en.wikipedia.org/wiki/Lyon',                 desc:'Gastronomic capital of France — Paul Bocuse\'s legacy lives at the confluence of the Rhône and Saône, Lyon\'s lights shimmer at night.'},
-  25: {emoji:'🎄', flag:'🇫🇷', country:'France',   km:6925, wiki:'https://en.wikipedia.org/wiki/Strasbourg',           desc:'Christmas capital of Europe — the half-timbered Alsatian old town, the EU quarter and a Gothic cathedral that took 400 years to build.'},
-  26: {emoji:'🏠', flag:'🇩🇪', country:'Germany',  km:7325, wiki:'https://en.wikipedia.org/wiki/Munich',              desc:'Back home in Munich — 7,325 km across 6 countries, 3 sea crossings and memories that will last a lifetime.'},
-};
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const state = { data: null, entries: [], filter: 'alle', query: '', markers: new Map() };
+    const statusLabels = { idee: 'Idee', geplant: 'Geplant', unterwegs: 'Unterwegs', besucht: 'Besucht' };
+    const dateFormatter = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
 
-const TOTAL_KM = 7325;
-
-// ── Map init ──────────────────────────────────────────────────
-const map = L.map('map', {
-  center: [44, 8],
-  zoom: 5,
-  zoomControl: false,
-  preferCanvas: false,
-});
-
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-  subdomains: 'abcd',
-  maxZoom: 19,
-}).addTo(map);
-
-L.control.zoom({ position: 'topright' }).addTo(map);
-
-// ── State ─────────────────────────────────────────────────────
-const drawnLines  = [];
-const markerObjs  = [];
-let   animIndex   = 0;
-let   animTimer   = null;
-let   activePanelIdx = -1;
-
-// ── Route animation ───────────────────────────────────────────
-function buildIcon(stop) {
-  return L.divIcon({
-    className: '',
-    html: `<div class="marker-wrap"><div class="marker-pin type-${stop.type}" id="mp-${stop.n}">${stop.n}</div></div>`,
-    iconSize: [34, 34],
-    iconAnchor: [17, 17],
-  });
-}
-
-function drawNextStep() {
-  if (animIndex >= STOPS.length) {
-    onAnimComplete();
-    return;
-  }
-
-  const stop = STOPS[animIndex];
-  const isFerry = animIndex > 0 && FERRY_SEGS.has(`${animIndex - 1}-${animIndex}`);
-
-  if (animIndex > 0) {
-    const prev = STOPS[animIndex - 1];
-    // glow layer
-    L.polyline([[prev.lat, prev.lng], [stop.lat, stop.lng]], {
-      color: isFerry ? '#f6ad55' : '#4299e1',
-      weight: isFerry ? 10 : 8,
-      opacity: 0.08,
-      lineCap: 'round',
+    const map = L.map('map', { zoomControl: false, scrollWheelZoom: true }).setView([47, 10], 5);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
     }).addTo(map);
 
-    // main line
-    const pl = L.polyline([[prev.lat, prev.lng], [stop.lat, stop.lng]], {
-      color: isFerry ? '#f6ad55' : '#4299e1',
-      weight: isFerry ? 2.5 : 2.5,
-      opacity: 0.85,
-      dashArray: isFerry ? '9 7' : null,
-      lineCap: 'round',
-    }).addTo(map);
-    drawnLines.push(pl);
-  }
+    const markerLayer = L.layerGroup().addTo(map);
+    let routeLine = null;
 
-  const markerIdx = animIndex;
-  const marker = L.marker([stop.lat, stop.lng], { icon: buildIcon(stop), zIndexOffset: stop.n })
-    .addTo(map);
-  marker.on('click', () => openPanel(markerIdx));
-  markerObjs.push(marker);
+    function formatDate(value) {
+      const date = new Date(`${value}T12:00:00`);
+      return Number.isNaN(date.valueOf()) ? value : dateFormatter.format(date);
+    }
 
-  animIndex++;
-  animTimer = setTimeout(drawNextStep, 230);
-}
+    function markerIcon(order) {
+      return L.divIcon({
+        className: '',
+        html: `<div class="route-marker"><span>${order}</span></div>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 30],
+        popupAnchor: [0, -30]
+      });
+    }
 
-function onAnimComplete() {
-  animTimer = null;
-  countUpKm(TOTAL_KM);
-  const bounds = L.latLngBounds(STOPS.map(s => [s.lat, s.lng]));
-  setTimeout(() => map.fitBounds(bounds, { padding: [70, 70], animate: true, duration: 1.2 }), 300);
-}
+    function searchableText(entry) {
+      return [entry.title, entry.summary, entry.location.name, entry.location.region, entry.location.country, ...(entry.tags || []), ...(entry.body || [])]
+        .filter(Boolean).join(' ').toLocaleLowerCase('de-DE');
+    }
 
-function resetAnimation() {
-  if (animTimer) clearTimeout(animTimer);
-  drawnLines.forEach(l => map.removeLayer(l));
-  drawnLines.length = 0;
-  markerObjs.forEach(m => map.removeLayer(m));
-  markerObjs.length = 0;
-  animIndex = 0;
-  document.getElementById('km-counter').textContent = '0';
-  closePanel();
-  map.setView([44, 8], 5, { animate: true });
-  setTimeout(drawNextStep, 600);
-}
+    function visibleEntries() {
+      return state.entries.filter(entry => {
+        const statusMatch = state.filter === 'alle' || entry.status === state.filter;
+        const queryMatch = !state.query || searchableText(entry).includes(state.query);
+        return statusMatch && queryMatch;
+      });
+    }
 
-// ── KM counter ────────────────────────────────────────────────
-function countUpKm(target) {
-  const el = document.getElementById('km-counter');
-  let cur = 0;
-  const step = Math.ceil(target / 80);
-  const t = setInterval(() => {
-    cur = Math.min(cur + step, target);
-    el.textContent = cur.toLocaleString();
-    if (cur >= target) clearInterval(t);
-  }, 20);
-}
+    function createCard(entry) {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'entry-card';
+      card.setAttribute('aria-label', `${entry.title} in ${entry.location.name} öffnen`);
 
-// ── Panel ─────────────────────────────────────────────────────
-function openPanel(idx) {
-  activePanelIdx = idx;
-  const stop = STOPS[idx];
-  const d    = DETAILS[stop.n];
-  const pct  = Math.round((d.km / TOTAL_KM) * 100);
+      if (entry.cover_image) {
+        const image = document.createElement('img');
+        image.className = 'card-image';
+        image.src = entry.cover_image;
+        image.alt = `${entry.location.name} – Titelbild`;
+        image.loading = 'lazy';
+        card.append(image);
+      }
 
-  document.getElementById('p-emoji').textContent  = d.emoji;
-  document.getElementById('p-num').textContent     = `Stop #${stop.n} of 26`;
-  document.getElementById('p-name').textContent    = stop.name;
-  document.getElementById('p-country').textContent = `${d.flag} ${d.country}`;
-  document.getElementById('p-desc').textContent    = d.desc;
-  document.getElementById('p-km').textContent      = `${d.km.toLocaleString()} km`;
-  document.getElementById('p-pct').textContent     = `${pct}%`;
-  document.getElementById('p-prog-pct').textContent = `${pct}%`;
-  document.getElementById('p-wiki').href = d.wiki;
+      const body = document.createElement('div');
+      body.className = 'card-body';
 
-  const bar = document.getElementById('p-prog-bar');
-  requestAnimationFrame(() => { bar.style.width = pct + '%'; });
+      const meta = document.createElement('div');
+      meta.className = 'card-meta';
+      const status = document.createElement('span');
+      status.className = `status status-${entry.status}`;
+      status.textContent = statusLabels[entry.status] || entry.status;
+      const where = document.createElement('span');
+      where.textContent = `${entry.location.name}, ${entry.location.country}`;
+      const date = document.createElement('time');
+      date.dateTime = entry.date;
+      date.textContent = formatDate(entry.date);
+      meta.append(status, where, date);
 
-  const badge = document.getElementById('p-badge');
-  const typeLabel = stop.type === 'ferry' ? '⛴ Ferry port' : stop.type === 'start' ? '🏠 Start' : stop.type === 'end' ? '🏠 End' : '🚐 Drive';
-  badge.textContent = typeLabel;
-  badge.className   = `p-badge badge-${stop.type}`;
+      const title = document.createElement('h2');
+      title.className = 'card-title';
+      title.textContent = entry.title;
+      const summary = document.createElement('p');
+      summary.className = 'card-summary';
+      summary.textContent = entry.summary;
 
-  document.getElementById('btn-prev').toggleAttribute('disabled', idx === 0);
-  document.getElementById('btn-next').toggleAttribute('disabled', idx === STOPS.length - 1);
+      const footer = document.createElement('div');
+      footer.className = 'card-footer';
+      const tags = document.createElement('span');
+      tags.className = 'tags';
+      for (const tag of (entry.tags || []).slice(0, 3)) {
+        const item = document.createElement('span');
+        item.className = 'tag';
+        item.textContent = `#${tag}`;
+        tags.append(item);
+      }
+      const read = document.createElement('span');
+      read.textContent = 'Lesen →';
+      footer.append(tags, read);
+      body.append(meta, title, summary, footer);
+      card.append(body);
 
-  document.getElementById('panel').classList.add('open');
+      card.addEventListener('click', () => openEntry(entry));
+      card.addEventListener('mouseenter', () => state.markers.get(entry.id)?.openPopup());
+      return card;
+    }
 
-  // Highlight active marker
-  document.querySelectorAll('.marker-pin').forEach(el => el.classList.remove('active'));
-  const pin = document.getElementById(`mp-${stop.n}`);
-  if (pin) pin.classList.add('active');
+    function render() {
+      const entries = visibleEntries();
+      const list = document.getElementById('entry-list');
+      list.replaceChildren();
+      if (!entries.length) {
+        const empty = document.createElement('p');
+        empty.className = 'empty';
+        empty.textContent = 'Keine passenden Einträge gefunden.';
+        list.append(empty);
+      } else {
+        for (const entry of entries) list.append(createCard(entry));
+      }
 
-  map.panTo([stop.lat, stop.lng], { animate: true, duration: 0.6 });
-}
+      const uniquePlaces = new Set(entries.map(entry => `${entry.location.lat},${entry.location.lng}`));
+      const uniqueCountries = new Set(entries.map(entry => entry.location.country_code));
+      document.getElementById('place-count').textContent = uniquePlaces.size;
+      document.getElementById('country-count').textContent = uniqueCountries.size;
+      document.getElementById('entry-count').textContent = entries.length;
+      document.getElementById('map-badge').textContent = `${entries.length} ${entries.length === 1 ? 'Eintrag' : 'Einträge'} auf der Karte`;
+      renderMap(entries);
+    }
 
-function closePanel() {
-  document.getElementById('panel').classList.remove('open');
-  document.querySelectorAll('.marker-pin').forEach(el => el.classList.remove('active'));
-  activePanelIdx = -1;
-}
+    function renderMap(entries) {
+      markerLayer.clearLayers();
+      state.markers.clear();
+      if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
 
-document.getElementById('p-close').addEventListener('click', closePanel);
+      const sorted = [...entries].sort((a, b) => a.route_order - b.route_order);
+      const coordinates = [];
+      for (const entry of sorted) {
+        const { lat, lng } = entry.location;
+        coordinates.push([lat, lng]);
+        const popup = document.createElement('div');
+        const title = document.createElement('button');
+        title.type = 'button';
+        title.className = 'popup-title';
+        title.style.cssText = 'border:0;background:none;padding:0;cursor:pointer;text-align:left';
+        title.textContent = entry.title;
+        title.addEventListener('click', () => openEntry(entry));
+        const meta = document.createElement('span');
+        meta.className = 'popup-meta';
+        meta.textContent = `${entry.location.name} · ${formatDate(entry.date)}`;
+        popup.append(title, meta);
 
-document.getElementById('btn-prev').addEventListener('click', () => {
-  if (activePanelIdx > 0) openPanel(activePanelIdx - 1);
-});
-document.getElementById('btn-next').addEventListener('click', () => {
-  if (activePanelIdx < STOPS.length - 1) openPanel(activePanelIdx + 1);
-});
+        const marker = L.marker([lat, lng], { icon: markerIcon(entry.route_order), title: entry.title })
+          .bindPopup(popup)
+          .addTo(markerLayer);
+        marker.on('click', () => marker.openPopup());
+        state.markers.set(entry.id, marker);
+      }
 
-// close panel on map click
-map.on('click', () => closePanel());
+      if (coordinates.length > 1) {
+        routeLine = L.polyline(coordinates, { color: '#c86445', weight: 4, opacity: .78, dashArray: '2 10', lineCap: 'round' }).addTo(map);
+      }
+      if (coordinates.length === 1) map.setView(coordinates[0], 9, { animate: true });
+      if (coordinates.length > 1) map.fitBounds(coordinates, { padding: [55, 55], maxZoom: 9 });
+    }
 
-// ── Fullscreen ────────────────────────────────────────────────
-document.getElementById('btn-fs').addEventListener('click', () => {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch(() => {});
-  } else {
-    document.exitFullscreen().catch(() => {});
-  }
-});
+    function openEntry(entry) {
+      const dialog = document.getElementById('entry-dialog');
+      const root = document.getElementById('article-content');
+      root.replaceChildren();
 
-document.addEventListener('fullscreenchange', () => {
-  document.getElementById('btn-fs').textContent = document.fullscreenElement ? '✕' : '⛶';
-});
+      if (entry.cover_image) {
+        const cover = document.createElement('img');
+        cover.className = 'article-cover';
+        cover.src = entry.cover_image;
+        cover.alt = `${entry.location.name} – Titelbild`;
+        root.append(cover);
+      }
 
-// ── Replay ────────────────────────────────────────────────────
-document.getElementById('btn-replay').addEventListener('click', resetAnimation);
+      const article = document.createElement('article');
+      article.className = 'article';
+      const meta = document.createElement('div');
+      meta.className = 'card-meta';
+      const status = document.createElement('span');
+      status.className = `status status-${entry.status}`;
+      status.textContent = statusLabels[entry.status] || entry.status;
+      const date = document.createElement('time');
+      date.dateTime = entry.date;
+      date.textContent = formatDate(entry.date);
+      meta.append(status, date);
 
-// ── Start ─────────────────────────────────────────────────────
-setTimeout(drawNextStep, 900);
-</script>
+      const location = document.createElement('div');
+      location.className = 'article-location';
+      location.textContent = `📍 ${entry.location.name}${entry.location.region ? `, ${entry.location.region}` : ''} · ${entry.location.country}`;
+      const title = document.createElement('h2');
+      title.id = 'article-title';
+      title.textContent = entry.title;
+      article.append(meta, location, title);
 
+      for (const paragraphText of entry.body || []) {
+        const paragraph = document.createElement('p');
+        paragraph.textContent = paragraphText;
+        article.append(paragraph);
+      }
+
+      if (entry.highlights?.length) {
+        const heading = document.createElement('h3');
+        heading.textContent = 'Notizen & Highlights';
+        const list = document.createElement('ul');
+        for (const text of entry.highlights) {
+          const item = document.createElement('li');
+          item.textContent = text;
+          list.append(item);
+        }
+        article.append(heading, list);
+      }
+
+      if (entry.gallery?.length) {
+        const gallery = document.createElement('div');
+        gallery.className = 'gallery';
+        for (const path of entry.gallery) {
+          const image = document.createElement('img');
+          image.src = path;
+          image.alt = `${entry.location.name} – Reisebild`;
+          image.loading = 'lazy';
+          gallery.append(image);
+        }
+        article.append(gallery);
+      }
+
+      if (entry.links?.length) {
+        const links = document.createElement('div');
+        links.className = 'article-links';
+        for (const link of entry.links) {
+          const anchor = document.createElement('a');
+          let parsedUrl;
+          try { parsedUrl = new URL(link.url); } catch { continue; }
+          if (parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:') continue;
+          anchor.href = parsedUrl.href;
+          anchor.target = '_blank';
+          anchor.rel = 'noopener noreferrer';
+          anchor.textContent = `${link.label} ↗`;
+          links.append(anchor);
+        }
+        article.append(links);
+      }
+
+      root.append(article);
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+      else dialog.setAttribute('open', '');
+    }
+
+    document.getElementById('dialog-close').addEventListener('click', () => document.getElementById('entry-dialog').close());
+    document.getElementById('entry-dialog').addEventListener('click', event => {
+      if (event.target === event.currentTarget) event.currentTarget.close();
+    });
+    document.getElementById('search').addEventListener('input', event => {
+      state.query = event.target.value.trim().toLocaleLowerCase('de-DE');
+      render();
+    });
+    document.getElementById('filters').addEventListener('click', event => {
+      const button = event.target.closest('[data-filter]');
+      if (!button) return;
+      state.filter = button.dataset.filter;
+      for (const item of document.querySelectorAll('[data-filter]')) item.setAttribute('aria-pressed', String(item === button));
+      render();
+    });
+
+    async function init() {
+      try {
+        const response = await fetch('./data/entries.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        state.data = await response.json();
+        state.entries = state.data.entries.filter(entry => entry.published).sort((a, b) => a.route_order - b.route_order);
+        document.documentElement.lang = state.data.trip.locale?.split('-')[0] || 'de';
+        document.title = state.data.trip.title;
+        document.getElementById('trip-title').textContent = state.data.trip.title;
+        document.getElementById('trip-subtitle').textContent = state.data.trip.subtitle;
+        const { lat, lng } = state.data.trip.home;
+        map.setView([lat, lng], 6);
+        render();
+      } catch (error) {
+        const list = document.getElementById('entry-list');
+        list.replaceChildren();
+        const message = document.createElement('p');
+        message.className = 'error';
+        message.textContent = `Die Reisedaten konnten nicht geladen werden: ${error.message}`;
+        list.append(message);
+      }
+    }
+
+    init();
+  </script>
 </body>
 </html>
