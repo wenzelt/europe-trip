@@ -6,6 +6,9 @@
   <meta name="description" content="Unser Europa-Roadtrip mit dem Auto – Orte, Geschichten und Pläne auf einer interaktiven Karte.">
   <title>Europa Roadtrip Journal</title>
   <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     :root {
@@ -267,20 +270,51 @@
       *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
     }
   </style>
+  <link rel="stylesheet" href="./design-system.css">
 </head>
 <body>
   <header class="site-header">
+    <div class="confetti" aria-hidden="true">
+      <span class="shape shape-circle"></span>
+      <span class="shape shape-square"></span>
+      <span class="shape shape-triangle"></span>
+      <span class="shape shape-pill"></span>
+      <span class="shape shape-dot-grid"></span>
+    </div>
     <div class="header-inner">
-      <p class="eyebrow">🚗 Auto · 🏡 Airbnbs · 📍 Europa</p>
-      <h1 id="trip-title">Europa Roadtrip Journal</h1>
-      <p class="subtitle" id="trip-subtitle">Orte, Geschichten und Pläne auf einer interaktiven Karte.</p>
+      <div class="hero-copy">
+        <p class="eyebrow">🚗 Auto · 🏡 Airbnbs · 📍 Europa</p>
+        <h1 id="trip-title">Europa Roadtrip Journal</h1>
+        <p class="subtitle" id="trip-subtitle">Orte, Geschichten und Pläne auf einer interaktiven Karte.</p>
+        <div class="hero-chips" aria-label="Reiseart">
+          <span>Roadtrip</span>
+          <span>Spontan</span>
+          <span>Mittendrin</span>
+        </div>
+      </div>
+      <div class="hero-sticker" aria-hidden="true">
+        <span class="hero-pin">📍</span>
+        <strong>ROADTRIP<br>MODE</strong>
+        <span class="hero-sticker-note">Ein Ort. Eine Story. Immer weiter.</span>
+      </div>
     </div>
   </header>
 
+  <div class="trip-marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>NEUE ORTE ✦</span><span>ECHTE GESCHICHTEN ●</span><span>VIEL FREIHEIT ▲</span><span>NEUE ORTE ✦</span><span>ECHTE GESCHICHTEN ●</span><span>VIEL FREIHEIT ▲</span>
+    </div>
+  </div>
+
   <main class="layout">
     <section class="journal" aria-label="Reisetagebuch">
+      <div class="section-heading">
+        <span class="section-kicker">Unser Logbuch</span>
+        <h2>Stories auf vier Rädern.</h2>
+        <svg class="heading-squiggle" viewBox="0 0 180 18" aria-hidden="true"><path d="M3 11c18-13 32 12 50 0s32 12 50 0 32 12 50 0 19 0 24-2"/></svg>
+      </div>
       <div class="toolbar">
-        <label for="search" class="eyebrow" style="color:var(--green); margin-bottom:9px">Journal durchsuchen</label>
+        <label for="search" class="eyebrow">Journal durchsuchen</label>
         <input class="search" id="search" type="search" placeholder="Ort, Land, Tag oder Text …" autocomplete="off">
         <div class="filters" id="filters" aria-label="Nach Status filtern">
           <button class="filter" type="button" data-filter="alle" aria-pressed="true">Alle</button>
