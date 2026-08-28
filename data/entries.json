@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "trip": {
+    "title": "Europa Roadtrip Journal",
+    "subtitle": "Mit dem Auto, in Airbnbs und mit Zeit für die Orte dazwischen.",
+    "locale": "de-DE",
+    "transport": "Auto",
+    "accommodation": "Airbnbs",
+    "home": {
+      "name": "München",
+      "lat": 48.1351,
+      "lng": 11.582
+    }
+  },
+  "entries": [
+    {
+      "id": "neuer-plan-muenchen",
+      "title": "Neuer Plan: Roadtrip statt Campervan",
+      "date": "2026-08-28",
+      "status": "geplant",
+      "published": true,
+      "route_order": 1,
+      "location": {
+        "name": "München",
+        "region": "Bayern",
+        "country": "Deutschland",
+        "country_code": "DE",
+        "lat": 48.1351,
+        "lng": 11.582
+      },
+      "summary": "Wir fahren mit unserem eigenen Auto und wohnen unterwegs in Airbnbs. So bleiben wir auch im Winter flexibel.",
+      "body": [
+        "Der Campervan-Plan ist vom Tisch. Da wichtige Fährverbindungen von Sizilien zwischen Januar und März nicht wie benötigt fahren, planen wir die Reise neu.",
+        "Wir nehmen unser eigenes Auto, suchen uns entlang der Route Airbnbs und nutzen dieses Journal, um Planung und Erlebnisse direkt mit den Orten auf der Karte zu verbinden."
+      ],
+      "highlights": [
+        "Flexiblere Route ohne Fährzwang",
+        "Feste Unterkünfte statt Campervan",
+        "Blogeinträge erscheinen automatisch auf der Karte"
+      ],
+      "tags": ["Planung", "Roadtrip"],
+      "cover_image": null,
+      "gallery": [],
+      "links": []
+    }
+  ]
+}
