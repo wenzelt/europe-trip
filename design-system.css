@@ -173,14 +173,16 @@ h1 {
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 245px;
-  padding: 42px 30px 28px;
+  width: min(270px, 100%);
+  min-height: 210px;
+  justify-self: end;
+  padding: 38px 26px 24px;
   border: 3px solid var(--foreground);
   border-radius: 50% 50% 24px 50%;
   background: var(--secondary);
-  box-shadow: 12px 12px 0 var(--foreground);
+  box-shadow: 8px 8px 0 var(--foreground);
   text-align: center;
-  transform: rotate(4deg);
+  transform: rotate(2deg);
   animation: sticker-pop .7s var(--bounce) both;
 }
 
@@ -194,21 +196,21 @@ h1 {
 
 .hero-pin {
   position: absolute;
-  top: -36px;
+  top: -30px;
   display: grid;
   place-items: center;
-  width: 74px;
-  height: 74px;
+  width: 62px;
+  height: 62px;
   border: 3px solid var(--foreground);
   border-radius: 50%;
   background: var(--tertiary);
   box-shadow: var(--pop-shadow);
-  font-size: 2rem;
+  font-size: 1.65rem;
 }
 
 .hero-sticker strong {
   position: relative;
-  font: 800 clamp(2.05rem, 4vw, 3.25rem)/.88 "Outfit", system-ui, sans-serif;
+  font: 800 clamp(1.7rem, 3.2vw, 2.35rem)/.92 "Outfit", system-ui, sans-serif;
   letter-spacing: -.045em;
 }
 
@@ -511,8 +513,8 @@ dialog::backdrop { background: rgba(30, 41, 59, .7); backdrop-filter: blur(3px);
 .error { border-style: solid; background: #fce7f3; color: var(--foreground); }
 
 @keyframes sticker-pop {
-  from { opacity: 0; transform: rotate(4deg) scale(.4); }
-  to { opacity: 1; transform: rotate(4deg) scale(1); }
+  from { opacity: 0; transform: rotate(2deg) scale(.4); }
+  to { opacity: 1; transform: rotate(2deg) scale(1); }
 }
 
 @keyframes marquee { to { transform: translateX(-50%); } }
@@ -529,7 +531,7 @@ dialog::backdrop { background: rgba(30, 41, 59, .7); backdrop-filter: blur(3px);
   .site-header { min-height: 0; padding: 58px 20px 52px; }
   .header-inner { grid-template-columns: 1fr; gap: 54px; }
   h1 { font-size: clamp(3.25rem, 17vw, 5.6rem); }
-  .hero-sticker { width: min(290px, 82vw); min-height: 210px; justify-self: center; }
+  .hero-sticker { width: min(260px, 78vw); min-height: 190px; justify-self: center; }
   .shape-dot-grid,
   .shape-triangle,
   .map-shell::before { display: none; }
