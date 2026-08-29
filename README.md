@@ -1,6 +1,6 @@
-# Europe Trip — Roadtrip Journal
+# Europe Trip — Elternzeit-Journal
 
-Ein datengetriebenes Reiseblog mit interaktiver Karte. Die Reise wird mit dem eigenen Auto geplant; Unterkünfte sind Airbnbs oder ähnliche Ferienwohnungen.
+Ein datengetriebenes Elternzeit-Journal mit interaktiver Karte. Von Januar bis 1. April reisen wir mit dem eigenen Auto; Unterkünfte sind Airbnbs oder ähnliche Ferienwohnungen.
 
 ## Inhalte pflegen
 
@@ -14,7 +14,7 @@ Alle sichtbaren Blogeinträge stehen in [`data/entries.json`](data/entries.json)
 
 Das vollständige Format ist in [`data/entries.schema.json`](data/entries.schema.json) beschrieben. Hinweise für künftige ChatGPT-/Codex-Bearbeitungen stehen in [`AGENTS.md`](AGENTS.md).
 
-## Neuen Eintrag mit ChatGPT ergänzen
+## Neuen Elternzeit-Eintrag mit ChatGPT ergänzen
 
 Das Repo in ChatGPT verbinden und zum Beispiel schreiben:
 
