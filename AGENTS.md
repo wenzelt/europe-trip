@@ -1,6 +1,6 @@
 # Repository instructions
 
-This repository is a German-language, data-driven Europe roadtrip journal. The public site is rendered by `index.html`; editorial content lives in `data/entries.json`.
+This repository is a German-language, data-driven parental-leave travel journal for January through April 1. The public site is rendered by `index.html`; editorial content lives in `data/entries.json`.
 
 ## Adding or editing an entry
 
@@ -19,4 +19,4 @@ The repository and GitHub Pages site are public. Never add exact Airbnb addresse
 
 ## Scope
 
-The current trip uses the travelers' own car and Airbnb-style accommodation. Do not reintroduce campervan or ferry assumptions unless the user explicitly changes the plan again.
+The entire site documents the family's parental-leave journey from January through April 1, using their own car and Airbnb-style accommodation. Do not reintroduce campervan or ferry assumptions unless the user explicitly changes the plan again.
