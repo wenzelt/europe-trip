@@ -566,3 +566,120 @@ dialog::backdrop { background: rgba(30, 41, 59, .7); backdrop-filter: blur(3px);
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Elternzeit view switcher */
+.header-inner {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.hero-copy {
+  max-width: 850px;
+}
+
+.view-switcher {
+  position: sticky;
+  z-index: 1100;
+  top: 14px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  width: min(540px, calc(100% - 32px));
+  margin: 24px auto -52px;
+  padding: 12px 14px;
+  border: 3px solid var(--foreground);
+  border-radius: 26px 26px 26px 0;
+  background: var(--tertiary);
+  box-shadow: 7px 7px 0 var(--foreground);
+  color: var(--foreground);
+  touch-action: pan-y;
+  transform: rotate(-.4deg);
+}
+
+.switcher-label,
+.switcher-date {
+  font: 800 .68rem/1 "Outfit", system-ui, sans-serif;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.switcher-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  padding: 5px;
+  border: 2px solid var(--foreground);
+  border-radius: var(--radius-full);
+  background: var(--card);
+}
+
+.switcher-options button {
+  min-height: 42px;
+  padding: 8px 13px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  font-weight: 800;
+  transition: transform .25s var(--bounce), background .2s ease, box-shadow .25s var(--bounce);
+}
+
+.switcher-options button:hover {
+  background: #ede9fe;
+}
+
+.switcher-options button[aria-pressed="true"] {
+  border-color: var(--foreground);
+  background: var(--accent);
+  box-shadow: 3px 3px 0 var(--foreground);
+  color: #fff;
+  transform: translate(-1px, -1px);
+}
+
+@media (max-width: 980px) {
+  .view-switcher {
+    grid-template-columns: 1fr;
+    width: min(360px, calc(100% - 28px));
+    gap: 7px;
+    margin-bottom: -30px;
+    padding: 10px;
+    border-radius: 22px 22px 22px 0;
+  }
+
+  .switcher-label,
+  .switcher-date {
+    text-align: center;
+  }
+
+  .switcher-label {
+    display: none;
+  }
+
+  .layout[data-mobile-view="journal"] .map-shell {
+    display: none;
+  }
+
+  .layout[data-mobile-view="map"] .journal {
+    display: none;
+  }
+
+  .layout[data-mobile-view="map"] .map-shell {
+    display: block;
+    grid-row: auto;
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .view-switcher {
+    position: sticky;
+    top: 8px;
+    box-shadow: 4px 4px 0 var(--foreground);
+  }
+
+  .switcher-options button {
+    min-height: 46px;
+  }
+}
