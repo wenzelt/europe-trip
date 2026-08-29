@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Unser Europa-Roadtrip mit dem Auto – Orte, Geschichten und Pläne auf einer interaktiven Karte.">
-  <title>Europa Roadtrip Journal</title>
+  <meta name="description" content="Unsere Elternzeit in Europa – Orte, Erinnerungen und Pläne auf einer interaktiven Karte.">
+  <title>Unsere Elternzeit in Europa</title>
   <link rel="preconnect" href="https://unpkg.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -283,8 +283,8 @@
     </div>
     <div class="header-inner">
       <div class="hero-copy">
-        <p class="eyebrow">🚗 Auto · 🏡 Airbnbs · 📍 Europa</p>
-        <h1 id="trip-title">Europa Roadtrip Journal</h1>
+        <p class="eyebrow">👶 Elternzeit · 🚗 Auto · 📍 Europa</p>
+        <h1 id="trip-title">Unsere Elternzeit in Europa</h1>
         <p class="subtitle" id="trip-subtitle">Orte, Geschichten und Pläne auf einer interaktiven Karte.</p>
         <div class="hero-chips" aria-label="Reiseart">
           <span>Elternzeit</span>
@@ -292,29 +292,33 @@
           <span>Unterwegs</span>
         </div>
       </div>
-      <div class="hero-sticker" aria-hidden="true">
-        <span class="hero-pin">📍</span>
-        <strong>ELTERNZEIT</strong>
-        <span class="hero-sticker-note">Januar bis 1. April</span>
-      </div>
-    </div>
+          </div>
   </header>
 
   <div class="trip-marquee" aria-hidden="true">
     <div class="marquee-track">
-      <span>NEUE ORTE ✦</span><span>ECHTE GESCHICHTEN ●</span><span>VIEL FREIHEIT ▲</span><span>NEUE ORTE ✦</span><span>ECHTE GESCHICHTEN ●</span><span>VIEL FREIHEIT ▲</span>
+      <span>ELTERNZEIT ✦</span><span>NEUE ORTE ●</span><span>ECHTE GESCHICHTEN ▲</span><span>ELTERNZEIT ✦</span><span>NEUE ORTE ●</span><span>ECHTE GESCHICHTEN ▲</span>
     </div>
   </div>
 
-  <main class="layout">
+  <nav class="view-switcher" aria-label="Zwischen Logbuch und Karte wechseln">
+    <span class="switcher-label">Elternzeit</span>
+    <div class="switcher-options">
+      <button type="button" data-view="journal" aria-pressed="true"><span aria-hidden="true">📖</span> Logbuch</button>
+      <button type="button" data-view="map" aria-pressed="false"><span aria-hidden="true">🗺️</span> Karte</button>
+    </div>
+    <span class="switcher-date">Januar – 1. April</span>
+  </nav>
+
+  <main class="layout" data-mobile-view="journal">
     <section class="journal" aria-label="Reisetagebuch">
       <div class="section-heading">
         <span class="section-kicker">Unser Logbuch</span>
-        <h2>Stories auf vier Rädern.</h2>
+        <h2>Geschichten aus unserer Elternzeit.</h2>
         <svg class="heading-squiggle" viewBox="0 0 180 18" aria-hidden="true"><path d="M3 11c18-13 32 12 50 0s32 12 50 0 32 12 50 0 19 0 24-2"/></svg>
       </div>
       <div class="toolbar">
-        <label for="search" class="eyebrow">Journal durchsuchen</label>
+        <label for="search" class="eyebrow">Logbuch durchsuchen</label>
         <input class="search" id="search" type="search" placeholder="Ort, Land, Tag oder Text …" autocomplete="off">
         <div class="filters" id="filters" aria-label="Nach Status filtern">
           <button class="filter" type="button" data-filter="alle" aria-pressed="true">Alle</button>
@@ -337,7 +341,7 @@
     </section>
 
     <aside class="map-shell" aria-label="Interaktive Karte der Reise">
-      <div class="map-title"><span class="map-badge" id="map-badge">Route & Orte</span></div>
+      <div class="map-title"><span class="map-badge" id="map-badge">Karte & Orte</span></div>
       <div id="map"></div>
     </aside>
   </main>
@@ -593,6 +597,53 @@
       if (typeof dialog.showModal === 'function') dialog.showModal();
       else dialog.setAttribute('open', '');
     }
+
+    const layout = document.querySelector('.layout');
+    const viewSwitcher = document.querySelector('.view-switcher');
+    const viewButtons = [...document.querySelectorAll('[data-view]')];
+    const mobileView = window.matchMedia('(max-width: 980px)');
+
+    function selectView(view, { scroll = true } = {}) {
+      layout.dataset.mobileView = view;
+      for (const button of viewButtons) {
+        button.setAttribute('aria-pressed', String(button.dataset.view === view));
+      }
+
+      if (view === 'map') {
+        setTimeout(() => map.invalidateSize({ animate: false }), 0);
+      }
+
+      if (scroll) {
+        const target = mobileView.matches ? layout : document.querySelector(view === 'map' ? '.map-shell' : '.journal');
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+      }
+    }
+
+    for (const button of viewButtons) {
+      button.addEventListener('click', () => selectView(button.dataset.view));
+    }
+
+    let swipeStartX = null;
+    let swipeStartY = null;
+    viewSwitcher.addEventListener('pointerdown', event => {
+      swipeStartX = event.clientX;
+      swipeStartY = event.clientY;
+    });
+    viewSwitcher.addEventListener('pointerup', event => {
+      if (swipeStartX === null) return;
+      const deltaX = event.clientX - swipeStartX;
+      const deltaY = event.clientY - swipeStartY;
+      if (Math.abs(deltaX) > 36 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+        selectView(deltaX < 0 ? 'map' : 'journal');
+      }
+      swipeStartX = null;
+      swipeStartY = null;
+    });
+    viewSwitcher.addEventListener('pointercancel', () => {
+      swipeStartX = null;
+      swipeStartY = null;
+    });
 
     document.getElementById('dialog-close').addEventListener('click', () => document.getElementById('entry-dialog').close());
     document.getElementById('entry-dialog').addEventListener('click', event => {
