@@ -15,7 +15,7 @@
   padding-top: clamp(44px, 6vw, 68px);
 }
 
-.entry-card:not(:has(.card-image)) .card-meta {
+.entry-card > .card-body:first-child .card-meta {
   padding-right: 52px;
 }
 
