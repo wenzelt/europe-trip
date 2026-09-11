@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Unsere Elternzeit in Europa – Orte, Erinnerungen und Pläne auf einer interaktiven Karte.">
-  <title>Unsere Elternzeit in Europa</title>
+  <meta name="description" content="Our parental leave in Europe – places, memories and plans on an interactive map.">
+  <title>Our Parental Leave in Europe</title>
   <link rel="preconnect" href="https://unpkg.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -283,79 +283,79 @@
     </div>
     <div class="header-inner">
       <div class="hero-copy">
-        <p class="eyebrow">👶 Elternzeit · 🚗 Auto · 📍 Europa</p>
-        <h1 id="trip-title">Unsere Elternzeit in Europa</h1>
-        <p class="subtitle" id="trip-subtitle">Orte, Geschichten und Pläne auf einer interaktiven Karte.</p>
-        <div class="hero-chips" aria-label="Reiseart">
-          <span>Elternzeit</span>
-          <span>Januar – 1. April</span>
-          <span>Unterwegs</span>
+        <p class="eyebrow">👶 Parental leave · 🚗 Car · 📍 Europe</p>
+        <h1 id="trip-title">Our Parental Leave in Europe</h1>
+        <p class="subtitle" id="trip-subtitle">Places, stories and plans on an interactive map.</p>
+        <div class="hero-chips" aria-label="Travel style">
+          <span>Parental leave</span>
+          <span>January – April 1</span>
+          <span>On the road</span>
         </div>
       </div>
-          </div>
+    </div>
   </header>
 
   <div class="trip-marquee" aria-hidden="true">
     <div class="marquee-track">
-      <span>ELTERNZEIT ✦</span><span>NEUE ORTE ●</span><span>ECHTE GESCHICHTEN ▲</span><span>ELTERNZEIT ✦</span><span>NEUE ORTE ●</span><span>ECHTE GESCHICHTEN ▲</span>
+      <span>PARENTAL LEAVE ✦</span><span>NEW PLACES ●</span><span>REAL STORIES ▲</span><span>PARENTAL LEAVE ✦</span><span>NEW PLACES ●</span><span>REAL STORIES ▲</span>
     </div>
   </div>
 
-  <nav class="view-switcher" aria-label="Zwischen Logbuch und Karte wechseln">
-    <span class="switcher-label">Elternzeit</span>
+  <nav class="view-switcher" aria-label="Switch between journal and map">
+    <span class="switcher-label">Parental leave</span>
     <div class="switcher-options">
-      <button type="button" data-view="journal" aria-pressed="true"><span aria-hidden="true">📖</span> Logbuch</button>
-      <button type="button" data-view="map" aria-pressed="false"><span aria-hidden="true">🗺️</span> Karte</button>
+      <button type="button" data-view="journal" aria-pressed="true"><span aria-hidden="true">📖</span> Journal</button>
+      <button type="button" data-view="map" aria-pressed="false"><span aria-hidden="true">🗺️</span> Map</button>
     </div>
-    <span class="switcher-date">Januar – 1. April</span>
+    <span class="switcher-date">January – April 1</span>
   </nav>
 
   <main class="layout" data-mobile-view="journal">
-    <section class="journal" aria-label="Reisetagebuch">
+    <section class="journal" aria-label="Travel journal">
       <div class="section-heading">
-        <span class="section-kicker">Unser Logbuch</span>
-        <h2>Geschichten aus unserer Elternzeit.</h2>
+        <span class="section-kicker">Our journal</span>
+        <h2>Stories from our parental leave.</h2>
         <svg class="heading-squiggle" viewBox="0 0 180 18" aria-hidden="true"><path d="M3 11c18-13 32 12 50 0s32 12 50 0 32 12 50 0 19 0 24-2"/></svg>
       </div>
       <div class="toolbar">
-        <label for="search" class="eyebrow">Logbuch durchsuchen</label>
-        <input class="search" id="search" type="search" placeholder="Ort, Land, Tag oder Text …" autocomplete="off">
-        <div class="filters" id="filters" aria-label="Nach Status filtern">
-          <button class="filter" type="button" data-filter="alle" aria-pressed="true">Alle</button>
-          <button class="filter" type="button" data-filter="idee" aria-pressed="false">Ideen</button>
-          <button class="filter" type="button" data-filter="geplant" aria-pressed="false">Geplant</button>
-          <button class="filter" type="button" data-filter="unterwegs" aria-pressed="false">Unterwegs</button>
-          <button class="filter" type="button" data-filter="besucht" aria-pressed="false">Besucht</button>
+        <label for="search" class="eyebrow">Search the journal</label>
+        <input class="search" id="search" type="search" placeholder="Place, country, tag or text …" autocomplete="off">
+        <div class="filters" id="filters" aria-label="Filter by status">
+          <button class="filter" type="button" data-filter="alle" aria-pressed="true">All</button>
+          <button class="filter" type="button" data-filter="idee" aria-pressed="false">Ideas</button>
+          <button class="filter" type="button" data-filter="geplant" aria-pressed="false">Planned</button>
+          <button class="filter" type="button" data-filter="unterwegs" aria-pressed="false">On the road</button>
+          <button class="filter" type="button" data-filter="besucht" aria-pressed="false">Visited</button>
         </div>
       </div>
 
-      <div class="summary-row" aria-label="Reisestatistik">
-        <div class="summary-item"><strong class="summary-value" id="place-count">–</strong><span class="summary-label">Orte</span></div>
-        <div class="summary-item"><strong class="summary-value" id="country-count">–</strong><span class="summary-label">Länder</span></div>
-        <div class="summary-item"><strong class="summary-value" id="entry-count">–</strong><span class="summary-label">Einträge</span></div>
+      <div class="summary-row" aria-label="Travel statistics">
+        <div class="summary-item"><strong class="summary-value" id="place-count">–</strong><span class="summary-label">Places</span></div>
+        <div class="summary-item"><strong class="summary-value" id="country-count">–</strong><span class="summary-label">Countries</span></div>
+        <div class="summary-item"><strong class="summary-value" id="entry-count">–</strong><span class="summary-label">Entries</span></div>
       </div>
 
       <div class="entry-list" id="entry-list" aria-live="polite">
-        <p class="empty">Einträge werden geladen …</p>
+        <p class="empty">Loading entries …</p>
       </div>
     </section>
 
-    <aside class="map-shell" aria-label="Interaktive Karte der Reise">
-      <div class="map-title"><span class="map-badge" id="map-badge">Karte & Orte</span></div>
+    <aside class="map-shell" aria-label="Interactive map of the trip">
+      <div class="map-title"><span class="map-badge" id="map-badge">Map & places</span></div>
       <div id="map"></div>
     </aside>
   </main>
 
   <dialog id="entry-dialog" aria-labelledby="article-title">
-    <button class="dialog-close" id="dialog-close" type="button" aria-label="Artikel schließen">×</button>
+    <button class="dialog-close" id="dialog-close" type="button" aria-label="Close article">×</button>
     <div id="article-content"></div>
   </dialog>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const state = { data: null, entries: [], filter: 'alle', query: '', markers: new Map() };
-    const statusLabels = { idee: 'Idee', geplant: 'Geplant', unterwegs: 'Unterwegs', besucht: 'Besucht' };
-    const dateFormatter = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
+    const statusLabels = { idee: 'Idea', geplant: 'Planned', unterwegs: 'On the road', besucht: 'Visited' };
+    const dateFormatter = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
 
     const map = L.map('map', { zoomControl: false, scrollWheelZoom: true }).setView([47, 10], 5);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -385,7 +385,7 @@
 
     function searchableText(entry) {
       return [entry.title, entry.summary, entry.location.name, entry.location.region, entry.location.country, ...(entry.tags || []), ...(entry.body || [])]
-        .filter(Boolean).join(' ').toLocaleLowerCase('de-DE');
+        .filter(Boolean).join(' ').toLocaleLowerCase('en-GB');
     }
 
     function visibleEntries() {
@@ -400,13 +400,13 @@
       const card = document.createElement('button');
       card.type = 'button';
       card.className = 'entry-card';
-      card.setAttribute('aria-label', `${entry.title} in ${entry.location.name} öffnen`);
+      card.setAttribute('aria-label', `Open ${entry.title} in ${entry.location.name}`);
 
       if (entry.cover_image) {
         const image = document.createElement('img');
         image.className = 'card-image';
         image.src = entry.cover_image;
-        image.alt = `${entry.location.name} – Titelbild`;
+        image.alt = `${entry.location.name} – cover image`;
         image.loading = 'lazy';
         card.append(image);
       }
@@ -444,7 +444,7 @@
         tags.append(item);
       }
       const read = document.createElement('span');
-      read.textContent = 'Lesen →';
+      read.textContent = 'Read →';
       footer.append(tags, read);
       body.append(meta, title, summary, footer);
       card.append(body);
@@ -461,7 +461,7 @@
       if (!entries.length) {
         const empty = document.createElement('p');
         empty.className = 'empty';
-        empty.textContent = 'Keine passenden Einträge gefunden.';
+        empty.textContent = 'No matching entries found.';
         list.append(empty);
       } else {
         for (const entry of entries) list.append(createCard(entry));
@@ -472,7 +472,7 @@
       document.getElementById('place-count').textContent = uniquePlaces.size;
       document.getElementById('country-count').textContent = uniqueCountries.size;
       document.getElementById('entry-count').textContent = entries.length;
-      document.getElementById('map-badge').textContent = `${entries.length} ${entries.length === 1 ? 'Eintrag' : 'Einträge'} auf der Karte`;
+      document.getElementById('map-badge').textContent = `${entries.length} ${entries.length === 1 ? 'entry' : 'entries'} on the map`;
       renderMap(entries);
     }
 
@@ -521,7 +521,7 @@
         const cover = document.createElement('img');
         cover.className = 'article-cover';
         cover.src = entry.cover_image;
-        cover.alt = `${entry.location.name} – Titelbild`;
+        cover.alt = `${entry.location.name} – cover image`;
         root.append(cover);
       }
 
@@ -553,7 +553,7 @@
 
       if (entry.highlights?.length) {
         const heading = document.createElement('h3');
-        heading.textContent = 'Notizen & Highlights';
+        heading.textContent = 'Notes & Highlights';
         const list = document.createElement('ul');
         for (const text of entry.highlights) {
           const item = document.createElement('li');
@@ -569,7 +569,7 @@
         for (const path of entry.gallery) {
           const image = document.createElement('img');
           image.src = path;
-          image.alt = `${entry.location.name} – Reisebild`;
+          image.alt = `${entry.location.name} – travel photo`;
           image.loading = 'lazy';
           gallery.append(image);
         }
@@ -650,7 +650,7 @@
       if (event.target === event.currentTarget) event.currentTarget.close();
     });
     document.getElementById('search').addEventListener('input', event => {
-      state.query = event.target.value.trim().toLocaleLowerCase('de-DE');
+      state.query = event.target.value.trim().toLocaleLowerCase('en-GB');
       render();
     });
     document.getElementById('filters').addEventListener('click', event => {
@@ -667,7 +667,7 @@
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         state.data = await response.json();
         state.entries = state.data.entries.filter(entry => entry.published).sort((a, b) => a.route_order - b.route_order);
-        document.documentElement.lang = state.data.trip.locale?.split('-')[0] || 'de';
+        document.documentElement.lang = state.data.trip.locale?.split('-')[0] || 'en';
         document.title = state.data.trip.title;
         document.getElementById('trip-title').textContent = state.data.trip.title;
         document.getElementById('trip-subtitle').textContent = state.data.trip.subtitle;
@@ -679,7 +679,7 @@
         list.replaceChildren();
         const message = document.createElement('p');
         message.className = 'error';
-        message.textContent = `Die Reisedaten konnten nicht geladen werden: ${error.message}`;
+        message.textContent = `The travel data could not be loaded: ${error.message}`;
         list.append(message);
       }
     }
