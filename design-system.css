@@ -7,6 +7,13 @@
   padding: 22px;
 }
 
+/* The kicker is a span; make it a real layout box so its bottom margin
+   creates space before the large section heading. */
+.section-kicker {
+  display: inline-block;
+  margin-bottom: 22px;
+}
+
 /* Desktop already shows journal and map side by side, so the view switcher
    is only useful in the single-column/mobile layout. */
 .view-switcher {
@@ -54,6 +61,10 @@
   .toolbar,
   .card-body {
     padding: 18px;
+  }
+
+  .section-kicker {
+    margin-bottom: 18px;
   }
 
   .summary-item {
