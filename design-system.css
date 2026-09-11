@@ -7,7 +7,10 @@
   padding: 22px;
 }
 
+/* Desktop already shows journal and map side by side, so the view switcher
+   is only useful in the single-column/mobile layout. */
 .view-switcher {
+  display: none;
   margin: 24px auto 0;
 }
 
@@ -30,6 +33,7 @@
 
 @media (max-width: 980px) {
   .view-switcher {
+    display: grid;
     margin-bottom: 0;
   }
 

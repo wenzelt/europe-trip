@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "trip": {
-    "title": "Unsere Elternzeit in Europa",
-    "subtitle": "Januar bis 1. April – mit dem Auto, Airbnbs und Zeit für die Orte dazwischen.",
-    "locale": "de-DE",
-    "transport": "Auto",
+    "title": "Our Parental Leave in Europe",
+    "subtitle": "January to April 1 – travelling by car, staying in Airbnbs, and making time for the places in between.",
+    "locale": "en-GB",
+    "transport": "Car",
     "accommodation": "Airbnbs",
     "home": {
-      "name": "München",
+      "name": "Munich",
       "lat": 48.1351,
       "lng": 11.582
     }
@@ -15,32 +15,32 @@
   "entries": [
     {
       "id": "neuer-plan-muenchen",
-      "title": "Neuer Plan: Roadtrip statt Campervan",
+      "title": "New plan: road trip instead of campervan",
       "date": "2026-08-28",
       "status": "geplant",
       "published": true,
       "route_order": 1,
       "location": {
-        "name": "München",
-        "region": "Bayern",
-        "country": "Deutschland",
+        "name": "Munich",
+        "region": "Bavaria",
+        "country": "Germany",
         "country_code": "DE",
         "lat": 48.1351,
         "lng": 11.582
       },
-      "summary": "Wir fahren mit unserem eigenen Auto und wohnen unterwegs in Airbnbs. So bleiben wir auch im Winter flexibel.",
+      "summary": "We're travelling in our own car and staying in Airbnbs along the way. That keeps us flexible, even in winter.",
       "body": [
-        "Der Campervan-Plan ist vom Tisch. Da wichtige Fährverbindungen von Sizilien zwischen Januar und März nicht wie benötigt fahren, planen wir die Reise neu.",
-        "Wir nehmen unser eigenes Auto, suchen uns entlang der Route Airbnbs und nutzen dieses Journal, um Planung und Erlebnisse direkt mit den Orten auf der Karte zu verbinden."
+        "The campervan plan is off the table. Because key ferry connections from Sicily between January and March do not run in the way we need, we're replanning the trip.",
+        "We're taking our own car, finding Airbnbs along the route, and using this journal to connect our plans and experiences directly with the places on the map."
       ],
       "highlights": [
-        "Flexiblere Route ohne Fährzwang",
-        "Feste Unterkünfte statt Campervan",
-        "Blogeinträge erscheinen automatisch auf der Karte"
+        "A more flexible route without relying on ferries",
+        "Fixed accommodation instead of a campervan",
+        "Journal entries appear automatically on the map"
       ],
       "tags": [
-        "Planung",
-        "Roadtrip"
+        "Planning",
+        "Road trip"
       ],
       "cover_image": null,
       "gallery": [],
@@ -48,33 +48,33 @@
     },
     {
       "id": "klettern-flintsbach-2026-08-28",
-      "title": "Klettern in Flintsbach",
+      "title": "Rock climbing in Flintsbach",
       "date": "2026-08-28",
       "status": "besucht",
       "published": true,
       "route_order": 2,
       "location": {
         "name": "Flintsbach am Inn",
-        "region": "Bayern",
-        "country": "Deutschland",
+        "region": "Bavaria",
+        "country": "Germany",
         "country_code": "DE",
         "lat": 47.7257,
         "lng": 12.1237
       },
-      "summary": "Heute waren wir in Flintsbach am Inn klettern – ein gemeinsamer Nachmittag am grauen Fels, eingerahmt von Bäumen und spätsommerlichem Licht.",
+      "summary": "Today we went rock climbing in Flintsbach am Inn – an afternoon together on grey rock, framed by trees and late-summer light.",
       "body": [
-        "Heute ging es für uns nach Flintsbach am Inn zum Klettern. Zwischen Bäumen und grauem Fels suchten wir uns unsere Linie nach oben und genossen die gemeinsame Zeit draußen.",
-        "Das Foto hält den Moment fest, in dem wir nebeneinander über die geneigte Felsplatte klettern. Ein schöner erster Erlebnisbericht in unserem neuen Roadtrip-Journal."
+        "Today we headed to Flintsbach am Inn for some climbing. Between the trees and grey rock, we picked our line upward and enjoyed spending time outside together.",
+        "The photo captures the moment as we climb side by side across the sloping rock slab. A lovely first trip story in our new road-trip journal."
       ],
       "highlights": [
-        "Gemeinsam am Fels",
-        "Spätsommerlicht zwischen den Bäumen",
-        "Erster Erlebnisbericht im neuen Journal"
+        "Climbing together on the rock",
+        "Late-summer light among the trees",
+        "First trip story in our new journal"
       ],
       "tags": [
-        "Klettern",
+        "Climbing",
         "Flintsbach",
-        "Bayern"
+        "Bavaria"
       ],
       "cover_image": "assets/posts/klettern-flintsbach-2026-08-28/klettern-flintsbach-2026-08-28.jpeg",
       "gallery": [],
