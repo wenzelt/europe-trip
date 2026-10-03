@@ -35,3 +35,11 @@ node scripts/validate-content.mjs
 ```
 
 Pushes auf `master` werden nach erfolgreicher Prüfung automatisch über GitHub Pages veröffentlicht.
+
+## Gestaltung
+
+Die Seite nutzt statisches HTML, CSS und Leaflet. Die Schriftarten Outfit und Plus Jakarta Sans werden lokal aus `assets/fonts/` geladen; die jeweiligen SIL-OFL-Lizenzen liegen daneben. Die Dateien stammen aus den Fontsource-Paketen `@fontsource/outfit` und `@fontsource/plus-jakarta-sans`, jeweils Version 5.3.0.
+
+Das Farbschema folgt zunächst der Systemeinstellung. Der Schalter „Dark theme“ speichert die eigene Auswahl lokal im Browser. Die Kartendarstellung wechselt passend zwischen CARTO Voyager und Dark Matter.
+
+Die gestalterischen Entscheidungen und Prüfgrenzen sind in [`docs/design-review.md`](docs/design-review.md) dokumentiert.
