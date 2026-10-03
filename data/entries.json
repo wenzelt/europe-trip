@@ -14,125 +14,12 @@
   },
   "entries": [
     {
-      "id": "viktualienmarkt-muenchen-2026-09-19",
-      "title": "First stop: Viktualienmarkt",
-      "date": "2026-09-19",
-      "status": "besucht",
-      "published": true,
-      "route_order": 1,
-      "location": {
-        "name": "Viktualienmarkt",
-        "region": "Bavaria",
-        "country": "Germany",
-        "country_code": "DE",
-        "lat": 48.135306,
-        "lng": 11.576111
-      },
-      "summary": "Our first stop took us to Munich’s Viktualienmarkt, where my brother and I spent time together among the market stalls and the long history of the square.",
-      "body": [
-        "For our first stop, my brother and I headed to Munich’s Viktualienmarkt. We took a photo together under the trees and market umbrellas.",
-        "The market’s history at its current location began on 2 May 1807, when King Max I Joseph ordered part of Munich’s market to move from what is now Marienplatz because the old square had become too small for grain and other agricultural trade. The name “Viktualienmarkt” became established in the 19th century and comes from the Late Latin word “victualia”, meaning food.",
-        "The first maypole at the market was donated by Munich breweries in 1962. Since 6 November 1975, the market grounds have been a pedestrian zone, and the living market tradition has been listed in the Bavarian State Inventory of Intangible Cultural Heritage since 2014."
-      ],
-      "highlights": [
-        "First stop with my brother",
-        "At its current location since 1807",
-        "Name derived from Late Latin “victualia” for food",
-        "First market maypole donated in 1962"
-      ],
-      "tags": [
-        "Munich",
-        "Viktualienmarkt",
-        "History",
-        "Family"
-      ],
-      "cover_image": "assets/posts/viktualienmarkt-muenchen-2026-09-19/viktualienmarkt-with-brother-2026-09-19.jpeg",
-      "gallery": [],
-      "links": [
-        {
-          "label": "Viktualienmarkt history (City of Munich)",
-          "url": "https://www.muenchen.de/en/sights/attractions/viktualienmarkt-top-sight-munich"
-        },
-        {
-          "label": "Viktualienmarkt guide (Munich Travel)",
-          "url": "https://www.munich.travel/en/pois/markets-festivals/viktualienmarkt"
-        }
-      ]
-    },
-    {
-      "id": "neuer-plan-muenchen",
-      "title": "New plan: road trip instead of campervan",
-      "date": "2026-08-28",
-      "status": "geplant",
-      "published": true,
-      "route_order": 2,
-      "location": {
-        "name": "Munich",
-        "region": "Bavaria",
-        "country": "Germany",
-        "country_code": "DE",
-        "lat": 48.1351,
-        "lng": 11.582
-      },
-      "summary": "We're travelling in our own car and staying in Airbnbs along the way. That keeps us flexible, even in winter.",
-      "body": [
-        "The campervan plan is off the table. Because key ferry connections from Sicily between January and March do not run in the way we need, we're replanning the trip.",
-        "We're taking our own car, finding Airbnbs along the route, and using this journal to connect our plans and experiences directly with the places on the map."
-      ],
-      "highlights": [
-        "A more flexible route without relying on ferries",
-        "Fixed accommodation instead of a campervan",
-        "Journal entries appear automatically on the map"
-      ],
-      "tags": [
-        "Planning",
-        "Road trip"
-      ],
-      "cover_image": null,
-      "gallery": [],
-      "links": []
-    },
-    {
-      "id": "klettern-flintsbach-2026-08-28",
-      "title": "Rock climbing in Flintsbach",
-      "date": "2026-08-28",
-      "status": "besucht",
-      "published": true,
-      "route_order": 3,
-      "location": {
-        "name": "Flintsbach am Inn",
-        "region": "Bavaria",
-        "country": "Germany",
-        "country_code": "DE",
-        "lat": 47.7257,
-        "lng": 12.1237
-      },
-      "summary": "Today we went rock climbing in Flintsbach am Inn – an afternoon together on grey rock, framed by trees and late-summer light.",
-      "body": [
-        "Today we headed to Flintsbach am Inn for some climbing. Between the trees and grey rock, we picked our line upward and enjoyed spending time outside together.",
-        "The photo captures the moment as we climb side by side across the sloping rock slab. A lovely first trip story in our new road-trip journal."
-      ],
-      "highlights": [
-        "Climbing together on the rock",
-        "Late-summer light among the trees",
-        "First trip story in our new journal"
-      ],
-      "tags": [
-        "Climbing",
-        "Flintsbach",
-        "Bavaria"
-      ],
-      "cover_image": "assets/posts/klettern-flintsbach-2026-08-28/klettern-flintsbach-2026-08-28.jpeg",
-      "gallery": [],
-      "links": []
-    },
-    {
       "id": "aufbruch-fuerteventura-nuernberg-2026-10-03",
       "title": "Unser Fuerteventura-Abenteuer beginnt",
       "date": "2026-10-03",
       "status": "unterwegs",
       "published": true,
-      "route_order": 4,
+      "route_order": 1,
       "location": {
         "name": "Nürnberg",
         "region": "Bayern",
