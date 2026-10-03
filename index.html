@@ -6,9 +6,20 @@
   <meta name="description" content="Our parental leave in Europe – places, memories and plans on an interactive map.">
   <title>Our Parental Leave in Europe</title>
   <link rel="preconnect" href="https://unpkg.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="./assets/fonts/outfit-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./assets/fonts/plus-jakarta-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./fonts.css">
+  <script>
+    // Apply the saved/system theme before the page paints.
+    try {
+      const savedTheme = localStorage.getItem('journal-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.dataset.theme = savedTheme === 'light' || savedTheme === 'dark'
+        ? savedTheme : (prefersDark ? 'dark' : 'light');
+    } catch {
+      document.documentElement.dataset.theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+  </script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     :root {
@@ -275,32 +286,22 @@
 <body>
   <a class="skip-link" href="#journal">Skip to the journal</a>
   <header class="site-header">
-    <div class="confetti" aria-hidden="true">
-      <span class="shape shape-circle"></span>
-      <span class="shape shape-square"></span>
-      <span class="shape shape-triangle"></span>
-      <span class="shape shape-pill"></span>
-      <span class="shape shape-dot-grid"></span>
+    <div class="theme-controls">
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false">Dark theme</button>
     </div>
     <div class="header-inner">
       <div class="hero-copy">
-        <p class="eyebrow">👶 Parental leave · 🚗 Car · 📍 Europe</p>
+        <p class="eyebrow">Parental leave in Europe</p>
         <h1 id="trip-title">Our Parental Leave in Europe</h1>
         <p class="subtitle" id="trip-subtitle">Places, stories and plans on an interactive map.</p>
         <div class="hero-chips" aria-label="Travel style">
           <span>Parental leave</span>
-          <span>January – April 1</span>
+          <span>January - April 1</span>
           <span>On the road</span>
         </div>
       </div>
     </div>
   </header>
-
-  <div class="trip-marquee" aria-hidden="true">
-    <div class="marquee-track">
-      <span>PARENTAL LEAVE ✦</span><span>NEW PLACES ●</span><span>REAL STORIES ▲</span><span>PARENTAL LEAVE ✦</span><span>NEW PLACES ●</span><span>REAL STORIES ▲</span>
-    </div>
-  </div>
 
   <nav class="view-switcher" aria-label="Switch between journal and map">
     <span class="switcher-label">Parental leave</span>
@@ -308,15 +309,13 @@
       <button type="button" data-view="journal" aria-controls="journal" aria-pressed="true"><span aria-hidden="true">📖</span> Journal</button>
       <button type="button" data-view="map" aria-controls="trip-map" aria-pressed="false"><span aria-hidden="true">🗺️</span> Map</button>
     </div>
-    <span class="switcher-date">January – April 1</span>
+    <span class="switcher-date">January - April 1</span>
   </nav>
 
   <main class="layout" data-mobile-view="journal">
     <section class="journal" id="journal" aria-label="Travel journal" tabindex="-1">
       <div class="section-heading">
-        <span class="section-kicker">Our journal</span>
         <h2>Stories from our parental leave.</h2>
-        <svg class="heading-squiggle" viewBox="0 0 180 18" aria-hidden="true"><path d="M3 11c18-13 32 12 50 0s32 12 50 0 32 12 50 0 19 0 24-2"/></svg>
       </div>
       <div class="toolbar">
         <label for="search" class="eyebrow">Search the journal</label>
@@ -331,14 +330,17 @@
       </div>
 
       <div class="summary-row" aria-label="Travel statistics">
-        <div class="summary-item"><strong class="summary-value" id="place-count">–</strong><span class="summary-label">Places</span></div>
-        <div class="summary-item"><strong class="summary-value" id="country-count">–</strong><span class="summary-label">Countries</span></div>
-        <div class="summary-item"><strong class="summary-value" id="entry-count">–</strong><span class="summary-label">Entries</span></div>
+        <div class="summary-item"><strong class="summary-value" id="place-count">-</strong><span class="summary-label">Places</span></div>
+        <div class="summary-item"><strong class="summary-value" id="country-count">-</strong><span class="summary-label">Countries</span></div>
+        <div class="summary-item"><strong class="summary-value" id="entry-count">-</strong><span class="summary-label">Entries</span></div>
       </div>
 
       <p class="visually-hidden" id="results-status" role="status"></p>
       <div class="entry-list" id="entry-list" aria-busy="true">
-        <p class="empty">Loading entries …</p>
+        <div class="loading-placeholder" role="status" aria-label="Loading entries">
+          <div class="loading-photo" aria-hidden="true"></div>
+          <div class="loading-copy" aria-hidden="true"><span></span><span></span><span></span></div>
+        </div>
       </div>
     </section>
 
@@ -357,6 +359,27 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
+    let tileLayer = null;
+    const tileUrl = theme => `https://{s}.basemaps.cartocdn.com/${theme === 'dark' ? 'dark_all' : 'rastertiles/voyager'}/{z}/{x}/{y}.png?key=cb1_2htp_1_41c93b5f35f255820048b038`;
+    const themeButton = document.getElementById('theme-toggle');
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+    function applyTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      themeButton.setAttribute('aria-pressed', String(theme === 'dark'));
+      tileLayer?.setUrl(tileUrl(theme));
+    }
+    applyTheme(document.documentElement.dataset.theme || (systemTheme.matches ? 'dark' : 'light'));
+    themeButton.addEventListener('click', () => {
+      const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      applyTheme(theme);
+      try { localStorage.setItem('journal-theme', theme); } catch {}
+    });
+    systemTheme.addEventListener('change', event => {
+      let savedTheme = null;
+      try { savedTheme = localStorage.getItem('journal-theme'); } catch {}
+      if (savedTheme !== 'light' && savedTheme !== 'dark') applyTheme(event.matches ? 'dark' : 'light');
+    });
+
     const state = { data: null, entries: [], filter: 'alle', query: '', markers: new Map() };
     const statusLabels = { idee: 'Idea', geplant: 'Planned', unterwegs: 'On the road', besucht: 'Visited' };
     const dateFormatter = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -367,7 +390,7 @@
     if (window.L) {
       map = L.map('map', { zoomControl: false, scrollWheelZoom: false }).setView([47, 10], 5);
       L.control.zoom({ position: 'bottomright' }).addTo(map);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=cb1_2htp_1_41c93b5f35f255820048b038', {
+      tileLayer = L.tileLayer(tileUrl(document.documentElement.dataset.theme), {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
         maxZoom: 20
@@ -418,7 +441,7 @@
         const image = document.createElement('img');
         image.className = 'card-image';
         image.src = entry.cover_image;
-        image.alt = `${entry.location.name} – cover image`;
+        image.alt = `${entry.location.name} - cover image`;
         image.loading = 'lazy';
         card.append(image);
       }
@@ -564,7 +587,7 @@
         const cover = document.createElement('img');
         cover.className = 'article-cover';
         cover.src = entry.cover_image;
-        cover.alt = `${entry.location.name} – cover image`;
+        cover.alt = `${entry.location.name} - cover image`;
         root.append(cover);
       }
 
@@ -583,7 +606,7 @@
 
       const location = document.createElement('div');
       location.className = 'article-location';
-      location.textContent = `📍 ${entry.location.name}${entry.location.region ? `, ${entry.location.region}` : ''} · ${entry.location.country}`;
+      location.textContent = `${entry.location.name}${entry.location.region ? `, ${entry.location.region}` : ''} · ${entry.location.country}`;
       const title = document.createElement('h2');
       title.id = 'article-title';
       title.textContent = entry.title;
@@ -613,7 +636,7 @@
         for (const path of entry.gallery) {
           const image = document.createElement('img');
           image.src = path;
-          image.alt = `${entry.location.name} – travel photo`;
+          image.alt = `${entry.location.name} - travel photo`;
           image.loading = 'lazy';
           gallery.append(image);
         }
@@ -727,7 +750,7 @@
         document.documentElement.lang = state.data.trip.locale?.split('-')[0] || 'en';
         document.title = state.data.trip.title;
         document.getElementById('trip-title').textContent = state.data.trip.title;
-        document.getElementById('trip-subtitle').textContent = state.data.trip.subtitle;
+        document.getElementById('trip-subtitle').textContent = state.data.trip.subtitle.replace(/[—–]/g, '-');
         const { lat, lng } = state.data.trip.home;
         map?.setView([lat, lng], 6);
         render();
