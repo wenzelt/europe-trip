@@ -92,10 +92,7 @@ jobs:
           master_html = subprocess.check_output(
               ['git', 'show', 'origin/master:index.html'], text=True
           )
-          match = re.search(
-              r'basemaps\.cartocdn\.com/[^`"\']+\?key=([A-Za-z0-9_]+)',
-              master_html,
-          )
+          match = re.search(r'\?key=([A-Za-z0-9_]+)', master_html)
           if not match:
               raise SystemExit('Could not find CARTO key in master/index.html')
 
