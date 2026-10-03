@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [main, master]
   workflow_dispatch:
+    inputs:
+      site_ref:
+        description: Site version to deploy
+        required: true
+        default: master
+        type: choice
+        options:
+          - master
+          - vacation-plan
 
 permissions:
   contents: read
@@ -27,15 +36,48 @@ jobs:
       - name: Validate blog content
         run: node scripts/validate-content.mjs
 
+  resolve-site:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    outputs:
+      site_ref: ${{ steps.source.outputs.site_ref }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: source
+        name: Select site branch
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          MANUAL_SITE_REF: ${{ inputs.site_ref }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            site_ref="$MANUAL_SITE_REF"
+          else
+            site_ref="$(tr -d '[:space:]' < .github/pages-source.txt)"
+          fi
+
+          case "$site_ref" in
+            master|vacation-plan) ;;
+            *)
+              echo "Unsupported Pages source: $site_ref" >&2
+              exit 1
+              ;;
+          esac
+
+          echo "Deploying site from $site_ref"
+          echo "site_ref=$site_ref" >> "$GITHUB_OUTPUT"
+
   deploy:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    needs: validate
+    needs: [validate, resolve-site]
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve-site.outputs.site_ref }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
