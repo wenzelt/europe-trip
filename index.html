@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🚐 Winter Campervan — Munich Loop</title>
+  <title>Elternzeit-Roadtrip 2027 · München, Andalusien & Algarve</title>
+  <meta name="description" content="Routenentwurf ab München vom 1. Februar bis 25. April 2027: mit dem Hyundai nach Andalusien und an die Algarve. Zwei Tage Rückkehrpuffer bis 27. April.">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     :root {
       --bg: #0d1b2a;
       --panel: rgba(10, 20, 35, 0.94);
       --accent: #4299e1;
-      --ferry: #f6ad55;
+      --stay: #f6ad55;
       --start: #68d391;
       --text: #e2e8f0;
       --muted: #718096;
@@ -166,7 +167,7 @@
     }
 
     .badge-drive  { background: rgba(66,153,225,0.12); color: var(--accent); border: 1px solid rgba(66,153,225,0.25); }
-    .badge-ferry  { background: rgba(246,173,85,0.12); color: var(--ferry); border: 1px solid rgba(246,173,85,0.25); }
+    .badge-stay  { background: rgba(246,173,85,0.12); color: var(--stay); border: 1px solid rgba(246,173,85,0.25); }
     .badge-start  { background: rgba(104,211,145,0.12); color: var(--start); border: 1px solid rgba(104,211,145,0.25); }
     .badge-end    { background: rgba(104,211,145,0.12); color: var(--start); border: 1px solid rgba(104,211,145,0.25); }
 
@@ -288,10 +289,10 @@
       box-shadow: 0 0 0 4px rgba(104,211,145,0.2), 0 4px 14px rgba(0,0,0,0.5);
     }
 
-    .marker-pin.type-ferry {
+    .marker-pin.type-stay {
       background: #5a3010;
-      color: var(--ferry);
-      border-color: var(--ferry);
+      color: var(--stay);
+      border-color: var(--stay);
       box-shadow: 0 0 0 4px rgba(246,173,85,0.2), 0 4px 14px rgba(0,0,0,0.5);
     }
 
@@ -312,7 +313,7 @@
       box-shadow: 0 0 0 6px rgba(104,211,145,0.35), 0 6px 20px rgba(0,0,0,0.6);
     }
 
-    .marker-pin.type-ferry.active {
+    .marker-pin.type-stay.active {
       box-shadow: 0 0 0 6px rgba(246,173,85,0.35), 0 6px 20px rgba(0,0,0,0.6);
     }
 
@@ -375,6 +376,19 @@
 
       #btn-fs, #btn-replay { display: none; }
     }
+
+    #btn-plan { pointer-events: auto; margin-top: 10px; padding: 8px 12px; background: var(--panel); color: var(--text); border: 1px solid var(--accent); border-radius: 8px; cursor: pointer; }
+    #p-nights { color: var(--start); margin-bottom: 16px; font-size: .85rem; }
+    .p-close { background: transparent; border: 0; }
+    button { font-family: inherit; }
+    .plan-note { font-size: .75rem; line-height: 1.6; color: #a0aec0; margin: 20px 0; }
+    .itinerary-title { font-size: 1rem; margin: 20px 0 10px; }
+    #itinerary { display: grid; gap: 6px; }
+    #itinerary button { font: inherit; font-size: .78rem; text-align: left; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--text); cursor: pointer; }
+    #itinerary button:hover, #itinerary button:focus-visible { border-color: var(--accent); }
+    .p-name { white-space: normal; }
+    @media (max-width: 600px) { .h-title { font-size: .95rem; } .h-sub { max-width: 290px; line-height: 1.5; } #stats { padding: 10px; } .stat-val { font-size: .85rem; } .stat-label { font-size: .48rem; letter-spacing: .3px; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   </style>
 </head>
 <body>
@@ -383,50 +397,50 @@
 
 <div id="header">
   <div class="h-row">
-    <div class="h-icon">🚐</div>
+    <div class="h-icon">🚗</div>
     <div>
-      <div class="h-title">Winter Campervan — Munich Loop</div>
-      <div class="h-sub">26 stops &nbsp;·&nbsp; 3 ferries &nbsp;·&nbsp; 6 countries &nbsp;·&nbsp; ~8,500 km</div>
+      <div class="h-title">Elternzeit · Andalusien & Algarve</div>
+      <div class="h-sub">01.02.–25.04.2027 · Hyundai ab München · Puffer bis 27.04.<br>Routenentwurf · keine Buchungen · keine Flüge oder Fähren<br><button id="btn-plan" type="button">Etappen ansehen</button></div>
     </div>
   </div>
 </div>
 
 <div id="stats">
-  <div class="stat"><div class="stat-val">26</div><div class="stat-label">Stops</div></div>
-  <div class="stat"><div class="stat-val">6</div><div class="stat-label">Countries</div></div>
-  <div class="stat"><div class="stat-val">3</div><div class="stat-label">Ferries</div></div>
-  <div class="stat"><div class="stat-val" id="km-counter">0</div><div class="stat-label">km driven</div></div>
+  <div class="stat"><div class="stat-val" id="stop-count">20</div><div class="stat-label">Stationen</div></div>
+  <div class="stat"><div class="stat-val" id="country-count">5</div><div class="stat-label">Länder</div></div>
+  <div class="stat"><div class="stat-val" id="night-counter">83</div><div class="stat-label">Nächte</div></div>
+  <div class="stat"><div class="stat-val">6.500–7.000</div><div class="stat-label">km grob, ohne Ausflüge</div></div>
 </div>
 
-<div id="btn-fs" title="Fullscreen">⛶</div>
-<div id="btn-replay" title="Replay animation">↺</div>
+<button type="button" id="btn-fs" title="Vollbild" aria-label="Vollbild umschalten">⛶</button>
+<button type="button" id="btn-replay" title="Animation wiederholen" aria-label="Animation wiederholen">↺</button>
 
 <div id="panel">
   <div class="panel-head">
     <div class="p-emoji" id="p-emoji">🏔</div>
     <div class="p-info">
-      <div class="p-num" id="p-num">Stop #1 of 26</div>
-      <div class="p-name" id="p-name">Munich</div>
-      <div class="p-country" id="p-country">🇩🇪 Germany</div>
+      <div class="p-num" id="p-num">Station 1 von 20</div>
+      <div class="p-name" id="p-name">München</div>
+      <div class="p-country" id="p-country">🇩🇪 Deutschland</div>
     </div>
-    <div class="p-close" id="p-close">×</div>
+    <button type="button" class="p-close" id="p-close" aria-label="Etappen schließen">×</button>
   </div>
   <div class="panel-body">
     <span class="p-badge badge-start" id="p-badge">Start</span>
-    <p class="p-desc" id="p-desc"></p>
+    <p class="p-desc" id="p-desc"></p><p id="p-nights"></p>
     <div class="p-km-card">
       <div class="p-km-item">
-        <div class="p-km-val" id="p-km">0 km</div>
-        <div class="p-km-label">from Munich</div>
+        <div class="p-km-val" id="p-arrival">01.02.2027</div>
+        <div class="p-km-label">Ankunft</div>
       </div>
       <div class="p-km-item">
-        <div class="p-km-val" id="p-pct">0%</div>
-        <div class="p-km-label">of total trip</div>
+        <div class="p-km-val" id="p-departure">01.02.2027</div>
+        <div class="p-km-label">Weiterfahrt</div>
       </div>
     </div>
     <div class="p-progress">
       <div class="p-progress-label">
-        <span>Munich</span><span id="p-prog-pct">0%</span>
+        <span>Zeit im Reiseplan</span><span id="p-prog-pct">0%</span>
       </div>
       <div class="p-progress-bar">
         <div class="p-progress-fill" id="p-prog-bar" style="width:0%"></div>
@@ -434,83 +448,368 @@
     </div>
     <a class="wiki-btn" id="p-wiki" href="#" target="_blank" rel="noopener noreferrer">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      Read on Wikipedia
+      Mehr zum Ort
     </a>
+    <p class="plan-note">Die Karte verbindet die Stationen schematisch; sie zeigt keine berechnete Straßenroute. Die Kilometer sind eine grobe Planungsschätzung. Unterkünfte und genaue Fahrzeiten sind offen.</p>
+    <h2 class="itinerary-title">Alle Etappen</h2>
+    <nav id="itinerary" aria-label="Geplante Etappen"></nav>
   </div>
   <div class="panel-nav">
-    <div class="nav-btn" id="btn-prev">← Previous</div>
-    <div class="nav-btn" id="btn-next">Next →</div>
+    <button type="button" class="nav-btn" id="btn-prev">← Zurück</button>
+    <button type="button" class="nav-btn" id="btn-next">Weiter →</button>
   </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const STOPS = [
-  {n:1,  name:'Munich',             lat:48.1351, lng:11.5820, type:'start'},
-  {n:2,  name:'Innsbruck',          lat:47.2692, lng:11.4041, type:'drive'},
-  {n:3,  name:'Verona',             lat:45.4384, lng:10.9916, type:'drive'},
-  {n:4,  name:'Florence',           lat:43.7696, lng:11.2558, type:'drive'},
-  {n:5,  name:'Rome',               lat:41.9028, lng:12.4964, type:'drive'},
-  {n:6,  name:'Naples',             lat:40.8518, lng:14.2681, type:'drive'},
-  {n:7,  name:'Villa San Giovanni', lat:38.2167, lng:15.6333, type:'ferry'},
-  {n:8,  name:'Messina',            lat:38.1938, lng:15.5540, type:'ferry'},
-  {n:9,  name:'Catania / Etna',     lat:37.5079, lng:15.0830, type:'drive'},
-  {n:10, name:'Palermo',            lat:38.1157, lng:13.3615, type:'ferry'},
-  {n:11, name:'Cagliari',           lat:39.2238, lng:9.1217,  type:'ferry'},
-  {n:12, name:'Olbia',              lat:40.9236, lng:9.4964,  type:'ferry'},
-  {n:13, name:'Livorno',            lat:43.5485, lng:10.3106, type:'ferry'},
-  {n:14, name:'Genoa',              lat:44.4056, lng:8.9463,  type:'drive'},
-  {n:15, name:'Nice',               lat:43.7102, lng:7.2620,  type:'drive'},
-  {n:16, name:'Montpellier',        lat:43.6119, lng:3.8772,  type:'drive'},
-  {n:17, name:'Barcelona',          lat:41.3851, lng:2.1734,  type:'drive'},
-  {n:18, name:'Valencia',           lat:39.4699, lng:-0.3763, type:'drive'},
-  {n:19, name:'Murcia',             lat:37.9922, lng:-1.1307, type:'drive'},
-  {n:20, name:'Granada',            lat:37.1773, lng:-3.5986, type:'drive'},
-  {n:21, name:'Málaga',             lat:36.7213, lng:-4.4214, type:'drive'},
-  {n:22, name:'Seville',            lat:37.3891, lng:-5.9845, type:'drive'},
-  {n:23, name:'Zaragoza',           lat:41.6488, lng:-0.8891, type:'drive'},
-  {n:24, name:'Lyon',               lat:45.7640, lng:4.8357,  type:'drive'},
-  {n:25, name:'Strasbourg',         lat:48.5734, lng:7.7521,  type:'drive'},
-  {n:26, name:'Munich',             lat:48.1351, lng:11.5820, type:'end'},
+const ROUTE = [
+  {
+    "n": 1,
+    "name": "München",
+    "lat": 48.1375,
+    "lng": 11.575,
+    "type": "start",
+    "arrival": "2027-02-01",
+    "departure": "2027-02-01",
+    "country": "Deutschland",
+    "countryCode": "DE",
+    "flag": "🇩🇪",
+    "emoji": "🏠",
+    "wiki": "https://en.wikipedia.org/wiki/Munich",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Munich",
+    "desc": "Wir starten am 1. Februar mit unserem Hyundai in München. Die erste Übernachtung planen wir in Bern."
+  },
+  {
+    "n": 2,
+    "name": "Bern",
+    "lat": 46.94806,
+    "lng": 7.4475,
+    "type": "drive",
+    "arrival": "2027-02-01",
+    "departure": "2027-02-02",
+    "country": "Schweiz",
+    "countryCode": "CH",
+    "flag": "🇨🇭",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/Bern",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Bern",
+    "desc": "Unsere erste Übernachtung auf dem Weg nach Süden ist in Bern geplant."
+  },
+  {
+    "n": 3,
+    "name": "Lyon",
+    "lat": 45.7675,
+    "lng": 4.835,
+    "type": "drive",
+    "arrival": "2027-02-02",
+    "departure": "2027-02-03",
+    "country": "Frankreich",
+    "countryCode": "FR",
+    "flag": "🇫🇷",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/Lyon",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Lyon",
+    "desc": "Nach einer Nacht in Lyon fahren wir weiter Richtung Mittelmeer."
+  },
+  {
+    "n": 4,
+    "name": "Montpellier",
+    "lat": 43.6119,
+    "lng": 3.8772,
+    "type": "drive",
+    "arrival": "2027-02-03",
+    "departure": "2027-02-04",
+    "country": "Frankreich",
+    "countryCode": "FR",
+    "flag": "🇫🇷",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/Montpellier",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Montpellier",
+    "desc": "Wir planen eine Nacht im Raum Montpellier, bevor es nach Spanien geht."
+  },
+  {
+    "n": 5,
+    "name": "Girona / Costa Brava",
+    "lat": 41.98444,
+    "lng": 2.82111,
+    "type": "drive",
+    "arrival": "2027-02-04",
+    "departure": "2027-02-05",
+    "country": "Spanien",
+    "countryCode": "ES",
+    "flag": "🇪🇸",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/Girona",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Girona",
+    "desc": "Eine Nacht in Girona teilt die Anreise. Danach fahren wir weiter nach Peñíscola."
+  },
+  {
+    "n": 6,
+    "name": "Peñíscola",
+    "lat": 40.35917,
+    "lng": 0.4075,
+    "type": "drive",
+    "arrival": "2027-02-05",
+    "departure": "2027-02-08",
+    "country": "Spanien",
+    "countryCode": "ES",
+    "flag": "🇪🇸",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/Pe%C3%B1%C3%ADscola",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Pe%C3%B1%C3%ADscola",
+    "desc": "Nach den ersten Fahrtagen bleiben wir drei Nächte in Peñíscola."
+  },
+  {
+    "n": 7,
+    "name": "Alicante / Playa de San Juan",
+    "lat": 38.34528,
+    "lng": -0.48306,
+    "type": "drive",
+    "arrival": "2027-02-08",
+    "departure": "2027-02-12",
+    "country": "Spanien",
+    "countryCode": "ES",
+    "flag": "🇪🇸",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/Alicante",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Alicante",
+    "desc": "Wir planen vier Nächte in Alicante oder an der Playa de San Juan."
+  },
+  {
+    "n": 8,
+    "name": "San José / Cabo de Gata",
+    "lat": 36.76048,
+    "lng": -2.10912,
+    "type": "stay",
+    "arrival": "2027-02-12",
+    "departure": "2027-03-01",
+    "country": "Spanien",
+    "countryCode": "ES",
+    "flag": "🇪🇸",
+    "emoji": "🌿",
+    "wiki": "https://en.wikipedia.org/wiki/San_Jos%C3%A9_(Almer%C3%ADa)",
+    "coordinateSource": "https://www.geonames.org/2511357/san-jose.html",
+    "desc": "Unser erster langer Aufenthalt: 17 Nächte in San José im Cabo de Gata. Wir nehmen uns Zeit, an einem Ort anzukommen."
+  },
+  {
+    "n": 9,
+    "name": "Torrox Costa / Nerja",
+    "lat": 36.75,
+    "lng": -3.95,
+    "type": "stay",
+    "arrival": "2027-03-01",
+    "departure": "2027-03-15",
+    "country": "Spanien",
+    "countryCode": "ES",
+    "flag": "🇪🇸",
+    "emoji": "🌿",
+    "wiki": "https://en.wikipedia.org/wiki/Torrox",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Torrox",
+    "desc": "Wir bleiben 14 Nächte in Torrox Costa oder Nerja. Die genaue Basis steht noch nicht fest; der Marker zeigt die Gemeinde Torrox."
+  },
+  {
+    "n": 10,
+    "name": "Sevilla",
+    "lat": 37.38861,
+    "lng": -5.995,
+    "type": "drive",
+    "arrival": "2027-03-15",
+    "departure": "2027-03-19",
+    "country": "Spanien",
+    "countryCode": "ES",
+    "flag": "🇪🇸",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/Seville",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Seville",
+    "desc": "Für Sevilla sind vier Nächte eingeplant. Anschließend fahren wir weiter nach Portugal."
+  },
+  {
+    "n": 11,
+    "name": "Tavira / östliche Algarve",
+    "lat": 37.117,
+    "lng": -7.65,
+    "type": "stay",
+    "arrival": "2027-03-19",
+    "departure": "2027-04-02",
+    "country": "Portugal",
+    "countryCode": "PT",
+    "flag": "🇵🇹",
+    "emoji": "🌿",
+    "wiki": "https://en.wikipedia.org/wiki/Tavira",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Tavira",
+    "desc": "Unser dritter langer Aufenthalt: 14 Nächte in Tavira oder der östlichen Algarve, bevor wir nach Andalusien zurückfahren."
+  },
+  {
+    "n": 12,
+    "name": "El Puerto de Santa María / Cádiz",
+    "lat": 36.6014694,
+    "lng": -6.2381472,
+    "type": "drive",
+    "arrival": "2027-04-02",
+    "departure": "2027-04-06",
+    "country": "Spanien",
+    "countryCode": "ES",
+    "flag": "🇪🇸",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/El_Puerto_de_Santa_Mar%C3%ADa",
+    "coordinateSource": "https://en.wikipedia.org/wiki/El_Puerto_de_Santa_Mar%C3%ADa",
+    "desc": "Wir planen vier Nächte in El Puerto de Santa María als Basis für die Gegend um Cádiz."
+  },
+  {
+    "n": 13,
+    "name": "Nerja",
+    "lat": 36.74694,
+    "lng": -3.87889,
+    "type": "drive",
+    "arrival": "2027-04-06",
+    "departure": "2027-04-09",
+    "country": "Spanien",
+    "countryCode": "ES",
+    "flag": "🇪🇸",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/Nerja",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Nerja",
+    "desc": "Auf dem Rückweg bleiben wir noch einmal drei Nächte in Nerja."
+  },
+  {
+    "n": 14,
+    "name": "Cartagena / Umgebung",
+    "lat": 37.6019,
+    "lng": -0.9842,
+    "type": "drive",
+    "arrival": "2027-04-09",
+    "departure": "2027-04-12",
+    "country": "Spanien",
+    "countryCode": "ES",
+    "flag": "🇪🇸",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/Cartagena,_Spain",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Cartagena,_Spain",
+    "desc": "Drei Nächte in Cartagena oder Umgebung teilen die Rückreise entlang der spanischen Mittelmeerküste."
+  },
+  {
+    "n": 15,
+    "name": "Valencia / Umgebung",
+    "lat": 39.47,
+    "lng": -0.37639,
+    "type": "drive",
+    "arrival": "2027-04-12",
+    "departure": "2027-04-17",
+    "country": "Spanien",
+    "countryCode": "ES",
+    "flag": "🇪🇸",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/Valencia",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Valencia",
+    "desc": "Wir planen fünf Nächte in Valencia oder Umgebung."
+  },
+  {
+    "n": 16,
+    "name": "Girona / Costa Brava",
+    "lat": 41.98444,
+    "lng": 2.82111,
+    "type": "drive",
+    "arrival": "2027-04-17",
+    "departure": "2027-04-21",
+    "country": "Spanien",
+    "countryCode": "ES",
+    "flag": "🇪🇸",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/Girona",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Girona",
+    "desc": "Vor der Weiterfahrt nach Frankreich bleiben wir vier Nächte in Girona oder an der Costa Brava."
+  },
+  {
+    "n": 17,
+    "name": "Montpellier",
+    "lat": 43.6119,
+    "lng": 3.8772,
+    "type": "drive",
+    "arrival": "2027-04-21",
+    "departure": "2027-04-23",
+    "country": "Frankreich",
+    "countryCode": "FR",
+    "flag": "🇫🇷",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/Montpellier",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Montpellier",
+    "desc": "Wir planen zwei Nächte im Raum Montpellier, bevor die letzten drei Fahrtage beginnen."
+  },
+  {
+    "n": 18,
+    "name": "Lyon",
+    "lat": 45.7675,
+    "lng": 4.835,
+    "type": "drive",
+    "arrival": "2027-04-23",
+    "departure": "2027-04-24",
+    "country": "Frankreich",
+    "countryCode": "FR",
+    "flag": "🇫🇷",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/Lyon",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Lyon",
+    "desc": "Eine Nacht in Lyon ist als Zwischenstopp auf der Rückfahrt vorgesehen."
+  },
+  {
+    "n": 19,
+    "name": "Bern",
+    "lat": 46.94806,
+    "lng": 7.4475,
+    "type": "drive",
+    "arrival": "2027-04-24",
+    "departure": "2027-04-25",
+    "country": "Schweiz",
+    "countryCode": "CH",
+    "flag": "🇨🇭",
+    "emoji": "🚗",
+    "wiki": "https://en.wikipedia.org/wiki/Bern",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Bern",
+    "desc": "Die letzte Übernachtung unterwegs planen wir in Bern. Am nächsten Tag geht es nach München."
+  },
+  {
+    "n": 20,
+    "name": "München",
+    "lat": 48.1375,
+    "lng": 11.575,
+    "type": "end",
+    "arrival": "2027-04-25",
+    "departure": "2027-04-25",
+    "country": "Deutschland",
+    "countryCode": "DE",
+    "flag": "🇩🇪",
+    "emoji": "🏠",
+    "wiki": "https://en.wikipedia.org/wiki/Munich",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Munich",
+    "desc": "Wir planen die Rückkehr am 25. April. Bis zum Elternzeitende am 27. April bleiben zwei Tage Puffer."
+  }
 ];
 
-// 0-indexed segment pairs that are ferries
-const FERRY_SEGS = new Set(['6-7','9-10','11-12']);
+const STOPS = ROUTE;
+const DETAILS = Object.fromEntries(ROUTE.map(stop => [stop.n, stop]));
+const nightsAt = stop => (Date.parse(stop.departure) - Date.parse(stop.arrival)) / 86400000;
+const TOTAL_NIGHTS = ROUTE.reduce((sum, stop) => sum + nightsAt(stop), 0);
+const COUNTRY_COUNT = new Set(ROUTE.map(stop => stop.countryCode)).size;
+const formatDate = value => new Intl.DateTimeFormat('de-DE', {
+  day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC'
+}).format(new Date(value + 'T00:00:00Z'));
 
-const DETAILS = {
-  1:  {emoji:'🏔', flag:'🇩🇪', country:'Germany',  km:0,    wiki:'https://en.wikipedia.org/wiki/Munich',              desc:'Bavarian capital — world-class beer gardens, the vibrant Marienplatz and the Alps shimmering on the southern horizon.'},
-  2:  {emoji:'🎿', flag:'🇦🇹', country:'Austria',  km:150,  wiki:'https://en.wikipedia.org/wiki/Innsbruck',            desc:'Tyrolean alpine gem — the glittering Golden Roof, crisp mountain air and legendary ski resorts all within arm\'s reach.'},
-  3:  {emoji:'💌', flag:'🇮🇹', country:'Italy',    km:400,  wiki:'https://en.wikipedia.org/wiki/Verona',               desc:'City of Romeo & Juliet — a 2,000-year-old Roman arena that still fills with opera-goers under the summer stars.'},
-  4:  {emoji:'🎨', flag:'🇮🇹', country:'Italy',    km:650,  wiki:'https://en.wikipedia.org/wiki/Florence',             desc:'Cradle of the Renaissance — Botticelli in the Uffizi, Brunelleschi\'s terracotta Duomo and endless rolling Tuscan hills.'},
-  5:  {emoji:'🏛', flag:'🇮🇹', country:'Italy',    km:930,  wiki:'https://en.wikipedia.org/wiki/Rome',                 desc:'The Eternal City — the Colosseum at golden hour, Vatican Museums at dawn and the obligatory coin tossed in Trevi Fountain.'},
-  6:  {emoji:'🍕', flag:'🇮🇹', country:'Italy',    km:1150, wiki:'https://en.wikipedia.org/wiki/Naples',               desc:'Birthplace of pizza — gateway to steaming Pompeii, the clifftop Amalfi Coast and Vesuvius brooding on the horizon.'},
-  7:  {emoji:'⛴',  flag:'🇮🇹', country:'Italy',    km:1580, wiki:'https://en.wikipedia.org/wiki/Villa_San_Giovanni',   desc:'The narrow Strait of Messina — the legendary whirlpool of Charybdis supposedly lurks here. Ferry crossing to Sicily begins.'},
-  8:  {emoji:'⚓',  flag:'🇮🇹', country:'Italy',    km:1583, wiki:'https://en.wikipedia.org/wiki/Messina',              desc:'First taste of Sicily — arrival in the city guarding the strait, ancient mosaics and a famous swordfish market.'},
-  9:  {emoji:'🌋', flag:'🇮🇹', country:'Italy',    km:1685, wiki:'https://en.wikipedia.org/wiki/Catania',              desc:'Europe\'s highest active volcano — Mt Etna\'s lava fields loom over this Greek-founded port city full of baroque piazzas.'},
-  10: {emoji:'🌊', flag:'🇮🇹', country:'Italy',    km:1820, wiki:'https://en.wikipedia.org/wiki/Palermo',              desc:'Sicily\'s vibrant capital — Arab-Norman cathedrals, the chaotic Ballaró street market and a ferry west towards Sardinia.'},
-  11: {emoji:'🏝', flag:'🇮🇹', country:'Italy',    km:2120, wiki:'https://en.wikipedia.org/wiki/Cagliari',             desc:'Sardinia\'s sun-bleached capital arrived via an overnight ferry — Roman ruins, pink flamingos and some of Italy\'s best pasta.'},
-  12: {emoji:'🏖', flag:'🇮🇹', country:'Italy',    km:2395, wiki:'https://en.wikipedia.org/wiki/Olbia',                desc:'Northern Sardinian port town — the impossibly turquoise Costa Smeralda is just a short drive from here.'},
-  13: {emoji:'⛵',  flag:'🇮🇹', country:'Italy',    km:2725, wiki:'https://en.wikipedia.org/wiki/Livorno',              desc:'Back on the Italian mainland — city of ten fortresses, the Leaning Tower a short hop away and superb seafood.'},
-  14: {emoji:'🛳', flag:'🇮🇹', country:'Italy',    km:2895, wiki:'https://en.wikipedia.org/wiki/Genoa',                desc:'Italy\'s largest port and birthplace of Christopher Columbus, basil pesto and a celebrated annual boat show.'},
-  15: {emoji:'🌴', flag:'🇫🇷', country:'France',   km:3070, wiki:'https://en.wikipedia.org/wiki/Nice',                 desc:'The French Riviera — Promenade des Anglais bathed in eternal sunshine, Monaco just 20 km east along the coast.'},
-  16: {emoji:'☀️', flag:'🇫🇷', country:'France',   km:3390, wiki:'https://en.wikipedia.org/wiki/Montpellier',          desc:'Southern France at its liveliest — a thriving university city with a medieval historic centre and beaches minutes away.'},
-  17: {emoji:'🏗', flag:'🇪🇸', country:'Spain',    km:3710, wiki:'https://en.wikipedia.org/wiki/Barcelona',            desc:'Gaudí\'s playground — Sagrada Família under perpetual construction, Park Güell mosaics and tapas on every corner of La Barceloneta.'},
-  18: {emoji:'🥘', flag:'🇪🇸', country:'Spain',    km:4075, wiki:'https://en.wikipedia.org/wiki/Valencia',             desc:'City of Arts & Sciences — birthplace of paella, a stunning medieval old town and a half-hour drive from the Mar Menor.'},
-  19: {emoji:'🌿', flag:'🇪🇸', country:'Spain',    km:4335, wiki:'https://en.wikipedia.org/wiki/Murcia',               desc:'Warm Mediterranean city famous for its ornate baroque cathedral, the spring flower-carpet festival and excellent tapas culture.'},
-  20: {emoji:'🏰', flag:'🇪🇸', country:'Spain',    km:4610, wiki:'https://en.wikipedia.org/wiki/Granada',              desc:'The incomparable Alhambra fortress palace — intricate Nasrid tile-work and reflecting pools set against snow-capped Sierra Nevada.'},
-  21: {emoji:'🎨', flag:'🇪🇸', country:'Spain',    km:4740, wiki:'https://en.wikipedia.org/wiki/M%C3%A1laga',          desc:'Picasso\'s birthplace on the Costa del Sol — 320 days of sunshine a year, a renovated historic centre and perfect beaches.'},
-  22: {emoji:'💃', flag:'🇪🇸', country:'Spain',    km:4960, wiki:'https://en.wikipedia.org/wiki/Seville',              desc:'The soul of flamenco — the Alcázar palace, the soaring Giralda tower and some of Europe\'s finest tapas bars in the Triana quarter.'},
-  23: {emoji:'🕌', flag:'🇪🇸', country:'Spain',    km:5815, wiki:'https://en.wikipedia.org/wiki/Zaragoza',             desc:'Northern Spain\'s crossroads — the dazzling twin-towered Basilica del Pilar mirrors perfectly in the Ebro river below.'},
-  24: {emoji:'🍷', flag:'🇫🇷', country:'France',   km:6440, wiki:'https://en.wikipedia.org/wiki/Lyon',                 desc:'Gastronomic capital of France — Paul Bocuse\'s legacy lives at the confluence of the Rhône and Saône, Lyon\'s lights shimmer at night.'},
-  25: {emoji:'🎄', flag:'🇫🇷', country:'France',   km:6925, wiki:'https://en.wikipedia.org/wiki/Strasbourg',           desc:'Christmas capital of Europe — the half-timbered Alsatian old town, the EU quarter and a Gothic cathedral that took 400 years to build.'},
-  26: {emoji:'🏠', flag:'🇩🇪', country:'Germany',  km:7325, wiki:'https://en.wikipedia.org/wiki/Munich',              desc:'Back home in Munich — 7,325 km across 6 countries, 3 sea crossings and memories that will last a lifetime.'},
-};
-
-const TOTAL_KM = 7325;
+document.getElementById('stop-count').textContent = STOPS.length;
+document.getElementById('country-count').textContent = COUNTRY_COUNT;
+const itinerary = document.getElementById('itinerary');
+ROUTE.forEach((stop, idx) => {
+  const button = document.createElement('button');
+  button.type = 'button';
+  const nights = nightsAt(stop);
+  const stay = stop.type === 'start' ? 'Start' : stop.type === 'end' ? 'Rückkehr' : `${nights} ${nights === 1 ? 'Nacht' : 'Nächte'}`;
+  button.textContent = `${stop.n}. ${stop.name} · ${formatDate(stop.arrival)} · ${stay}`;
+  button.addEventListener('click', () => openPanel(idx));
+  itinerary.append(button);
+});
 
 // ── Map init ──────────────────────────────────────────────────
 const map = L.map('map', {
-  center: [44, 8],
+  center: [43, 2],
   zoom: 5,
   zoomControl: false,
   preferCanvas: false,
@@ -548,24 +847,24 @@ function drawNextStep() {
   }
 
   const stop = STOPS[animIndex];
-  const isFerry = animIndex > 0 && FERRY_SEGS.has(`${animIndex - 1}-${animIndex}`);
 
   if (animIndex > 0) {
     const prev = STOPS[animIndex - 1];
     // glow layer
-    L.polyline([[prev.lat, prev.lng], [stop.lat, stop.lng]], {
-      color: isFerry ? '#f6ad55' : '#4299e1',
-      weight: isFerry ? 10 : 8,
+    const glow = L.polyline([[prev.lat, prev.lng], [stop.lat, stop.lng]], {
+      color: '#4299e1',
+      weight: 8,
       opacity: 0.08,
       lineCap: 'round',
-    }).addTo(map);
+    });
+    glow.addTo(map);
+    drawnLines.push(glow);
 
     // main line
     const pl = L.polyline([[prev.lat, prev.lng], [stop.lat, stop.lng]], {
-      color: isFerry ? '#f6ad55' : '#4299e1',
-      weight: isFerry ? 2.5 : 2.5,
+      color: '#4299e1',
+      weight: 2.5,
       opacity: 0.85,
-      dashArray: isFerry ? '9 7' : null,
       lineCap: 'round',
     }).addTo(map);
     drawnLines.push(pl);
@@ -583,7 +882,7 @@ function drawNextStep() {
 
 function onAnimComplete() {
   animTimer = null;
-  countUpKm(TOTAL_KM);
+  document.getElementById('night-counter').textContent = TOTAL_NIGHTS;
   const bounds = L.latLngBounds(STOPS.map(s => [s.lat, s.lng]));
   setTimeout(() => map.fitBounds(bounds, { padding: [70, 70], animate: true, duration: 1.2 }), 300);
 }
@@ -595,22 +894,10 @@ function resetAnimation() {
   markerObjs.forEach(m => map.removeLayer(m));
   markerObjs.length = 0;
   animIndex = 0;
-  document.getElementById('km-counter').textContent = '0';
+  document.getElementById('night-counter').textContent = TOTAL_NIGHTS;
   closePanel();
-  map.setView([44, 8], 5, { animate: true });
+  map.setView([43, 2], 5, { animate: true });
   setTimeout(drawNextStep, 600);
-}
-
-// ── KM counter ────────────────────────────────────────────────
-function countUpKm(target) {
-  const el = document.getElementById('km-counter');
-  let cur = 0;
-  const step = Math.ceil(target / 80);
-  const t = setInterval(() => {
-    cur = Math.min(cur + step, target);
-    el.textContent = cur.toLocaleString();
-    if (cur >= target) clearInterval(t);
-  }, 20);
 }
 
 // ── Panel ─────────────────────────────────────────────────────
@@ -618,15 +905,17 @@ function openPanel(idx) {
   activePanelIdx = idx;
   const stop = STOPS[idx];
   const d    = DETAILS[stop.n];
-  const pct  = Math.round((d.km / TOTAL_KM) * 100);
+  const pct = Math.round((Date.parse(stop.arrival) - Date.parse(STOPS[0].arrival)) / (TOTAL_NIGHTS * 86400000) * 100);
 
   document.getElementById('p-emoji').textContent  = d.emoji;
-  document.getElementById('p-num').textContent     = `Stop #${stop.n} of 26`;
+  document.getElementById('p-num').textContent     = `Station ${stop.n} von ${STOPS.length}`;
   document.getElementById('p-name').textContent    = stop.name;
   document.getElementById('p-country').textContent = `${d.flag} ${d.country}`;
   document.getElementById('p-desc').textContent    = d.desc;
-  document.getElementById('p-km').textContent      = `${d.km.toLocaleString()} km`;
-  document.getElementById('p-pct').textContent     = `${pct}%`;
+  document.getElementById('p-arrival').textContent = formatDate(stop.arrival);
+  document.getElementById('p-departure').textContent = formatDate(stop.departure);
+  const nights = nightsAt(stop);
+  document.getElementById('p-nights').textContent = stop.type === 'start' ? 'Start am 1. Februar 2027' : stop.type === 'end' ? 'Rückkehr am 25. April · 2 Tage Puffer bis 27. April' : `${nights} ${nights === 1 ? 'Nacht' : 'Nächte'} · geplant`;
   document.getElementById('p-prog-pct').textContent = `${pct}%`;
   document.getElementById('p-wiki').href = d.wiki;
 
@@ -634,7 +923,7 @@ function openPanel(idx) {
   requestAnimationFrame(() => { bar.style.width = pct + '%'; });
 
   const badge = document.getElementById('p-badge');
-  const typeLabel = stop.type === 'ferry' ? '⛴ Ferry port' : stop.type === 'start' ? '🏠 Start' : stop.type === 'end' ? '🏠 End' : '🚐 Drive';
+  const typeLabel = stop.type === 'start' ? 'Start' : stop.type === 'end' ? 'Rückkehr' : stop.type === 'stay' ? 'Langer Aufenthalt' : 'Etappe';
   badge.textContent = typeLabel;
   badge.className   = `p-badge badge-${stop.type}`;
 
@@ -642,6 +931,7 @@ function openPanel(idx) {
   document.getElementById('btn-next').toggleAttribute('disabled', idx === STOPS.length - 1);
 
   document.getElementById('panel').classList.add('open');
+  document.querySelector('.panel-body').scrollTop = 0;
 
   // Highlight active marker
   document.querySelectorAll('.marker-pin').forEach(el => el.classList.remove('active'));
@@ -656,6 +946,8 @@ function closePanel() {
   document.querySelectorAll('.marker-pin').forEach(el => el.classList.remove('active'));
   activePanelIdx = -1;
 }
+
+document.getElementById('btn-plan').addEventListener('click', () => openPanel(0));
 
 document.getElementById('p-close').addEventListener('click', closePanel);
 
@@ -691,3 +983,4 @@ setTimeout(drawNextStep, 900);
 
 </body>
 </html>
+
