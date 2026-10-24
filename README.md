@@ -62,5 +62,5 @@ Dann `http://localhost:8000` öffnen. Die Validierung prüft unter anderem lück
 
 ## Branch und Veröffentlichung
 
-Diese Planerversion basiert auf `vacation-plan`. `master` enthält das separate Journal mit `data/entries.json` und dessen Post-Playbook. Die Route lebt im `ROUTE`-Array in `index.html`; keine Änderung an Journalbeiträgen ist nötig. Die Veröffentlichung wird weiterhin von der vorhandenen Pages-Konfiguration gesteuert. Ein neuer Planungsbranch wird nicht automatisch veröffentlicht.
+Diese Planerversion basiert auf `vacation-plan`. `master` enthält das separate Journal mit `data/entries.json` und dessen Post-Playbook. Die Route lebt im `ROUTE`-Array in `index.html`; keine Änderung an Journalbeiträgen ist nötig. Pushes und Merges auf `vacation-plan` veröffentlichen den Planer nach erfolgreicher Routenprüfung automatisch, solange `.github/pages-source.txt` auf `master` den Planer auswählt. Pull Requests und neue Planungsbranches veröffentlichen nichts. Der Deployment-Schritt übernimmt wie bisher die CARTO-Konfiguration aus `master`.
 

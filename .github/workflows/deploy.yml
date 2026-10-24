@@ -1,27 +1,83 @@
-name: Deploy to GitHub Pages
+name: Validate and deploy vacation planner
 
 on:
   push:
-    branches: [main, master]
+    branches: [vacation-plan]
+  pull_request:
+    branches: [vacation-plan]
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: vacation-plan-pages-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      planner_selected: ${{ steps.source.outputs.planner_selected }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate route plan
+        run: node scripts/validate-plan.mjs
+      - id: source
+        name: Respect the Pages source selected on master
+        shell: bash
+        run: |
+          git fetch --depth=1 origin master
+          selected="$(git show origin/master:.github/pages-source.txt | tr -d '[:space:]')"
+          if [ "$selected" = "vacation-plan" ]; then
+            echo "planner_selected=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "planner_selected=false" >> "$GITHUB_OUTPUT"
+          fi
+
   deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/vacation-plan' && needs.validate.outputs.planner_selected == 'true'
+    needs: validate
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Restore CARTO authentication for vacation planner
+        shell: bash
+        run: |
+          git fetch --depth=1 origin master
+          python - <<'PY'
+          import re
+          import subprocess
+          from pathlib import Path
+
+          master_html = subprocess.check_output(
+              ['git', 'show', 'origin/master:index.html'], text=True
+          )
+          match = re.search(r'\?key=([A-Za-z0-9_]+)', master_html)
+          if not match:
+              raise SystemExit('Could not find CARTO key in master/index.html')
+
+          key = match.group(1)
+          path = Path('index.html')
+          html = path.read_text(encoding='utf-8')
+          old_url = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+          if old_url not in html:
+              raise SystemExit('Expected vacation-plan CARTO tile URL was not found')
+
+          html = html.replace(old_url, f'{old_url}?key={key}', 1)
+          html = html.replace('maxZoom: 19,', 'maxZoom: 20,', 1)
+          path.write_text(html, encoding='utf-8')
+          PY
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
