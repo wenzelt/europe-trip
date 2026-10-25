@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Elternzeit-Roadtrip 2027 · München, Andalusien & Algarve</title>
-  <meta name="description" content="Routenentwurf ab München vom 1. Februar bis 25. April 2027: mit dem Hyundai nach Andalusien und an die Algarve. Zwei Tage Rückkehrpuffer bis 27. April.">
+  <meta name="description" content="Elternzeit-Routenentwurf vom 8. Februar bis 25. April 2027 mit Kite-Woche in Tarifa, Ostern in Cádiz und Algarve danach. Zwei Tage Puffer bis 27. April.">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     :root {
@@ -321,6 +321,41 @@
       box-shadow: 0 0 0 6px rgba(66,153,225,0.35), 0 6px 20px rgba(0,0,0,0.6);
     }
 
+    /* Close or repeated route stops are merged at the current zoom level. */
+    .marker-pin.type-cluster {
+      background: #48371f;
+      color: #fff;
+      border-color: var(--stay);
+      box-shadow: 0 0 0 4px rgba(246,173,85,0.18), 0 4px 16px rgba(0,0,0,0.5);
+    }
+    .marker-pin.type-cluster.active {
+      box-shadow: 0 0 0 6px rgba(246,173,85,0.42), 0 6px 20px rgba(0,0,0,0.65);
+    }
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+      background: #122337;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .leaflet-popup-content { margin: 14px; }
+    .leaflet-popup-close-button { color: #e2e8f0 !important; }
+    .route-stop-picker { min-width: 205px; display: grid; gap: 8px; }
+    .route-stop-picker strong { font-size: 0.85rem; }
+    .route-stop-picker button {
+      text-align: left;
+      border: 1px solid rgba(66,153,225,0.3);
+      border-radius: 8px;
+      padding: 9px;
+      background: rgba(66,153,225,0.08);
+      color: #e2e8f0;
+      cursor: pointer;
+      font-size: .76rem;
+      line-height: 1.5;
+    }
+    .route-stop-picker button:hover, .route-stop-picker button:focus-visible {
+      border-color: var(--stay);
+      background: rgba(246,173,85,0.14);
+    }
+
     /* Pulse on start */
     @keyframes pulse {
       0%   { box-shadow: 0 0 0 0 rgba(104,211,145,0.5), 0 4px 14px rgba(0,0,0,0.5); }
@@ -400,16 +435,16 @@
     <div class="h-icon">🚗</div>
     <div>
       <div class="h-title">Elternzeit · Andalusien & Algarve</div>
-      <div class="h-sub">01.02.–25.04.2027 · Hyundai ab München · Puffer bis 27.04.<br>Routenentwurf · keine Buchungen · keine Flüge oder Fähren<br><button id="btn-plan" type="button">Etappen ansehen</button></div>
+      <div class="h-sub">08.02.–25.04.2027 · Hyundai ab München · Puffer bis 27.04.<br>Routenentwurf · nicht gebucht · ohne Flüge<br><button id="btn-plan" type="button">Etappen ansehen</button></div>
     </div>
   </div>
 </div>
 
 <div id="stats">
-  <div class="stat"><div class="stat-val" id="stop-count">20</div><div class="stat-label">Stationen</div></div>
+  <div class="stat"><div class="stat-val" id="stop-count">21</div><div class="stat-label">Stationen</div></div>
   <div class="stat"><div class="stat-val" id="country-count">5</div><div class="stat-label">Länder</div></div>
-  <div class="stat"><div class="stat-val" id="night-counter">83</div><div class="stat-label">Nächte</div></div>
-  <div class="stat"><div class="stat-val">6.500–7.000</div><div class="stat-label">km grob, ohne Ausflüge</div></div>
+  <div class="stat"><div class="stat-val" id="night-counter">76</div><div class="stat-label">Nächte</div></div>
+  <div class="stat"><div class="stat-val">2</div><div class="stat-label">Puffertage</div></div>
 </div>
 
 <button type="button" id="btn-fs" title="Vollbild" aria-label="Vollbild umschalten">⛶</button>
@@ -419,7 +454,7 @@
   <div class="panel-head">
     <div class="p-emoji" id="p-emoji">🏔</div>
     <div class="p-info">
-      <div class="p-num" id="p-num">Station 1 von 20</div>
+      <div class="p-num" id="p-num">Station 1 von 21</div>
       <div class="p-name" id="p-name">München</div>
       <div class="p-country" id="p-country">🇩🇪 Deutschland</div>
     </div>
@@ -430,11 +465,11 @@
     <p class="p-desc" id="p-desc"></p><p id="p-nights"></p>
     <div class="p-km-card">
       <div class="p-km-item">
-        <div class="p-km-val" id="p-arrival">01.02.2027</div>
+        <div class="p-km-val" id="p-arrival">08.02.2027</div>
         <div class="p-km-label">Ankunft</div>
       </div>
       <div class="p-km-item">
-        <div class="p-km-val" id="p-departure">01.02.2027</div>
+        <div class="p-km-val" id="p-departure">08.02.2027</div>
         <div class="p-km-label">Weiterfahrt</div>
       </div>
     </div>
@@ -450,7 +485,7 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
       Mehr zum Ort
     </a>
-    <p class="plan-note">Die Karte verbindet die Stationen schematisch; sie zeigt keine berechnete Straßenroute. Die Kilometer sind eine grobe Planungsschätzung. Unterkünfte und genaue Fahrzeiten sind offen.</p>
+    <p class="plan-note">Die Linien verbinden die Stationen schematisch und zeigen keine berechnete Straßenroute. Dauer, Unterkünfte und Fahrzeiten sind noch nicht gebucht bzw. geprüft. Überlappende Marker zeigen mehrere Etappen zur Auswahl.</p>
     <h2 class="itinerary-title">Alle Etappen</h2>
     <nav id="itinerary" aria-label="Geplante Etappen"></nav>
   </div>
@@ -469,15 +504,15 @@ const ROUTE = [
     "lat": 48.1375,
     "lng": 11.575,
     "type": "start",
-    "arrival": "2027-02-01",
-    "departure": "2027-02-01",
+    "arrival": "2027-02-08",
+    "departure": "2027-02-08",
     "country": "Deutschland",
     "countryCode": "DE",
     "flag": "🇩🇪",
     "emoji": "🏠",
     "wiki": "https://en.wikipedia.org/wiki/Munich",
     "coordinateSource": "https://en.wikipedia.org/wiki/Munich",
-    "desc": "Wir starten am 1. Februar mit unserem Hyundai in München. Die erste Übernachtung planen wir in Bern."
+    "desc": "Wir planen den Aufbruch ab München nach der Rückkehr aus den USA und dem Theaterbesuch in Augsburg. Erste Zwischenübernachtung: Bern."
   },
   {
     "n": 2,
@@ -485,15 +520,15 @@ const ROUTE = [
     "lat": 46.94806,
     "lng": 7.4475,
     "type": "drive",
-    "arrival": "2027-02-01",
-    "departure": "2027-02-02",
+    "arrival": "2027-02-08",
+    "departure": "2027-02-09",
     "country": "Schweiz",
     "countryCode": "CH",
     "flag": "🇨🇭",
     "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Bern",
     "coordinateSource": "https://en.wikipedia.org/wiki/Bern",
-    "desc": "Unsere erste Übernachtung auf dem Weg nach Süden ist in Bern geplant."
+    "desc": "Eine Nacht in Bern auf der Anreise nach Südspanien."
   },
   {
     "n": 3,
@@ -501,15 +536,15 @@ const ROUTE = [
     "lat": 45.7675,
     "lng": 4.835,
     "type": "drive",
-    "arrival": "2027-02-02",
-    "departure": "2027-02-03",
+    "arrival": "2027-02-09",
+    "departure": "2027-02-10",
     "country": "Frankreich",
     "countryCode": "FR",
     "flag": "🇫🇷",
     "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Lyon",
     "coordinateSource": "https://en.wikipedia.org/wiki/Lyon",
-    "desc": "Nach einer Nacht in Lyon fahren wir weiter Richtung Mittelmeer."
+    "desc": "Eine Übernachtung in Lyon, bevor wir weiter Richtung Mittelmeer fahren."
   },
   {
     "n": 4,
@@ -517,15 +552,15 @@ const ROUTE = [
     "lat": 43.6119,
     "lng": 3.8772,
     "type": "drive",
-    "arrival": "2027-02-03",
-    "departure": "2027-02-04",
+    "arrival": "2027-02-10",
+    "departure": "2027-02-11",
     "country": "Frankreich",
     "countryCode": "FR",
     "flag": "🇫🇷",
     "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Montpellier",
     "coordinateSource": "https://en.wikipedia.org/wiki/Montpellier",
-    "desc": "Wir planen eine Nacht im Raum Montpellier, bevor es nach Spanien geht."
+    "desc": "Zwischenstopp am Mittelmeer mit Zeit für einen Spaziergang."
   },
   {
     "n": 5,
@@ -533,15 +568,15 @@ const ROUTE = [
     "lat": 41.98444,
     "lng": 2.82111,
     "type": "drive",
-    "arrival": "2027-02-04",
-    "departure": "2027-02-05",
+    "arrival": "2027-02-11",
+    "departure": "2027-02-12",
     "country": "Spanien",
     "countryCode": "ES",
     "flag": "🇪🇸",
     "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Girona",
     "coordinateSource": "https://en.wikipedia.org/wiki/Girona",
-    "desc": "Eine Nacht in Girona teilt die Anreise. Danach fahren wir weiter nach Peñíscola."
+    "desc": "Erste Nacht in Spanien auf dem Weg zur sonnigeren Küste."
   },
   {
     "n": 6,
@@ -549,15 +584,15 @@ const ROUTE = [
     "lat": 40.35917,
     "lng": 0.4075,
     "type": "drive",
-    "arrival": "2027-02-05",
-    "departure": "2027-02-08",
+    "arrival": "2027-02-12",
+    "departure": "2027-02-15",
     "country": "Spanien",
     "countryCode": "ES",
     "flag": "🇪🇸",
     "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Pe%C3%B1%C3%ADscola",
     "coordinateSource": "https://en.wikipedia.org/wiki/Pe%C3%B1%C3%ADscola",
-    "desc": "Nach den ersten Fahrtagen bleiben wir drei Nächte in Peñíscola."
+    "desc": "Drei Nächte an der Küste zum Ankommen, Bummeln und Kochen."
   },
   {
     "n": 7,
@@ -565,31 +600,31 @@ const ROUTE = [
     "lat": 38.34528,
     "lng": -0.48306,
     "type": "drive",
-    "arrival": "2027-02-08",
-    "departure": "2027-02-12",
+    "arrival": "2027-02-15",
+    "departure": "2027-02-20",
     "country": "Spanien",
     "countryCode": "ES",
     "flag": "🇪🇸",
     "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Alicante",
     "coordinateSource": "https://en.wikipedia.org/wiki/Alicante",
-    "desc": "Wir planen vier Nächte in Alicante oder an der Playa de San Juan."
+    "desc": "Fünf Nächte für Strandspaziergänge, Cafés, Stadtleben und möglichst viel Sonne."
   },
   {
     "n": 8,
-    "name": "San José / Cabo de Gata",
-    "lat": 36.76048,
-    "lng": -2.10912,
+    "name": "Almería / Cabo de Gata",
+    "lat": 36.8417,
+    "lng": -2.4639,
     "type": "stay",
-    "arrival": "2027-02-12",
-    "departure": "2027-03-01",
+    "arrival": "2027-02-20",
+    "departure": "2027-03-06",
     "country": "Spanien",
     "countryCode": "ES",
     "flag": "🇪🇸",
-    "emoji": "🌿",
-    "wiki": "https://en.wikipedia.org/wiki/San_Jos%C3%A9_(Almer%C3%ADa)",
-    "coordinateSource": "https://www.geonames.org/2511357/san-jose.html",
-    "desc": "Unser erster langer Aufenthalt: 17 Nächte in San José im Cabo de Gata. Wir nehmen uns Zeit, an einem Ort anzukommen."
+    "emoji": "☀️",
+    "wiki": "https://en.wikipedia.org/wiki/Almer%C3%ADa",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Almer%C3%ADa",
+    "desc": "Vierzehn Nächte an der vergleichsweise trockenen Küste: Meer, Cabo-de-Gata-Wanderungen, Lesen und Zeit zum Kochen. Almería-Stadt ist die vorgeschlagene Basis; San José bleibt eine Alternative nach Prüfung der Winterinfrastruktur."
   },
   {
     "n": 9,
@@ -597,15 +632,15 @@ const ROUTE = [
     "lat": 36.75,
     "lng": -3.95,
     "type": "stay",
-    "arrival": "2027-03-01",
-    "departure": "2027-03-15",
+    "arrival": "2027-03-06",
+    "departure": "2027-03-17",
     "country": "Spanien",
     "countryCode": "ES",
     "flag": "🇪🇸",
     "emoji": "🌿",
     "wiki": "https://en.wikipedia.org/wiki/Torrox",
     "coordinateSource": "https://en.wikipedia.org/wiki/Torrox",
-    "desc": "Wir bleiben 14 Nächte in Torrox Costa oder Nerja. Die genaue Basis steht noch nicht fest; der Marker zeigt die Gemeinde Torrox."
+    "desc": "Elf Nächte mit dem Meer vor der Tür. Zeit für Wanderungen, Cafés, Joggen, Bücher und Videoschnitt; Ausflüge in die Berge nach Wetterlage."
   },
   {
     "n": 10,
@@ -613,103 +648,119 @@ const ROUTE = [
     "lat": 37.38861,
     "lng": -5.995,
     "type": "drive",
-    "arrival": "2027-03-15",
-    "departure": "2027-03-19",
+    "arrival": "2027-03-17",
+    "departure": "2027-03-20",
     "country": "Spanien",
     "countryCode": "ES",
     "flag": "🇪🇸",
     "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Seville",
     "coordinateSource": "https://en.wikipedia.org/wiki/Seville",
-    "desc": "Für Sevilla sind vier Nächte eingeplant. Anschließend fahren wir weiter nach Portugal."
+    "desc": "Drei Nächte für spanische Küche, Museen, Cafés und Stadtspaziergänge vor der Karwoche."
   },
   {
     "n": 11,
+    "name": "Tarifa",
+    "lat": 36.014,
+    "lng": -5.606,
+    "type": "stay",
+    "arrival": "2027-03-20",
+    "departure": "2027-03-27",
+    "country": "Spanien",
+    "countryCode": "ES",
+    "flag": "🇪🇸",
+    "emoji": "🪁",
+    "wiki": "https://en.wikipedia.org/wiki/Tarifa",
+    "coordinateSource": "https://en.wikipedia.org/wiki/Tarifa",
+    "desc": "Sieben Nächte am Atlantik für Wind- und Kitesurfen. Verleihmöglichkeiten und Wetter müssen für März 2027 noch bestätigt werden; so bleiben mehrere mögliche Windtage."
+  },
+  {
+    "n": 12,
+    "name": "Cádiz / El Puerto de Santa María",
+    "lat": 36.535,
+    "lng": -6.2975,
+    "type": "stay",
+    "arrival": "2027-03-27",
+    "departure": "2027-04-03",
+    "country": "Spanien",
+    "countryCode": "ES",
+    "flag": "🇪🇸",
+    "emoji": "🌊",
+    "wiki": "https://en.wikipedia.org/wiki/C%C3%A1diz",
+    "coordinateSource": "https://en.wikipedia.org/wiki/C%C3%A1diz",
+    "desc": "Ostern am 28. März verbringen wir geplant in Spanien: sieben Nächte für Strand, Altstadt, Restaurants und Cafés. Unterkunft und genaues Quartier sind noch offen."
+  },
+  {
+    "n": 13,
     "name": "Tavira / östliche Algarve",
     "lat": 37.117,
     "lng": -7.65,
     "type": "stay",
-    "arrival": "2027-03-19",
-    "departure": "2027-04-02",
+    "arrival": "2027-04-03",
+    "departure": "2027-04-11",
     "country": "Portugal",
     "countryCode": "PT",
     "flag": "🇵🇹",
     "emoji": "🌿",
     "wiki": "https://en.wikipedia.org/wiki/Tavira",
     "coordinateSource": "https://en.wikipedia.org/wiki/Tavira",
-    "desc": "Unser dritter langer Aufenthalt: 14 Nächte in Tavira oder der östlichen Algarve, bevor wir nach Andalusien zurückfahren."
+    "desc": "Acht Nächte in Portugal, bewusst erst nach Ostern. Meer, ruhige Tage, Kochen, Lesen und Spaziergänge."
   },
   {
-    "n": 12,
-    "name": "El Puerto de Santa María / Cádiz",
-    "lat": 36.6014694,
-    "lng": -6.2381472,
-    "type": "drive",
-    "arrival": "2027-04-02",
-    "departure": "2027-04-06",
-    "country": "Spanien",
-    "countryCode": "ES",
-    "flag": "🇪🇸",
-    "emoji": "🚗",
-    "wiki": "https://en.wikipedia.org/wiki/El_Puerto_de_Santa_Mar%C3%ADa",
-    "coordinateSource": "https://en.wikipedia.org/wiki/El_Puerto_de_Santa_Mar%C3%ADa",
-    "desc": "Wir planen vier Nächte in El Puerto de Santa María als Basis für die Gegend um Cádiz."
-  },
-  {
-    "n": 13,
+    "n": 14,
     "name": "Nerja",
     "lat": 36.74694,
     "lng": -3.87889,
     "type": "drive",
-    "arrival": "2027-04-06",
-    "departure": "2027-04-09",
+    "arrival": "2027-04-11",
+    "departure": "2027-04-13",
     "country": "Spanien",
     "countryCode": "ES",
     "flag": "🇪🇸",
     "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Nerja",
     "coordinateSource": "https://en.wikipedia.org/wiki/Nerja",
-    "desc": "Auf dem Rückweg bleiben wir noch einmal drei Nächte in Nerja."
+    "desc": "Zwei Nächte zum entspannten Beginn der Rückfahrt entlang der Mittelmeerküste."
   },
   {
-    "n": 14,
+    "n": 15,
     "name": "Cartagena / Umgebung",
     "lat": 37.6019,
     "lng": -0.9842,
     "type": "drive",
-    "arrival": "2027-04-09",
-    "departure": "2027-04-12",
+    "arrival": "2027-04-13",
+    "departure": "2027-04-15",
     "country": "Spanien",
     "countryCode": "ES",
     "flag": "🇪🇸",
     "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Cartagena,_Spain",
     "coordinateSource": "https://en.wikipedia.org/wiki/Cartagena,_Spain",
-    "desc": "Drei Nächte in Cartagena oder Umgebung teilen die Rückreise entlang der spanischen Mittelmeerküste."
+    "desc": "Zwei Nächte für einen Stadtbesuch und einen Zwischenstopp auf der Rückreise."
   },
   {
-    "n": 15,
+    "n": 16,
     "name": "Valencia / Umgebung",
     "lat": 39.47,
     "lng": -0.37639,
     "type": "drive",
-    "arrival": "2027-04-12",
-    "departure": "2027-04-17",
+    "arrival": "2027-04-15",
+    "departure": "2027-04-19",
     "country": "Spanien",
     "countryCode": "ES",
     "flag": "🇪🇸",
     "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Valencia",
     "coordinateSource": "https://en.wikipedia.org/wiki/Valencia",
-    "desc": "Wir planen fünf Nächte in Valencia oder Umgebung."
+    "desc": "Vier Nächte für Stadt, Parks, Museen, Essen und Meer."
   },
   {
-    "n": 16,
+    "n": 17,
     "name": "Girona / Costa Brava",
     "lat": 41.98444,
     "lng": 2.82111,
     "type": "drive",
-    "arrival": "2027-04-17",
+    "arrival": "2027-04-19",
     "departure": "2027-04-21",
     "country": "Spanien",
     "countryCode": "ES",
@@ -717,10 +768,10 @@ const ROUTE = [
     "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Girona",
     "coordinateSource": "https://en.wikipedia.org/wiki/Girona",
-    "desc": "Vor der Weiterfahrt nach Frankreich bleiben wir vier Nächte in Girona oder an der Costa Brava."
+    "desc": "Zwei Nächte für die nördliche Costa Brava, bevor die Rückreise durch Frankreich beginnt."
   },
   {
-    "n": 17,
+    "n": 18,
     "name": "Montpellier",
     "lat": 43.6119,
     "lng": 3.8772,
@@ -733,10 +784,10 @@ const ROUTE = [
     "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Montpellier",
     "coordinateSource": "https://en.wikipedia.org/wiki/Montpellier",
-    "desc": "Wir planen zwei Nächte im Raum Montpellier, bevor die letzten drei Fahrtage beginnen."
+    "desc": "Zwei Nächte mit Zeitpuffer und Gelegenheit zum Ausruhen."
   },
   {
-    "n": 18,
+    "n": 19,
     "name": "Lyon",
     "lat": 45.7675,
     "lng": 4.835,
@@ -749,10 +800,10 @@ const ROUTE = [
     "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Lyon",
     "coordinateSource": "https://en.wikipedia.org/wiki/Lyon",
-    "desc": "Eine Nacht in Lyon ist als Zwischenstopp auf der Rückfahrt vorgesehen."
+    "desc": "Eine Nacht in Lyon auf dem Heimweg."
   },
   {
-    "n": 19,
+    "n": 20,
     "name": "Bern",
     "lat": 46.94806,
     "lng": 7.4475,
@@ -765,10 +816,10 @@ const ROUTE = [
     "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Bern",
     "coordinateSource": "https://en.wikipedia.org/wiki/Bern",
-    "desc": "Die letzte Übernachtung unterwegs planen wir in Bern. Am nächsten Tag geht es nach München."
+    "desc": "Letzte Nacht in der Schweiz vor der Rückfahrt nach München."
   },
   {
-    "n": 20,
+    "n": 21,
     "name": "München",
     "lat": 48.1375,
     "lng": 11.575,
@@ -781,7 +832,7 @@ const ROUTE = [
     "emoji": "🏠",
     "wiki": "https://en.wikipedia.org/wiki/Munich",
     "coordinateSource": "https://en.wikipedia.org/wiki/Munich",
-    "desc": "Wir planen die Rückkehr am 25. April. Bis zum Elternzeitende am 27. April bleiben zwei Tage Puffer."
+    "desc": "Geplante Rückkehr nach München am 25. April; bis zum genannten Elternzeitende am 27. April bleiben zwei Puffertage."
   }
 ];
 
@@ -830,15 +881,99 @@ let   animIndex   = 0;
 let   animTimer   = null;
 let   activePanelIdx = -1;
 
-// ── Route animation ───────────────────────────────────────────
-function buildIcon(stop) {
+// ── Route animation and collision-free marker grouping ──────
+// Cluster in screen pixels, not geographical distance: repeat visits and
+// nearby cities must remain individually selectable at every zoom level.
+// Complete-link grouping prevents chains of distant stops merging together.
+function clusterStopsByPixelDistance(stops, project, minimumGap = 48) {
+  const groups = [];
+  for (const stop of stops) {
+    const point = project(stop);
+    const matching = groups.find(group => group.points.every(other => {
+      const dx = point.x - other.x;
+      const dy = point.y - other.y;
+      return dx * dx + dy * dy < minimumGap * minimumGap;
+    }));
+    if (matching) {
+      matching.stops.push(stop);
+      matching.points.push(point);
+    } else {
+      groups.push({ stops: [stop], points: [point] });
+    }
+  }
+  return groups.map(group => group.stops);
+}
+
+function buildIcon(group) {
+  const multiple = group.length > 1;
+  const label = multiple ? `${group.length}×` : group[0].n;
+  const type = multiple ? 'cluster' : group[0].type;
+  const title = multiple ? `${group.length} Etappen – klicken, um auszuwählen` : `Etappe ${group[0].n}`;
   return L.divIcon({
     className: '',
-    html: `<div class="marker-wrap"><div class="marker-pin type-${stop.type}" id="mp-${stop.n}">${stop.n}</div></div>`,
+    html: `<div class="marker-wrap"><div class="marker-pin type-${type}" title="${title}">${label}</div></div>`,
     iconSize: [34, 34],
     iconAnchor: [17, 17],
   });
 }
+
+function stopPicker(group) {
+  const picker = document.createElement('div');
+  picker.className = 'route-stop-picker';
+  const title = document.createElement('strong');
+  title.textContent = `${group.length} Etappen – bitte auswählen`;
+  picker.append(title);
+  for (const stop of group) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    const kind = stop.type === 'start' ? 'Start' : stop.type === 'end' ? 'Rückkehr' : stop.name;
+    button.textContent = `${stop.n}. ${kind} · ${formatDate(stop.arrival)}`;
+    button.addEventListener('click', () => {
+      map.closePopup();
+      openPanel(stop.n - 1);
+    });
+    picker.append(button);
+  }
+  L.DomEvent.disableClickPropagation(picker);
+  return picker;
+}
+
+function highlightActiveMarker() {
+  document.querySelectorAll('.marker-pin').forEach(el => el.classList.remove('active'));
+  if (activePanelIdx < 0) return;
+  const group = markerObjs.find(item => item.stopIndexes.includes(activePanelIdx));
+  const pin = group?.marker.getElement()?.querySelector('.marker-pin');
+  if (pin) pin.classList.add('active');
+}
+
+function refreshMarkers() {
+  map.closePopup();
+  markerObjs.forEach(item => map.removeLayer(item.marker));
+  markerObjs.length = 0;
+  const visibleStops = STOPS.slice(0, animIndex);
+  const groups = clusterStopsByPixelDistance(
+    visibleStops, stop => map.latLngToLayerPoint([stop.lat, stop.lng])
+  );
+  for (const group of groups) {
+    // The route line always uses the actual coordinates; only the marker
+    // groups use a center, so no geolocation or travel order is altered.
+    const lat = group.reduce((sum, stop) => sum + stop.lat, 0) / group.length;
+    const lng = group.reduce((sum, stop) => sum + stop.lng, 0) / group.length;
+    const marker = L.marker([lat, lng], {
+      icon: buildIcon(group),
+      zIndexOffset: group.length > 1 ? 2000 : group[0].n,
+    }).addTo(map);
+    if (group.length === 1) {
+      marker.on('click', () => openPanel(group[0].n - 1));
+    } else {
+      marker.bindPopup(stopPicker(group), { maxWidth: 300, autoPanPadding: [30, 30] });
+    }
+    markerObjs.push({ marker, stopIndexes: group.map(stop => stop.n - 1) });
+  }
+  highlightActiveMarker();
+}
+
+map.on('zoomend', refreshMarkers);
 
 function drawNextStep() {
   if (animIndex >= STOPS.length) {
@@ -870,13 +1005,8 @@ function drawNextStep() {
     drawnLines.push(pl);
   }
 
-  const markerIdx = animIndex;
-  const marker = L.marker([stop.lat, stop.lng], { icon: buildIcon(stop), zIndexOffset: stop.n })
-    .addTo(map);
-  marker.on('click', () => openPanel(markerIdx));
-  markerObjs.push(marker);
-
   animIndex++;
+  refreshMarkers();
   animTimer = setTimeout(drawNextStep, 230);
 }
 
@@ -891,13 +1021,13 @@ function resetAnimation() {
   if (animTimer) clearTimeout(animTimer);
   drawnLines.forEach(l => map.removeLayer(l));
   drawnLines.length = 0;
-  markerObjs.forEach(m => map.removeLayer(m));
+  markerObjs.forEach(item => map.removeLayer(item.marker));
   markerObjs.length = 0;
   animIndex = 0;
   document.getElementById('night-counter').textContent = TOTAL_NIGHTS;
   closePanel();
   map.setView([43, 2], 5, { animate: true });
-  setTimeout(drawNextStep, 600);
+  animTimer = setTimeout(drawNextStep, 600);
 }
 
 // ── Panel ─────────────────────────────────────────────────────
@@ -915,7 +1045,7 @@ function openPanel(idx) {
   document.getElementById('p-arrival').textContent = formatDate(stop.arrival);
   document.getElementById('p-departure').textContent = formatDate(stop.departure);
   const nights = nightsAt(stop);
-  document.getElementById('p-nights').textContent = stop.type === 'start' ? 'Start am 1. Februar 2027' : stop.type === 'end' ? 'Rückkehr am 25. April · 2 Tage Puffer bis 27. April' : `${nights} ${nights === 1 ? 'Nacht' : 'Nächte'} · geplant`;
+  document.getElementById('p-nights').textContent = stop.type === 'start' ? 'Start am 8. Februar 2027' : stop.type === 'end' ? 'Rückkehr am 25. April · 2 Tage Puffer bis 27. April' : `${nights} ${nights === 1 ? 'Nacht' : 'Nächte'} · geplant`;
   document.getElementById('p-prog-pct').textContent = `${pct}%`;
   document.getElementById('p-wiki').href = d.wiki;
 
@@ -933,18 +1063,16 @@ function openPanel(idx) {
   document.getElementById('panel').classList.add('open');
   document.querySelector('.panel-body').scrollTop = 0;
 
-  // Highlight active marker
-  document.querySelectorAll('.marker-pin').forEach(el => el.classList.remove('active'));
-  const pin = document.getElementById(`mp-${stop.n}`);
-  if (pin) pin.classList.add('active');
+  // Also highlight shared markers representing repeat visits.
+  highlightActiveMarker();
 
   map.panTo([stop.lat, stop.lng], { animate: true, duration: 0.6 });
 }
 
 function closePanel() {
   document.getElementById('panel').classList.remove('open');
-  document.querySelectorAll('.marker-pin').forEach(el => el.classList.remove('active'));
   activePanelIdx = -1;
+  highlightActiveMarker();
 }
 
 document.getElementById('btn-plan').addEventListener('click', () => openPanel(0));
@@ -978,7 +1106,7 @@ document.addEventListener('fullscreenchange', () => {
 document.getElementById('btn-replay').addEventListener('click', resetAnimation);
 
 // ── Start ─────────────────────────────────────────────────────
-setTimeout(drawNextStep, 900);
+animTimer = setTimeout(drawNextStep, 900);
 </script>
 
 </body>
