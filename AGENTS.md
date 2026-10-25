@@ -1,6 +1,6 @@
 # AGENTS.md — Post creation playbook
 
-This repository is a German-language, data-driven parental-leave travel journal for January through April 1. The public site is rendered by `index.html`; editorial content lives in `data/entries.json`.
+This repository is a German-language, data-driven parental-leave travel journal for 8 February through 25 April 2027. The public site is rendered by `index.html`; editorial content lives in `data/entries.json`.
 
 These instructions apply to every agent that creates, edits, validates, or publishes a journal post.
 
@@ -232,4 +232,8 @@ A new post is complete only when:
 
 ## Project scope
 
-The entire site documents the family’s parental-leave journey from January through April 1, using their own car and Airbnb-style accommodation. Do not reintroduce campervan or ferry assumptions unless the user explicitly changes the plan again.
+The entire site documents the family’s parental-leave journey from 8 February through 25 April 2027, using their own car and Airbnb-style accommodation. Do not reintroduce campervan or ferry assumptions unless the user explicitly changes the plan again.
+
+## Route plan page
+
+`plan.html` is a separate page with the planned 2027 route. The journal links to it from the “Route plan” button in the top-right of `index.html`, and it links back with “← Journal”. Blog posts never touch `plan.html`; changing the route is a product change that must keep `node scripts/validate-plan.mjs` passing, including both navigation links.

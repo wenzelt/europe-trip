@@ -5,20 +5,7 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
-  workflow_run:
-    workflows: [Validate route plan]
-    types: [completed]
-    branches: [vacation-plan]
   workflow_dispatch:
-    inputs:
-      site_ref:
-        description: Site version to deploy
-        required: true
-        default: master
-        type: choice
-        options:
-          - master
-          - vacation-plan
 
 permissions:
   contents: read
@@ -31,7 +18,6 @@ concurrency:
 
 jobs:
   validate:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,92 +26,18 @@ jobs:
           node-version: 22
       - name: Validate blog content
         run: node scripts/validate-content.mjs
-
-  resolve-site:
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository)
-    runs-on: ubuntu-latest
-    outputs:
-      site_ref: ${{ steps.source.outputs.site_ref }}
-      publish_selected: ${{ steps.source.outputs.publish_selected }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: source
-        name: Select site branch
-        shell: bash
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          MANUAL_SITE_REF: ${{ inputs.site_ref }}
-        run: |
-          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
-            site_ref="$MANUAL_SITE_REF"
-          else
-            site_ref="$(tr -d '[:space:]' < .github/pages-source.txt)"
-          fi
-
-          case "$site_ref" in
-            master|vacation-plan) ;;
-            *)
-              echo "Unsupported Pages source: $site_ref" >&2
-              exit 1
-              ;;
-          esac
-
-          if [ "$EVENT_NAME" = "workflow_run" ] && [ "$site_ref" != "vacation-plan" ]; then
-            echo "publish_selected=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "publish_selected=true" >> "$GITHUB_OUTPUT"
-          fi
-
-          echo "Deploying site from $site_ref"
-          echo "site_ref=$site_ref" >> "$GITHUB_OUTPUT"
+      - name: Validate route plan and site navigation
+        run: node scripts/validate-plan.mjs
 
   deploy:
-    if: needs.resolve-site.outputs.publish_selected == 'true'
-    needs: [validate, resolve-site]
+    if: github.event_name != 'pull_request'
+    needs: validate
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || needs.resolve-site.outputs.site_ref }}
-          fetch-depth: 1
-      - uses: actions/setup-node@v4
-        if: needs.resolve-site.outputs.site_ref == 'vacation-plan'
-        with:
-          node-version: 22
-      - name: Validate the selected planner
-        if: needs.resolve-site.outputs.site_ref == 'vacation-plan'
-        run: node scripts/validate-plan.mjs
-      - name: Restore CARTO authentication for vacation planner
-        if: needs.resolve-site.outputs.site_ref == 'vacation-plan'
-        shell: bash
-        run: |
-          git fetch --depth=1 origin master
-          python - <<'PY'
-          import re
-          import subprocess
-          from pathlib import Path
-
-          master_html = subprocess.check_output(
-              ['git', 'show', 'origin/master:index.html'], text=True
-          )
-          match = re.search(r'\?key=([A-Za-z0-9_]+)', master_html)
-          if not match:
-              raise SystemExit('Could not find CARTO key in master/index.html')
-
-          key = match.group(1)
-          path = Path('index.html')
-          html = path.read_text(encoding='utf-8')
-          old_url = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-          if old_url not in html:
-              raise SystemExit('Expected vacation-plan CARTO tile URL was not found')
-
-          html = html.replace(old_url, f'{old_url}?key={key}', 1)
-          html = html.replace('maxZoom: 19,', 'maxZoom: 20,', 1)
-          path.write_text(html, encoding='utf-8')
-          PY
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
