@@ -233,3 +233,7 @@ A new post is complete only when:
 ## Project scope
 
 The entire site documents the family’s parental-leave journey from January through April 1, using their own car and Airbnb-style accommodation. Do not reintroduce campervan or ferry assumptions unless the user explicitly changes the plan again.
+
+## Route plan page
+
+`plan.html` is a separate page with the planned 2027 route. The journal links to it from the “Route plan” button in the top-right of `index.html`, and it links back with “← Journal”. Blog posts never touch `plan.html`; changing the route is a product change that must keep `node scripts/validate-plan.mjs` passing, including both navigation links.

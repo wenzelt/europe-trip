@@ -47,9 +47,11 @@ body {
 /* Shape scale: panels 24px, inputs 12px, status and filter controls pills.
    Layers: Leaflet uses 0-1000; mobile navigation 1100; skip link 2000;
    the native dialog occupies the browser's top layer. */
-.theme-controls {
+.header-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
+  gap: 10px;
   max-width: 1180px;
   margin: 0 auto 20px;
 }
@@ -77,6 +79,29 @@ body {
 }
 
 .theme-toggle:active {
+  transform: scale(.98);
+}
+
+.plan-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 9px 16px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-size: .82rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.plan-link:hover {
+  box-shadow: var(--surface-shadow-hover);
+}
+
+.plan-link:active {
   transform: scale(.98);
 }
 
