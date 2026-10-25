@@ -1,6 +1,6 @@
 # Europe Trip — Elternzeit-Journal
 
-Ein datengetriebenes Elternzeit-Journal mit interaktiver Karte. Von Januar bis 1. April reisen wir mit dem eigenen Auto; Unterkünfte sind Airbnbs oder ähnliche Ferienwohnungen.
+Ein datengetriebenes Elternzeit-Journal mit interaktiver Karte. Vom 8. Februar bis 25. April 2027 reisen wir mit dem eigenen Auto; Unterkünfte sind Airbnbs oder ähnliche Ferienwohnungen.
 
 Die Seite besteht aus zwei Teilen:
 
