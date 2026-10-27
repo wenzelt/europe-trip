@@ -28,6 +28,10 @@ jobs:
         run: node scripts/validate-content.mjs
       - name: Validate route plan and site navigation
         run: node scripts/validate-plan.mjs
+      - name: Validate SEO metadata and crawl files
+        run: node --test scripts/seo.test.mjs
+      - name: Test journal page
+        run: node --test scripts/journal.test.mjs
 
   deploy:
     if: github.event_name != 'pull_request'

@@ -1,0 +1,10 @@
+# Our Parental Leave in Europe
+
+> A family travel journal and a draft parental-leave road trip from Munich through Switzerland, France, Spain and Portugal, 8 February–25 April 2027.
+
+## Public pages
+
+- [Travel journal](https://wenzelt.github.io/europe-trip/): Published travel stories and an interactive map. Journal text includes English and German.
+- [Route plan](https://wenzelt.github.io/europe-trip/plan.html): German-language draft itinerary, with 21 stations and 76 nights. The route is a plan, not a record of completed travel or confirmed bookings.
+
+The journal and route plan are distinct: published stories may describe travel outside the planned 2027 itinerary. Do not infer that planned stops have been visited.

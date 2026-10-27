@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wenzelt.github.io/europe-trip/sitemap.xml

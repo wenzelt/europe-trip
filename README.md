@@ -83,7 +83,11 @@ Dann `http://localhost:8000` öffnen (Journal) bzw. `http://localhost:8000/plan.
 ```bash
 node scripts/validate-content.mjs
 node scripts/validate-plan.mjs
+node --test scripts/seo.test.mjs
+node --test scripts/journal.test.mjs
 ```
+
+Die SEO-Checkliste, RED/GREEN-Nachweise und offenen Punkte stehen in [`docs/seo.tdd.md`](docs/seo.tdd.md).
 
 `validate-plan.mjs` überprüft lückenlose Übernachtungen, das Osterfenster in Spanien, die Kite-Woche, die Marker-Gruppierungslogik und die gegenseitige Verlinkung von Journal und Reiseplan.
 
@@ -93,7 +97,7 @@ Pushes auf `master` werden nach erfolgreicher Prüfung beider Skripte automatisc
 
 ## Gestaltung
 
-Die Seite nutzt statisches HTML, CSS und Leaflet. Die Schriftarten Outfit und Plus Jakarta Sans werden lokal aus `assets/fonts/` geladen; die jeweiligen SIL-OFL-Lizenzen liegen daneben. Die Dateien stammen aus den Fontsource-Paketen `@fontsource/outfit` und `@fontsource/plus-jakarta-sans`, jeweils Version 5.3.0.
+Die Seite nutzt statisches HTML, CSS und Leaflet. Die Schriftarten Bebas Neue (Überschriften) und EB Garamond (Fließtext) werden lokal aus `assets/fonts/` geladen; die jeweiligen SIL-OFL-Lizenzen liegen daneben. Gemeinsame Farben, Schriftgrößen und Abstände stehen in `tokens.css`, das Journal nutzt `design-system.css`, der Reiseplan `plan.css`. Die vier Fotos unter `assets/found/` stammen von Wikimedia Commons; Urheber und Lizenz stehen in `assets/found/credits.json`.
 
 Das Farbschema des Journals folgt zunächst der Systemeinstellung. Der Schalter „Dark theme“ speichert die eigene Auswahl lokal im Browser. Die Kartendarstellung wechselt passend zwischen CARTO Voyager und Dark Matter. Der Reiseplan hat ein eigenes dunkles Design.
 

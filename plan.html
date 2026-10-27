@@ -5,491 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Elternzeit-Roadtrip 2027 · München, Andalusien & Algarve</title>
   <meta name="description" content="Elternzeit-Routenentwurf vom 8. Februar bis 25. April 2027 mit Kite-Woche in Tarifa, Ostern in Cádiz und Algarve danach. Zwei Tage Puffer bis 27. April.">
+  <link rel="canonical" href="https://wenzelt.github.io/europe-trip/plan.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Elternzeit-Roadtrip 2027 · Andalusien &amp; Algarve">
+  <meta property="og:description" content="Routenentwurf ab München vom 8. Februar bis 25. April 2027: 21 Stationen, 76 Nächte, Tarifa, Ostern in Cádiz und die Algarve.">
+  <meta property="og:url" content="https://wenzelt.github.io/europe-trip/plan.html">
+  <meta property="og:image" content="https://wenzelt.github.io/europe-trip/assets/posts/aufbruch-fuerteventura-nuernberg-2026-10-03/zugfahrt-nuernberg-2026-10-03.jpeg">
+  <meta property="og:image:alt" content="Ein Moment auf der Zugfahrt nach Nürnberg aus unserem Reisejournal.">
+  <meta property="og:image:width" content="1178">
+  <meta property="og:image:height" content="1571">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Elternzeit-Roadtrip 2027 · München, Andalusien & Algarve",
+      "url": "https://wenzelt.github.io/europe-trip/plan.html",
+      "description": "Noch nicht gebuchter Routenentwurf vom 8. Februar bis 25. April 2027 mit 21 Stationen und 76 Nächten.",
+      "inLanguage": "de",
+      "relatedLink": "https://wenzelt.github.io/europe-trip/"
+    }
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preload" href="./assets/fonts/bebas-neue-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./assets/fonts/eb-garamond-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./fonts.css">
+  <script>
+    // Apply the saved/system theme before the page paints.
+    try {
+      const savedTheme = localStorage.getItem('journal-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.dataset.theme = savedTheme === 'light' || savedTheme === 'dark'
+        ? savedTheme : (prefersDark ? 'dark' : 'light');
+    } catch {
+      document.documentElement.dataset.theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+  </script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <style>
-    :root {
-      --bg: #0d1b2a;
-      --panel: rgba(10, 20, 35, 0.94);
-      --accent: #4299e1;
-      --stay: #f6ad55;
-      --start: #68d391;
-      --text: #e2e8f0;
-      --muted: #718096;
-      --border: rgba(66, 153, 225, 0.18);
-      --shadow: 0 8px 40px rgba(0,0,0,0.55);
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      background: var(--bg);
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      height: 100dvh;
-      overflow: hidden;
-      color: var(--text);
-    }
-
-    #map { width: 100%; height: 100%; }
-
-    /* ── Header ── */
-    #header {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      z-index: 1000;
-      background: linear-gradient(180deg, rgba(10,20,35,0.92) 0%, rgba(10,20,35,0.5) 70%, transparent 100%);
-      padding: 18px 20px 56px;
-      pointer-events: none;
-    }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      min-height: 44px;
-      margin-bottom: 8px;
-      padding: 9px 16px;
-      border: 1px solid var(--accent);
-      border-radius: 999px;
-      background: var(--panel);
-      color: var(--text);
-      font-size: 0.82rem;
-      font-weight: 700;
-      text-decoration: none;
-      pointer-events: auto;
-    }
-    .back-link:hover, .back-link:focus-visible { background: rgba(66,153,225,0.15); color: #fff; }
-
-    .h-row { display: flex; align-items: center; gap: 12px; }
-    .h-icon { font-size: 2rem; }
-    .h-title { font-size: 1.05rem; font-weight: 700; color: #fff; letter-spacing: 0.3px; }
-    .h-sub { font-size: 0.68rem; color: var(--accent); margin-top: 3px; letter-spacing: 0.4px; }
-
-    /* ── Stats bar ── */
-    #stats {
-      position: absolute;
-      bottom: 24px; left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 50px;
-      padding: 11px 28px;
-      display: flex;
-      gap: 28px;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: var(--shadow);
-      white-space: nowrap;
-    }
-
-    .stat { text-align: center; }
-    .stat-val { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
-    .stat-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-top: 2px; }
-
-    /* ── Fullscreen button ── */
-    #btn-fs {
-      position: absolute;
-      top: 20px; right: 56px;
-      z-index: 1000;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      width: 34px; height: 34px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      font-size: 0.85rem;
-      color: var(--muted);
-      transition: color 0.2s, border-color 0.2s;
-    }
-    #btn-fs:hover { color: #fff; border-color: var(--accent); }
-
-    /* ── Replay button ── */
-    #btn-replay {
-      position: absolute;
-      top: 60px; right: 56px;
-      z-index: 1000;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      width: 34px; height: 34px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      font-size: 0.85rem;
-      color: var(--muted);
-      transition: color 0.2s, border-color 0.2s;
-    }
-    #btn-replay:hover { color: #fff; border-color: var(--accent); }
-
-    /* ── Stop panel ── */
-    #panel {
-      position: absolute;
-      top: 0; right: 0; bottom: 0;
-      width: min(380px, 100vw);
-      background: var(--panel);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border-left: 1px solid var(--border);
-      z-index: 1001;
-      transform: translateX(102%);
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      flex-direction: column;
-      box-shadow: -8px 0 40px rgba(0,0,0,0.4);
-    }
-
-    #panel.open { transform: translateX(0); }
-
-    .panel-head {
-      padding: 22px 20px 18px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-    }
-
-    .p-emoji { font-size: 2.6rem; flex-shrink: 0; line-height: 1; margin-top: 2px; }
-
-    .p-info { flex: 1; min-width: 0; }
-    .p-num { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); }
-    .p-name { font-size: 1.25rem; font-weight: 700; color: #fff; margin: 5px 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .p-country { font-size: 0.78rem; color: var(--accent); }
-
-    .p-close {
-      font-size: 1.5rem;
-      color: var(--muted);
-      cursor: pointer;
-      padding: 0 4px;
-      transition: color 0.2s;
-      line-height: 1;
-      flex-shrink: 0;
-    }
-    .p-close:hover { color: #fff; }
-
-    .panel-body { padding: 20px; flex: 1; overflow-y: auto; }
-
-    .p-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 14px;
-    }
-
-    .badge-drive  { background: rgba(66,153,225,0.12); color: var(--accent); border: 1px solid rgba(66,153,225,0.25); }
-    .badge-stay  { background: rgba(246,173,85,0.12); color: var(--stay); border: 1px solid rgba(246,173,85,0.25); }
-    .badge-start  { background: rgba(104,211,145,0.12); color: var(--start); border: 1px solid rgba(104,211,145,0.25); }
-    .badge-end    { background: rgba(104,211,145,0.12); color: var(--start); border: 1px solid rgba(104,211,145,0.25); }
-
-    .p-desc {
-      font-size: 0.88rem;
-      line-height: 1.65;
-      color: #a0aec0;
-      margin-bottom: 20px;
-    }
-
-    .p-km-card {
-      background: rgba(66,153,225,0.06);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
-      display: flex;
-      gap: 16px;
-    }
-
-    .p-km-item { flex: 1; }
-    .p-km-val { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
-    .p-km-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-top: 2px; }
-
-    /* Progress bar */
-    .p-progress {
-      margin-top: 16px;
-    }
-
-    .p-progress-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.62rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .p-progress-bar {
-      height: 4px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .p-progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), #667eea);
-      border-radius: 4px;
-      transition: width 0.6s ease;
-    }
-
-    .panel-nav {
-      padding: 16px 20px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 8px;
-    }
-
-    .nav-btn {
-      flex: 1;
-      padding: 10px 8px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: rgba(66,153,225,0.06);
-      color: var(--accent);
-      cursor: pointer;
-      font-size: 0.78rem;
-      font-weight: 600;
-      text-align: center;
-      transition: background 0.2s, border-color 0.2s;
-      user-select: none;
-    }
-    .nav-btn:hover:not([disabled]) { background: rgba(66,153,225,0.15); border-color: var(--accent); }
-    .nav-btn[disabled] { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
-
-    .wiki-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      width: 100%;
-      margin-top: 14px;
-      padding: 11px 16px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: rgba(255,255,255,0.03);
-      color: #90cdf4;
-      text-decoration: none;
-      font-size: 0.8rem;
-      font-weight: 600;
-      transition: background 0.2s, border-color 0.2s, color 0.2s;
-    }
-    .wiki-btn:hover { background: rgba(66,153,225,0.1); border-color: var(--accent); color: #fff; }
-    .wiki-btn svg { flex-shrink: 0; opacity: 0.7; }
-
-    /* ── Custom markers ── */
-    .marker-wrap {
-      width: 34px; height: 34px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-    }
-
-    .marker-pin {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; font-weight: 800;
-      border: 2px solid rgba(255,255,255,0.45);
-      transition: transform 0.2s, box-shadow 0.2s;
-      position: relative;
-    }
-
-    .marker-pin.type-start,
-    .marker-pin.type-end {
-      background: #1c4532;
-      color: var(--start);
-      border-color: var(--start);
-      box-shadow: 0 0 0 4px rgba(104,211,145,0.2), 0 4px 14px rgba(0,0,0,0.5);
-    }
-
-    .marker-pin.type-stay {
-      background: #5a3010;
-      color: var(--stay);
-      border-color: var(--stay);
-      box-shadow: 0 0 0 4px rgba(246,173,85,0.2), 0 4px 14px rgba(0,0,0,0.5);
-    }
-
-    .marker-pin.type-drive {
-      background: #1a365d;
-      color: var(--accent);
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(66,153,225,0.15), 0 4px 14px rgba(0,0,0,0.5);
-    }
-
-    .marker-pin.active {
-      transform: scale(1.25);
-      z-index: 999;
-    }
-
-    .marker-pin.type-start.active,
-    .marker-pin.type-end.active {
-      box-shadow: 0 0 0 6px rgba(104,211,145,0.35), 0 6px 20px rgba(0,0,0,0.6);
-    }
-
-    .marker-pin.type-stay.active {
-      box-shadow: 0 0 0 6px rgba(246,173,85,0.35), 0 6px 20px rgba(0,0,0,0.6);
-    }
-
-    .marker-pin.type-drive.active {
-      box-shadow: 0 0 0 6px rgba(66,153,225,0.35), 0 6px 20px rgba(0,0,0,0.6);
-    }
-
-    /* Close or repeated route stops are merged at the current zoom level. */
-    .marker-pin.type-cluster {
-      background: #48371f;
-      color: #fff;
-      border-color: var(--stay);
-      box-shadow: 0 0 0 4px rgba(246,173,85,0.18), 0 4px 16px rgba(0,0,0,0.5);
-    }
-    .marker-pin.type-cluster.active {
-      box-shadow: 0 0 0 6px rgba(246,173,85,0.42), 0 6px 20px rgba(0,0,0,0.65);
-    }
-    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-      background: #122337;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .leaflet-popup-content { margin: 14px; }
-    .leaflet-popup-close-button { color: #e2e8f0 !important; }
-    .route-stop-picker { min-width: 205px; display: grid; gap: 8px; }
-    .route-stop-picker strong { font-size: 0.85rem; }
-    .route-stop-picker button {
-      text-align: left;
-      border: 1px solid rgba(66,153,225,0.3);
-      border-radius: 8px;
-      padding: 9px;
-      background: rgba(66,153,225,0.08);
-      color: #e2e8f0;
-      cursor: pointer;
-      font-size: .76rem;
-      line-height: 1.5;
-    }
-    .route-stop-picker button:hover, .route-stop-picker button:focus-visible {
-      border-color: var(--stay);
-      background: rgba(246,173,85,0.14);
-    }
-
-    /* Pulse on start */
-    @keyframes pulse {
-      0%   { box-shadow: 0 0 0 0 rgba(104,211,145,0.5), 0 4px 14px rgba(0,0,0,0.5); }
-      70%  { box-shadow: 0 0 0 10px rgba(104,211,145,0), 0 4px 14px rgba(0,0,0,0.5); }
-      100% { box-shadow: 0 0 0 0 rgba(104,211,145,0), 0 4px 14px rgba(0,0,0,0.5); }
-    }
-
-    .marker-pin.type-start {
-      animation: pulse 2s infinite;
-    }
-
-    /* ── Leaflet overrides ── */
-    .leaflet-control-zoom a {
-      background: var(--panel) !important;
-      border-color: var(--border) !important;
-      color: var(--muted) !important;
-      backdrop-filter: blur(16px) !important;
-    }
-    .leaflet-control-zoom a:hover { color: #fff !important; }
-    .leaflet-control-attribution {
-      background: rgba(10,20,35,0.7) !important;
-      color: var(--muted) !important;
-      backdrop-filter: blur(8px) !important;
-    }
-    .leaflet-control-attribution a { color: var(--accent) !important; }
-
-    /* ── Mobile ── */
-    @media (max-width: 600px) {
-      #stats {
-        left: 12px; right: 12px;
-        transform: none;
-        border-radius: 16px;
-        justify-content: space-between;
-        gap: 0;
-        padding: 10px 18px;
-        bottom: 16px;
-      }
-
-      .stat-val { font-size: 0.95rem; }
-
-      #panel {
-        top: auto;
-        height: 62vh;
-        width: 100%;
-        transform: translateY(105%);
-        border-left: none;
-        border-top: 1px solid var(--border);
-        border-radius: 18px 18px 0 0;
-        box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
-      }
-
-      #panel.open { transform: translateY(0); }
-
-      #btn-fs, #btn-replay { display: none; }
-    }
-
-    #btn-plan { pointer-events: auto; margin-top: 10px; padding: 8px 12px; background: var(--panel); color: var(--text); border: 1px solid var(--accent); border-radius: 8px; cursor: pointer; }
-    #p-nights { color: var(--start); margin-bottom: 16px; font-size: .85rem; }
-    .p-close { background: transparent; border: 0; }
-    button { font-family: inherit; }
-    .plan-note { font-size: .75rem; line-height: 1.6; color: #a0aec0; margin: 20px 0; }
-    .itinerary-title { font-size: 1rem; margin: 20px 0 10px; }
-    #itinerary { display: grid; gap: 6px; }
-    #itinerary button { font: inherit; font-size: .78rem; text-align: left; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--text); cursor: pointer; }
-    #itinerary button:hover, #itinerary button:focus-visible { border-color: var(--accent); }
-    .p-name { white-space: normal; }
-    @media (max-width: 600px) { .h-title { font-size: .95rem; } .h-sub { max-width: 290px; line-height: 1.5; } #stats { padding: 10px; } .stat-val { font-size: .85rem; } .stat-label { font-size: .48rem; letter-spacing: .3px; } }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
-  </style>
+  <link rel="stylesheet" href="./tokens.css">
+  <link rel="stylesheet" href="./plan.css">
 </head>
 <body>
 
-<div id="map"></div>
+<header id="header">
+  <a class="back-link" href="./"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M11 5l-7 7 7 7"/></svg>Journal</a>
+  <h1 class="h-title">Elternzeit · Andalusien &amp; Algarve</h1>
+  <p class="h-dates"><time datetime="2027-02-08">08.02.</time>–<time datetime="2027-04-25">25.04.2027</time></p>
+  <p class="h-sub">Hyundai ab München · Puffer bis 27.04.<br>Routenentwurf · nicht gebucht · ohne Flüge</p>
+  <button id="btn-plan" class="btn btn-primary" type="button">Etappen ansehen</button>
+</header>
 
-<div id="header">
-  <a class="back-link" href="./"><span aria-hidden="true">←</span> Journal</a>
-  <div class="h-row">
-    <div class="h-icon">🚗</div>
-    <div>
-      <div class="h-title">Elternzeit · Andalusien & Algarve</div>
-      <div class="h-sub">08.02.–25.04.2027 · Hyundai ab München · Puffer bis 27.04.<br>Routenentwurf · nicht gebucht · ohne Flüge<br><button id="btn-plan" type="button">Etappen ansehen</button></div>
-    </div>
-  </div>
+<div id="tools">
+  <button type="button" id="btn-theme" class="btn" aria-pressed="false">Dunkel</button>
+  <button type="button" id="btn-replay" class="btn btn-icon" title="Animation wiederholen" aria-label="Animation wiederholen"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12a8 8 0 1 0 3-6.2"/><path d="M4 3v5h5"/></svg></button>
+  <button type="button" id="btn-fs" class="btn btn-icon" title="Vollbild" aria-label="Vollbild umschalten"><svg class="off" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><svg class="on" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg></button>
 </div>
 
-<div id="stats">
+<div id="stats" role="group" aria-label="Reise in Zahlen">
   <div class="stat"><div class="stat-val" id="stop-count">21</div><div class="stat-label">Stationen</div></div>
   <div class="stat"><div class="stat-val" id="country-count">5</div><div class="stat-label">Länder</div></div>
   <div class="stat"><div class="stat-val" id="night-counter">76</div><div class="stat-label">Nächte</div></div>
   <div class="stat"><div class="stat-val">2</div><div class="stat-label">Puffertage</div></div>
 </div>
 
-<button type="button" id="btn-fs" title="Vollbild" aria-label="Vollbild umschalten">⛶</button>
-<button type="button" id="btn-replay" title="Animation wiederholen" aria-label="Animation wiederholen">↺</button>
+<main id="map" aria-label="Routenkarte"></main>
 
-<div id="panel">
+<aside id="panel" tabindex="-1" aria-label="Etappendetails">
   <div class="panel-head">
-    <div class="p-emoji" id="p-emoji">🏔</div>
     <div class="p-info">
-      <div class="p-num" id="p-num">Station 1 von 21</div>
-      <div class="p-name" id="p-name">München</div>
-      <div class="p-country" id="p-country">🇩🇪 Deutschland</div>
+      <p class="p-num" id="p-num">Station 1 von 21</p>
+      <h2 class="p-name" id="p-name">München</h2>
+      <p class="p-country" id="p-country">Deutschland</p>
     </div>
-    <button type="button" class="p-close" id="p-close" aria-label="Etappen schließen">×</button>
+    <button type="button" class="btn btn-icon p-close" id="p-close" aria-label="Etappen schließen"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
   </div>
   <div class="panel-body">
-    <span class="p-badge badge-start" id="p-badge">Start</span>
+    <p class="p-type"><span class="p-glyph" id="p-glyph" aria-hidden="true"></span><span id="p-badge">Start</span></p>
     <p class="p-desc" id="p-desc"></p><p id="p-nights"></p>
-    <div class="p-km-card">
-      <div class="p-km-item">
-        <div class="p-km-val" id="p-arrival">08.02.2027</div>
-        <div class="p-km-label">Ankunft</div>
+    <div class="p-dates">
+      <div class="p-date">
+        <div class="p-date-val" id="p-arrival">08.02.2027</div>
+        <div class="p-date-label">Ankunft</div>
       </div>
-      <div class="p-km-item">
-        <div class="p-km-val" id="p-departure">08.02.2027</div>
-        <div class="p-km-label">Weiterfahrt</div>
+      <div class="p-date">
+        <div class="p-date-val" id="p-departure">08.02.2027</div>
+        <div class="p-date-label">Weiterfahrt</div>
       </div>
     </div>
     <div class="p-progress">
@@ -500,8 +101,8 @@
         <div class="p-progress-fill" id="p-prog-bar" style="width:0%"></div>
       </div>
     </div>
-    <a class="wiki-btn" id="p-wiki" href="#" target="_blank" rel="noopener noreferrer">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    <a class="btn wiki-btn" id="p-wiki" href="#" target="_blank" rel="noopener noreferrer">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
       Mehr zum Ort
     </a>
     <p class="plan-note">Die Linien verbinden die Stationen schematisch und zeigen keine berechnete Straßenroute. Dauer, Unterkünfte und Fahrzeiten sind noch nicht gebucht bzw. geprüft. Überlappende Marker zeigen mehrere Etappen zur Auswahl.</p>
@@ -509,10 +110,10 @@
     <nav id="itinerary" aria-label="Geplante Etappen"></nav>
   </div>
   <div class="panel-nav">
-    <button type="button" class="nav-btn" id="btn-prev">← Zurück</button>
-    <button type="button" class="nav-btn" id="btn-next">Weiter →</button>
+    <button type="button" class="btn nav-btn" id="btn-prev">Zurück</button>
+    <button type="button" class="btn nav-btn" id="btn-next">Weiter</button>
   </div>
-</div>
+</aside>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -527,8 +128,6 @@ const ROUTE = [
     "departure": "2027-02-08",
     "country": "Deutschland",
     "countryCode": "DE",
-    "flag": "🇩🇪",
-    "emoji": "🏠",
     "wiki": "https://en.wikipedia.org/wiki/Munich",
     "coordinateSource": "https://en.wikipedia.org/wiki/Munich",
     "desc": "Wir planen den Aufbruch ab München nach der Rückkehr aus den USA und dem Theaterbesuch in Augsburg. Erste Zwischenübernachtung: Bern."
@@ -543,8 +142,6 @@ const ROUTE = [
     "departure": "2027-02-09",
     "country": "Schweiz",
     "countryCode": "CH",
-    "flag": "🇨🇭",
-    "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Bern",
     "coordinateSource": "https://en.wikipedia.org/wiki/Bern",
     "desc": "Eine Nacht in Bern auf der Anreise nach Südspanien."
@@ -559,8 +156,6 @@ const ROUTE = [
     "departure": "2027-02-10",
     "country": "Frankreich",
     "countryCode": "FR",
-    "flag": "🇫🇷",
-    "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Lyon",
     "coordinateSource": "https://en.wikipedia.org/wiki/Lyon",
     "desc": "Eine Übernachtung in Lyon, bevor wir weiter Richtung Mittelmeer fahren."
@@ -575,8 +170,6 @@ const ROUTE = [
     "departure": "2027-02-11",
     "country": "Frankreich",
     "countryCode": "FR",
-    "flag": "🇫🇷",
-    "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Montpellier",
     "coordinateSource": "https://en.wikipedia.org/wiki/Montpellier",
     "desc": "Zwischenstopp am Mittelmeer mit Zeit für einen Spaziergang."
@@ -591,8 +184,6 @@ const ROUTE = [
     "departure": "2027-02-12",
     "country": "Spanien",
     "countryCode": "ES",
-    "flag": "🇪🇸",
-    "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Girona",
     "coordinateSource": "https://en.wikipedia.org/wiki/Girona",
     "desc": "Erste Nacht in Spanien auf dem Weg zur sonnigeren Küste."
@@ -607,8 +198,6 @@ const ROUTE = [
     "departure": "2027-02-15",
     "country": "Spanien",
     "countryCode": "ES",
-    "flag": "🇪🇸",
-    "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Pe%C3%B1%C3%ADscola",
     "coordinateSource": "https://en.wikipedia.org/wiki/Pe%C3%B1%C3%ADscola",
     "desc": "Drei Nächte an der Küste zum Ankommen, Bummeln und Kochen."
@@ -623,8 +212,6 @@ const ROUTE = [
     "departure": "2027-02-20",
     "country": "Spanien",
     "countryCode": "ES",
-    "flag": "🇪🇸",
-    "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Alicante",
     "coordinateSource": "https://en.wikipedia.org/wiki/Alicante",
     "desc": "Fünf Nächte für Strandspaziergänge, Cafés, Stadtleben und möglichst viel Sonne."
@@ -639,8 +226,6 @@ const ROUTE = [
     "departure": "2027-03-06",
     "country": "Spanien",
     "countryCode": "ES",
-    "flag": "🇪🇸",
-    "emoji": "☀️",
     "wiki": "https://en.wikipedia.org/wiki/Almer%C3%ADa",
     "coordinateSource": "https://en.wikipedia.org/wiki/Almer%C3%ADa",
     "desc": "Vierzehn Nächte an der vergleichsweise trockenen Küste: Meer, Cabo-de-Gata-Wanderungen, Lesen und Zeit zum Kochen. Almería-Stadt ist die vorgeschlagene Basis; San José bleibt eine Alternative nach Prüfung der Winterinfrastruktur."
@@ -655,8 +240,6 @@ const ROUTE = [
     "departure": "2027-03-17",
     "country": "Spanien",
     "countryCode": "ES",
-    "flag": "🇪🇸",
-    "emoji": "🌿",
     "wiki": "https://en.wikipedia.org/wiki/Torrox",
     "coordinateSource": "https://en.wikipedia.org/wiki/Torrox",
     "desc": "Elf Nächte mit dem Meer vor der Tür. Zeit für Wanderungen, Cafés, Joggen, Bücher und Videoschnitt; Ausflüge in die Berge nach Wetterlage."
@@ -671,8 +254,6 @@ const ROUTE = [
     "departure": "2027-03-20",
     "country": "Spanien",
     "countryCode": "ES",
-    "flag": "🇪🇸",
-    "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Seville",
     "coordinateSource": "https://en.wikipedia.org/wiki/Seville",
     "desc": "Drei Nächte für spanische Küche, Museen, Cafés und Stadtspaziergänge vor der Karwoche."
@@ -687,8 +268,6 @@ const ROUTE = [
     "departure": "2027-03-27",
     "country": "Spanien",
     "countryCode": "ES",
-    "flag": "🇪🇸",
-    "emoji": "🪁",
     "wiki": "https://en.wikipedia.org/wiki/Tarifa",
     "coordinateSource": "https://en.wikipedia.org/wiki/Tarifa",
     "desc": "Sieben Nächte am Atlantik für Wind- und Kitesurfen. Verleihmöglichkeiten und Wetter müssen für März 2027 noch bestätigt werden; so bleiben mehrere mögliche Windtage."
@@ -703,8 +282,6 @@ const ROUTE = [
     "departure": "2027-04-03",
     "country": "Spanien",
     "countryCode": "ES",
-    "flag": "🇪🇸",
-    "emoji": "🌊",
     "wiki": "https://en.wikipedia.org/wiki/C%C3%A1diz",
     "coordinateSource": "https://en.wikipedia.org/wiki/C%C3%A1diz",
     "desc": "Ostern am 28. März verbringen wir geplant in Spanien: sieben Nächte für Strand, Altstadt, Restaurants und Cafés. Unterkunft und genaues Quartier sind noch offen."
@@ -719,8 +296,6 @@ const ROUTE = [
     "departure": "2027-04-11",
     "country": "Portugal",
     "countryCode": "PT",
-    "flag": "🇵🇹",
-    "emoji": "🌿",
     "wiki": "https://en.wikipedia.org/wiki/Tavira",
     "coordinateSource": "https://en.wikipedia.org/wiki/Tavira",
     "desc": "Acht Nächte in Portugal, bewusst erst nach Ostern. Meer, ruhige Tage, Kochen, Lesen und Spaziergänge."
@@ -735,8 +310,6 @@ const ROUTE = [
     "departure": "2027-04-13",
     "country": "Spanien",
     "countryCode": "ES",
-    "flag": "🇪🇸",
-    "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Nerja",
     "coordinateSource": "https://en.wikipedia.org/wiki/Nerja",
     "desc": "Zwei Nächte zum entspannten Beginn der Rückfahrt entlang der Mittelmeerküste."
@@ -751,8 +324,6 @@ const ROUTE = [
     "departure": "2027-04-15",
     "country": "Spanien",
     "countryCode": "ES",
-    "flag": "🇪🇸",
-    "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Cartagena,_Spain",
     "coordinateSource": "https://en.wikipedia.org/wiki/Cartagena,_Spain",
     "desc": "Zwei Nächte für einen Stadtbesuch und einen Zwischenstopp auf der Rückreise."
@@ -767,8 +338,6 @@ const ROUTE = [
     "departure": "2027-04-19",
     "country": "Spanien",
     "countryCode": "ES",
-    "flag": "🇪🇸",
-    "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Valencia",
     "coordinateSource": "https://en.wikipedia.org/wiki/Valencia",
     "desc": "Vier Nächte für Stadt, Parks, Museen, Essen und Meer."
@@ -783,8 +352,6 @@ const ROUTE = [
     "departure": "2027-04-21",
     "country": "Spanien",
     "countryCode": "ES",
-    "flag": "🇪🇸",
-    "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Girona",
     "coordinateSource": "https://en.wikipedia.org/wiki/Girona",
     "desc": "Zwei Nächte für die nördliche Costa Brava, bevor die Rückreise durch Frankreich beginnt."
@@ -799,8 +366,6 @@ const ROUTE = [
     "departure": "2027-04-23",
     "country": "Frankreich",
     "countryCode": "FR",
-    "flag": "🇫🇷",
-    "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Montpellier",
     "coordinateSource": "https://en.wikipedia.org/wiki/Montpellier",
     "desc": "Zwei Nächte mit Zeitpuffer und Gelegenheit zum Ausruhen."
@@ -815,8 +380,6 @@ const ROUTE = [
     "departure": "2027-04-24",
     "country": "Frankreich",
     "countryCode": "FR",
-    "flag": "🇫🇷",
-    "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Lyon",
     "coordinateSource": "https://en.wikipedia.org/wiki/Lyon",
     "desc": "Eine Nacht in Lyon auf dem Heimweg."
@@ -831,8 +394,6 @@ const ROUTE = [
     "departure": "2027-04-25",
     "country": "Schweiz",
     "countryCode": "CH",
-    "flag": "🇨🇭",
-    "emoji": "🚗",
     "wiki": "https://en.wikipedia.org/wiki/Bern",
     "coordinateSource": "https://en.wikipedia.org/wiki/Bern",
     "desc": "Letzte Nacht in der Schweiz vor der Rückfahrt nach München."
@@ -847,8 +408,6 @@ const ROUTE = [
     "departure": "2027-04-25",
     "country": "Deutschland",
     "countryCode": "DE",
-    "flag": "🇩🇪",
-    "emoji": "🏠",
     "wiki": "https://en.wikipedia.org/wiki/Munich",
     "coordinateSource": "https://en.wikipedia.org/wiki/Munich",
     "desc": "Geplante Rückkehr nach München am 25. April; bis zum genannten Elternzeitende am 27. April bleiben zwei Puffertage."
@@ -857,6 +416,7 @@ const ROUTE = [
 
 const STOPS = ROUTE;
 const DETAILS = Object.fromEntries(ROUTE.map(stop => [stop.n, stop]));
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const nightsAt = stop => (Date.parse(stop.departure) - Date.parse(stop.arrival)) / 86400000;
 const TOTAL_NIGHTS = ROUTE.reduce((sum, stop) => sum + nightsAt(stop), 0);
 const COUNTRY_COUNT = new Set(ROUTE.map(stop => stop.countryCode)).size;
@@ -872,7 +432,10 @@ ROUTE.forEach((stop, idx) => {
   button.type = 'button';
   const nights = nightsAt(stop);
   const stay = stop.type === 'start' ? 'Start' : stop.type === 'end' ? 'Rückkehr' : `${nights} ${nights === 1 ? 'Nacht' : 'Nächte'}`;
-  button.textContent = `${stop.n}. ${stop.name} · ${formatDate(stop.arrival)} · ${stay}`;
+  button.innerHTML = '<span class="it-n"></span><span class="it-t"><strong></strong><span></span></span>';
+  button.querySelector('.it-n').textContent = stop.n;
+  button.querySelector('strong').textContent = stop.name;
+  button.querySelector('.it-t span').textContent = `${formatDate(stop.arrival)} · ${stay}`;
   button.addEventListener('click', () => openPanel(idx));
   itinerary.append(button);
 });
@@ -883,15 +446,18 @@ const map = L.map('map', {
   zoom: 5,
   zoomControl: false,
   preferCanvas: false,
+  zoomSnap: 0.25,
 });
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_2htp_1_41c93b5f35f255820048b038', {
+// Light tiles in the light theme, dark tiles in the dark theme (same sources as the journal map).
+const tileUrl = theme => `https://{s}.basemaps.cartocdn.com/${theme === 'dark' ? 'dark_all' : 'rastertiles/voyager'}/{z}/{x}/{y}{r}.png?key=cb1_2htp_1_41c93b5f35f255820048b038`;
+const tileLayer = L.tileLayer(tileUrl(document.documentElement.dataset.theme), {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
   subdomains: 'abcd',
   maxZoom: 20,
 }).addTo(map);
 
-L.control.zoom({ position: 'topright' }).addTo(map);
+L.control.zoom({ position: 'bottomright', zoomInTitle: 'Vergrößern', zoomOutTitle: 'Verkleinern' }).addTo(map);
 
 // ── State ─────────────────────────────────────────────────────
 const drawnLines  = [];
@@ -899,6 +465,29 @@ const markerObjs  = [];
 let   animIndex   = 0;
 let   animTimer   = null;
 let   activePanelIdx = -1;
+let   returnFocus = null;
+
+// ── Theme ─────────────────────────────────────────────────────
+const themeButton = document.getElementById('btn-theme');
+const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+const routeColor = () => getComputedStyle(document.documentElement).getPropertyValue('--route').trim();
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  themeButton.setAttribute('aria-pressed', String(theme === 'dark'));
+  tileLayer.setUrl(tileUrl(theme));
+  drawnLines.forEach(line => line.setStyle({ color: routeColor() }));
+}
+applyTheme(document.documentElement.dataset.theme);
+themeButton.addEventListener('click', () => {
+  const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(theme);
+  try { localStorage.setItem('journal-theme', theme); } catch {}
+});
+systemTheme.addEventListener('change', event => {
+  let savedTheme = null;
+  try { savedTheme = localStorage.getItem('journal-theme'); } catch {}
+  if (savedTheme !== 'light' && savedTheme !== 'dark') applyTheme(event.matches ? 'dark' : 'light');
+});
 
 // ── Route animation and collision-free marker grouping ──────
 // Cluster in screen pixels, not geographical distance: repeat visits and
@@ -923,16 +512,27 @@ function clusterStopsByPixelDistance(stops, project, minimumGap = 48) {
   return groups.map(group => group.stops);
 }
 
+// Shape carries the type: square = start and return, circle = stop on the way,
+// diamond = long stay, wide block = several stops merged at this zoom.
+const MARKER_SHAPES = {
+  start:   '<rect class="mk-shape" x="8" y="8" width="28" height="28"/>',
+  end:     '<rect class="mk-shape" x="8" y="8" width="28" height="28"/>',
+  drive:   '<circle class="mk-shape" cx="22" cy="22" r="14"/>',
+  stay:    '<polygon class="mk-shape" points="22,3 41,22 22,41 3,22"/>',
+  cluster: '<rect class="mk-shape" x="3" y="9" width="38" height="26"/>',
+};
+const markerSvg = (type, label, size = 44) =>
+  `<svg width="${size}" height="${size}" viewBox="0 0 44 44" aria-hidden="true" focusable="false">${MARKER_SHAPES[type]}<text class="mk-num" x="22" y="23">${label}</text></svg>`;
+
 function buildIcon(group) {
   const multiple = group.length > 1;
   const label = multiple ? `${group.length}×` : group[0].n;
   const type = multiple ? 'cluster' : group[0].type;
-  const title = multiple ? `${group.length} Etappen – klicken, um auszuwählen` : `Etappe ${group[0].n}`;
   return L.divIcon({
     className: '',
-    html: `<div class="marker-wrap"><div class="marker-pin type-${type}" title="${title}">${label}</div></div>`,
-    iconSize: [34, 34],
-    iconAnchor: [17, 17],
+    html: `<div class="marker-wrap"><div class="marker-pin type-${type}">${markerSvg(type, label)}</div></div>`,
+    iconSize: [44, 44],
+    iconAnchor: [22, 22],
   });
 }
 
@@ -980,6 +580,7 @@ function refreshMarkers() {
     const lng = group.reduce((sum, stop) => sum + stop.lng, 0) / group.length;
     const marker = L.marker([lat, lng], {
       icon: buildIcon(group),
+      title: group.length > 1 ? `${group.length} Etappen – klicken, um auszuwählen` : `Etappe ${group[0].n}: ${group[0].name}`,
       zIndexOffset: group.length > 1 ? 2000 : group[0].n,
     }).addTo(map);
     if (group.length === 1) {
@@ -1004,36 +605,33 @@ function drawNextStep() {
 
   if (animIndex > 0) {
     const prev = STOPS[animIndex - 1];
-    // glow layer
-    const glow = L.polyline([[prev.lat, prev.lng], [stop.lat, stop.lng]], {
-      color: '#4299e1',
-      weight: 8,
-      opacity: 0.08,
-      lineCap: 'round',
-    });
-    glow.addTo(map);
-    drawnLines.push(glow);
-
     // main line
     const pl = L.polyline([[prev.lat, prev.lng], [stop.lat, stop.lng]], {
-      color: '#4299e1',
-      weight: 2.5,
-      opacity: 0.85,
-      lineCap: 'round',
+      color: routeColor(),
+      weight: 4,
+      opacity: 1,
+      lineCap: 'butt',
     }).addTo(map);
     drawnLines.push(pl);
   }
 
   animIndex++;
   refreshMarkers();
-  animTimer = setTimeout(drawNextStep, 230);
+  animTimer = setTimeout(drawNextStep, reduceMotion ? 0 : 230);
 }
 
 function onAnimComplete() {
   animTimer = null;
   document.getElementById('night-counter').textContent = TOTAL_NIGHTS;
   const bounds = L.latLngBounds(STOPS.map(s => [s.lat, s.lng]));
-  setTimeout(() => map.fitBounds(bounds, { padding: [70, 70], animate: true, duration: 1.2 }), 300);
+  // Keep the whole route clear of the title card (top, phone) and the figures (bottom).
+  const phone = window.innerWidth <= 600;
+  const fit = {
+    paddingTopLeft: [70, phone ? document.getElementById('header').offsetHeight + 24 : 70],
+    paddingBottomRight: [70, phone ? 130 : 110],
+    animate: !reduceMotion, duration: 1.2,
+  };
+  setTimeout(() => map.fitBounds(bounds, fit), reduceMotion ? 0 : 300);
 }
 
 function resetAnimation() {
@@ -1046,7 +644,7 @@ function resetAnimation() {
   document.getElementById('night-counter').textContent = TOTAL_NIGHTS;
   closePanel();
   map.setView([43, 2], 5, { animate: true });
-  animTimer = setTimeout(drawNextStep, 600);
+  animTimer = setTimeout(drawNextStep, reduceMotion ? 0 : 600);
 }
 
 // ── Panel ─────────────────────────────────────────────────────
@@ -1056,10 +654,9 @@ function openPanel(idx) {
   const d    = DETAILS[stop.n];
   const pct = Math.round((Date.parse(stop.arrival) - Date.parse(STOPS[0].arrival)) / (TOTAL_NIGHTS * 86400000) * 100);
 
-  document.getElementById('p-emoji').textContent  = d.emoji;
   document.getElementById('p-num').textContent     = `Station ${stop.n} von ${STOPS.length}`;
   document.getElementById('p-name').textContent    = stop.name;
-  document.getElementById('p-country').textContent = `${d.flag} ${d.country}`;
+  document.getElementById('p-country').textContent = d.country;
   document.getElementById('p-desc').textContent    = d.desc;
   document.getElementById('p-arrival').textContent = formatDate(stop.arrival);
   document.getElementById('p-departure').textContent = formatDate(stop.departure);
@@ -1071,32 +668,53 @@ function openPanel(idx) {
   const bar = document.getElementById('p-prog-bar');
   requestAnimationFrame(() => { bar.style.width = pct + '%'; });
 
-  const badge = document.getElementById('p-badge');
   const typeLabel = stop.type === 'start' ? 'Start' : stop.type === 'end' ? 'Rückkehr' : stop.type === 'stay' ? 'Langer Aufenthalt' : 'Etappe';
-  badge.textContent = typeLabel;
-  badge.className   = `p-badge badge-${stop.type}`;
+  document.getElementById('p-badge').textContent = typeLabel;
+  const glyph = document.getElementById('p-glyph');
+  glyph.className = `p-glyph type-${stop.type}`;
+  glyph.innerHTML = markerSvg(stop.type, '', 36);
+  itinerary.querySelectorAll('button').forEach((item, i) => {
+    if (i === idx) item.setAttribute('aria-current', 'true'); else item.removeAttribute('aria-current');
+  });
 
   document.getElementById('btn-prev').toggleAttribute('disabled', idx === 0);
   document.getElementById('btn-next').toggleAttribute('disabled', idx === STOPS.length - 1);
 
-  document.getElementById('panel').classList.add('open');
+  const panel = document.getElementById('panel');
+  if (!panel.classList.contains('open')) {
+    returnFocus = document.activeElement;
+    panel.classList.add('open');
+    document.body.classList.add('panel-open');
+    panel.focus({ preventScroll: true });
+  }
   document.querySelector('.panel-body').scrollTop = 0;
 
   // Also highlight shared markers representing repeat visits.
   highlightActiveMarker();
 
-  map.panTo([stop.lat, stop.lng], { animate: true, duration: 0.6 });
+  // Centre the stop in the part of the map the panel leaves free.
+  const panelBox = document.getElementById('panel');
+  const sheet = panelBox.offsetWidth > window.innerWidth * 0.9;
+  const shift = L.point(sheet ? 0 : panelBox.offsetWidth / 2, sheet ? panelBox.offsetHeight / 2 : 0);
+  const target = map.unproject(map.project([stop.lat, stop.lng]).add(shift));
+  map.panTo(target, { animate: true, duration: 0.6 });
 }
 
-function closePanel() {
+function closePanel(restoreFocus = false) {
   document.getElementById('panel').classList.remove('open');
+  document.body.classList.remove('panel-open');
+  if (restoreFocus === true && returnFocus && document.contains(returnFocus)) returnFocus.focus();
+  returnFocus = null;
   activePanelIdx = -1;
   highlightActiveMarker();
 }
 
 document.getElementById('btn-plan').addEventListener('click', () => openPanel(0));
 
-document.getElementById('p-close').addEventListener('click', closePanel);
+document.getElementById('p-close').addEventListener('click', () => closePanel(true));
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && activePanelIdx >= 0) closePanel(true);
+});
 
 document.getElementById('btn-prev').addEventListener('click', () => {
   if (activePanelIdx > 0) openPanel(activePanelIdx - 1);
@@ -1118,14 +736,17 @@ document.getElementById('btn-fs').addEventListener('click', () => {
 });
 
 document.addEventListener('fullscreenchange', () => {
-  document.getElementById('btn-fs').textContent = document.fullscreenElement ? '✕' : '⛶';
+  const fs = document.getElementById('btn-fs');
+  fs.dataset.on = String(Boolean(document.fullscreenElement));
+  fs.setAttribute('aria-label', document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild umschalten');
+  fs.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
 });
 
 // ── Replay ────────────────────────────────────────────────────
 document.getElementById('btn-replay').addEventListener('click', resetAnimation);
 
 // ── Start ─────────────────────────────────────────────────────
-animTimer = setTimeout(drawNextStep, 900);
+animTimer = setTimeout(drawNextStep, reduceMotion ? 0 : 900);
 </script>
 
 </body>
