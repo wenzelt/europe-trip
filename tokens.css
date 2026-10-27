@@ -1,0 +1,51 @@
+/* Shared design tokens for the journal (index.html) and the route plan (plan.html).
+   Direction: "The page is the object" — the roadbook of the trip. Sand ground, moss ink-and-field.
+   Everything downstream references these tokens only. */
+:root {
+  color-scheme: light;
+
+  /* Colour: one ground, one ink, one accent, flat fields. No gradients, no shadows at rest. */
+  --bg: #ddd6c6;
+  --surface: #d2cab8;
+  --paper: #efe9da;
+  --ink: #2a2a26;
+  --muted: #59574e;
+  --accent: #4f6238;
+  --accent-ink: #ffffff;
+  --field: #3f5a2a;
+  --field-ink: #ffffff;
+  /* Three neighbouring tones of the ground, used for stacked folders and cards. */
+  --tone-1: #d2cab8;
+  --tone-2: #c7bea9;
+  --tone-3: #bcb299;
+
+  /* Type */
+  --font-display: "Bebas Neue", "Arial Narrow", Impact, sans-serif;
+  --font-text: "EB Garamond", Georgia, "Times New Roman", serif;
+  --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  --step-head: clamp(2.5rem, 1.2rem + 5vw, 5.5rem);
+
+  /* Frame and shape: one pair of margins, one corner (square), one button shape (square). */
+  --margin: clamp(16px, 2.5vw, 32px);
+  --radius: 0;
+  --section-gap: clamp(88px, 12vw, 200px);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1d1f19;
+  --surface: #272a21;
+  --paper: #30332a;
+  --ink: #ebe5d3;
+  --muted: #b3ad9a;
+  --accent: #a3bb78;
+  --accent-ink: #1d2412;
+  --field: #2f4220;
+  --field-ink: #f2efe3;
+  --tone-1: #272a21;
+  --tone-2: #2e3226;
+  --tone-3: #353a2b;
+}

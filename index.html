@@ -5,12 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Our parental leave in Europe – places, memories and plans on an interactive map.">
   <title>Our Parental Leave in Europe</title>
+  <link rel="canonical" href="https://wenzelt.github.io/europe-trip/">
+  <link rel="icon" href="data:,">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Our Parental Leave in Europe">
+  <meta property="og:description" content="Family travel stories and our planned road trip from Munich to Andalusia and the Algarve, 8 February–25 April 2027.">
+  <meta property="og:url" content="https://wenzelt.github.io/europe-trip/">
+  <meta property="og:image" content="https://wenzelt.github.io/europe-trip/assets/posts/aufbruch-fuerteventura-nuernberg-2026-10-03/zugfahrt-nuernberg-2026-10-03.jpeg">
+  <meta property="og:image:alt" content="A moment on the train journey to Nürnberg.">
+  <meta property="og:image:width" content="1178">
+  <meta property="og:image:height" content="1571">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Our Parental Leave in Europe",
+      "url": "https://wenzelt.github.io/europe-trip/",
+      "description": "A family travel journal with published stories and an interactive map, alongside a planned parental-leave road trip in 2027.",
+      "inLanguage": ["en", "de"],
+      "relatedLink": "https://wenzelt.github.io/europe-trip/plan.html"
+    }
+  </script>
   <link rel="preconnect" href="https://unpkg.com">
-  <link rel="preload" href="./assets/fonts/outfit-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="./assets/fonts/plus-jakarta-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./assets/fonts/bebas-neue-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./assets/fonts/eb-garamond-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./tokens.css">
   <link rel="stylesheet" href="./fonts.css">
   <script>
-    // Apply the saved/system theme before the page paints.
+    // Apply the saved/system theme before the page paints; mark that scripts run so entrances can wait for scroll.
+    document.documentElement.classList.add('js');
     try {
       const savedTheme = localStorage.getItem('journal-theme');
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -21,335 +45,183 @@
     }
   </script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <style>
-    :root {
-      color-scheme: light;
-      --ink: #17352f;
-      --muted: #6c7c76;
-      --paper: #f7f3eb;
-      --card: #fffdf8;
-      --line: #ded8cc;
-      --green: #215f50;
-      --green-soft: #d9e9df;
-      --terracotta: #c86445;
-      --sun: #e8b44f;
-      --shadow: 0 18px 50px rgba(27, 52, 45, .11);
-    }
-
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
-    body {
-      background: var(--paper);
-      color: var(--ink);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    button, input { font: inherit; }
-    button { color: inherit; }
-
-    .site-header {
-      min-height: 210px;
-      padding: 36px clamp(20px, 5vw, 72px) 32px;
-      color: #fff;
-      background:
-        radial-gradient(circle at 80% 20%, rgba(232,180,79,.35), transparent 28%),
-        linear-gradient(125deg, #163f36, #26705d 58%, #3f816f);
-      position: relative;
-      overflow: hidden;
-    }
-    .site-header::after {
-      content: "";
-      position: absolute;
-      inset: auto -5% -54px;
-      height: 100px;
-      background: var(--paper);
-      transform: rotate(-2deg);
-      transform-origin: left;
-    }
-    .header-inner { position: relative; z-index: 1; max-width: 1300px; margin: 0 auto; }
-    .eyebrow {
-      display: inline-flex;
-      gap: 8px;
-      align-items: center;
-      margin: 0 0 14px;
-      font-size: .75rem;
-      font-weight: 800;
-      letter-spacing: .13em;
-      text-transform: uppercase;
-      color: #d9eadf;
-    }
-    h1 {
-      margin: 0;
-      max-width: 780px;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(2.35rem, 5.4vw, 5rem);
-      font-weight: 500;
-      line-height: .98;
-      letter-spacing: -.045em;
-    }
-    .subtitle { max-width: 660px; margin: 18px 0 0; color: #deebe6; font-size: clamp(.95rem, 1.5vw, 1.12rem); line-height: 1.55; }
-
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(340px, 480px) minmax(420px, 1fr);
-      gap: 22px;
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: 16px clamp(16px, 3vw, 44px) 44px;
-    }
-    .journal { min-width: 0; }
-    .map-shell {
-      position: sticky;
-      top: 18px;
-      height: calc(100vh - 36px);
-      min-height: 560px;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-      background: #d7ddd6;
-    }
-    #map { width: 100%; height: 100%; }
-    .map-title {
-      position: absolute;
-      z-index: 500;
-      top: 16px;
-      left: 16px;
-      right: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      pointer-events: none;
-    }
-    .map-badge {
-      padding: 10px 14px;
-      border: 1px solid rgba(255,255,255,.75);
-      border-radius: 999px;
-      background: rgba(255,253,248,.92);
-      box-shadow: 0 6px 22px rgba(23,53,47,.14);
-      backdrop-filter: blur(10px);
-      color: var(--green);
-      font-size: .78rem;
-      font-weight: 800;
-    }
-
-    .toolbar {
-      margin-bottom: 16px;
-      padding: 16px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(255,253,248,.74);
-    }
-    .search {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      outline: none;
-      background: #fff;
-      color: var(--ink);
-    }
-    .search:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(33,95,80,.12); }
-    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    .filter {
-      padding: 7px 11px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: transparent;
-      cursor: pointer;
-      font-size: .78rem;
-      font-weight: 700;
-    }
-    .filter:hover, .filter[aria-pressed="true"] { border-color: var(--green); background: var(--green); color: #fff; }
-
-    .summary-row { display: flex; gap: 10px; margin: 0 0 16px; }
-    .summary-item {
-      flex: 1;
-      padding: 13px 14px;
-      border-left: 3px solid var(--terracotta);
-      background: rgba(255,255,255,.5);
-    }
-    .summary-value { display: block; font-family: Georgia, serif; font-size: 1.35rem; }
-    .summary-label { color: var(--muted); font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
-
-    .entry-list { display: grid; gap: 14px; }
-    .entry-card {
-      width: 100%;
-      padding: 0;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      background: var(--card);
-      box-shadow: 0 8px 28px rgba(23,53,47,.06);
-      text-align: left;
-      cursor: pointer;
-      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-    }
-    .entry-card:hover, .entry-card:focus-visible { transform: translateY(-2px); border-color: #b8c7c0; box-shadow: var(--shadow); outline: none; }
-    .card-image { display: block; width: 100%; aspect-ratio: 16/8; object-fit: cover; background: #dce6df; }
-    .card-body { padding: 18px; }
-    .card-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; color: var(--muted); font-size: .74rem; font-weight: 700; }
-    .status { padding: 4px 8px; border-radius: 999px; background: var(--green-soft); color: var(--green); text-transform: capitalize; }
-    .status-unterwegs { background: #fff0cc; color: #79530b; }
-    .status-besucht { background: #e3e8f5; color: #384d83; }
-    .status-idee { background: #f0e6f4; color: #71477e; }
-    .card-title { margin: 0 0 9px; font-family: Georgia, serif; font-size: 1.5rem; font-weight: 600; line-height: 1.14; }
-    .card-summary { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.55; }
-    .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 15px; color: var(--green); font-size: .78rem; font-weight: 800; }
-    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-    .tag { color: var(--muted); font-size: .7rem; font-weight: 650; }
-
-    .empty, .error {
-      padding: 28px;
-      border: 1px dashed var(--line);
-      border-radius: 18px;
-      color: var(--muted);
-      text-align: center;
-    }
-    .error { border-color: #d7a497; background: #fff6f3; color: #7e3927; }
-
-    dialog {
-      width: min(720px, calc(100vw - 28px));
-      max-height: calc(100vh - 28px);
-      padding: 0;
-      overflow: auto;
-      border: 0;
-      border-radius: 24px;
-      background: var(--card);
-      color: var(--ink);
-      box-shadow: 0 30px 90px rgba(12,36,30,.35);
-    }
-    dialog::backdrop { background: rgba(11,35,29,.6); backdrop-filter: blur(5px); }
-    .dialog-close {
-      position: sticky;
-      z-index: 2;
-      top: 14px;
-      float: right;
-      margin: 14px 14px -58px 0;
-      width: 42px;
-      height: 42px;
-      border: 1px solid rgba(255,255,255,.8);
-      border-radius: 50%;
-      background: rgba(255,253,248,.94);
-      cursor: pointer;
-      font-size: 1.25rem;
-    }
-    .article-cover { display: block; width: 100%; max-height: 390px; object-fit: cover; background: var(--green-soft); }
-    .article { padding: clamp(24px, 5vw, 52px); }
-    .article h2 { margin: 8px 0 16px; font-family: Georgia, serif; font-size: clamp(2rem, 5vw, 3.7rem); font-weight: 500; line-height: 1.03; letter-spacing: -.035em; }
-    .article-location { color: var(--terracotta); font-weight: 800; }
-    .article p { color: #445b54; line-height: 1.75; }
-    .article h3 { margin-top: 30px; font-family: Georgia, serif; font-size: 1.25rem; }
-    .article ul { padding-left: 20px; color: #445b54; line-height: 1.7; }
-    .article-links { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 26px; }
-    .article-links a { padding: 9px 12px; border-radius: 10px; background: var(--green-soft); color: var(--green); font-weight: 750; text-decoration: none; }
-    .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 24px; }
-    .gallery img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 12px; }
-
-    .route-marker {
-      display: grid;
-      place-items: center;
-      width: 34px;
-      height: 34px;
-      border: 3px solid #fff;
-      border-radius: 50% 50% 50% 10%;
-      transform: rotate(-45deg);
-      background: var(--terracotta);
-      box-shadow: 0 6px 16px rgba(23,53,47,.28);
-      color: #fff;
-      font-weight: 900;
-    }
-    .route-marker span { transform: rotate(45deg); font-size: .72rem; }
-    .leaflet-popup-content-wrapper { border-radius: 14px; box-shadow: var(--shadow); }
-    .popup-title { display: block; margin-bottom: 4px; color: var(--ink); font-weight: 850; }
-    .popup-meta { color: var(--muted); font-size: .75rem; }
-
-    @media (max-width: 900px) {
-      .layout { grid-template-columns: 1fr; }
-      .map-shell { position: relative; top: auto; grid-row: 1; height: 55vh; min-height: 420px; }
-      .journal { grid-row: 2; }
-    }
-    @media (max-width: 520px) {
-      .site-header { min-height: 190px; padding-top: 26px; }
-      .layout { padding-inline: 10px; }
-      .map-shell { height: 48vh; min-height: 350px; border-radius: 18px; }
-      .summary-row { gap: 4px; }
-      .summary-item { padding-inline: 10px; }
-      .gallery { grid-template-columns: 1fr; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
-    }
-  </style>
   <link rel="stylesheet" href="./design-system.css">
 </head>
 <body>
   <a class="skip-link" href="#journal">Skip to the journal</a>
-  <header class="site-header">
-    <div class="header-actions">
-      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false">Dark theme</button>
-      <a class="plan-link" href="./plan.html"><span aria-hidden="true">🧭</span> Route plan <span aria-hidden="true">→</span></a>
+
+  <header class="hero">
+    <div class="topbar">
+      <p class="route-line">Munich – Tarifa – Algarve – Munich</p>
+      <button class="theme-toggle button button-quiet" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false">Dark theme</button>
     </div>
-    <div class="header-inner">
-      <div class="hero-copy">
-        <p class="eyebrow">Parental leave in Europe</p>
-        <h1 id="trip-title">Our Parental Leave in Europe</h1>
-        <p class="subtitle" id="trip-subtitle">Places, stories and plans on an interactive map.</p>
-        <div class="hero-chips" aria-label="Travel style">
-          <span>Parental leave</span>
-          <span>8 Feb - 25 Apr 2027</span>
-          <span>On the road</span>
+
+    <div class="hero-head">
+      <h1 id="trip-title">Our Parental Leave in Europe</h1>
+      <p class="subtitle" id="trip-subtitle">8 February to 25 April 2027 – travelling by car, staying in Airbnbs, and making time for the places in between.</p>
+    </div>
+
+    <div class="roadbook">
+      <div class="folder folder-front">
+        <a class="tab-link" href="#journal" data-view-link="journal">Journal</a>
+        <div class="folder-body front-body">
+          <div class="front-copy">
+            <p class="dates">8 Feb – 25 Apr 2027</p>
+            <p class="live" id="trip-live">76 nights on the road</p>
+            <p class="facts">21 stations, 5 countries, and 2 buffer days to 27 April.</p>
+            <a class="button button-primary" href="#journal" data-view-link="journal">Read the journal</a>
+          </div>
+          <figure class="front-picture">
+            <img src="./assets/found/playa-de-los-lances-tarifa.jpg" width="1300" height="975" fetchpriority="high"
+              alt="Playa de los Lances near Tarifa: wooden dune fences, grass and Atlantic surf under a bright sky">
+            <figcaption>Playa de los Lances, Tarifa. A found picture, not ours.</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="folder folder-map">
+        <a class="tab-link" href="#trip-map" data-view-link="map">Map</a>
+        <div class="folder-body">
+          <p class="strip-note">Every entry, pinned to the road</p>
+          <a class="strip-link" href="#trip-map" data-view-link="map" tabindex="-1" aria-hidden="true"></a>
+        </div>
+      </div>
+
+      <div class="folder folder-route">
+        <a class="plan-link" href="./plan.html">Route plan</a>
+        <div class="folder-body">
+          <p class="strip-note">All 21 stations, with dates</p>
+          <a class="strip-link" href="./plan.html" tabindex="-1" aria-hidden="true"></a>
         </div>
       </div>
     </div>
   </header>
 
   <nav class="view-switcher" aria-label="Switch between journal and map">
-    <span class="switcher-label">Parental leave</span>
-    <div class="switcher-options">
-      <button type="button" data-view="journal" aria-controls="journal" aria-pressed="true"><span aria-hidden="true">📖</span> Journal</button>
-      <button type="button" data-view="map" aria-controls="trip-map" aria-pressed="false"><span aria-hidden="true">🗺️</span> Map</button>
-    </div>
-    <span class="switcher-date">8 Feb - 25 Apr 2027</span>
+    <button type="button" data-view="journal" aria-controls="journal" aria-pressed="true">Journal</button>
+    <button type="button" data-view="map" aria-controls="trip-map" aria-pressed="false">Map</button>
   </nav>
 
   <main class="layout" data-mobile-view="journal">
-    <section class="journal" id="journal" aria-label="Travel journal" tabindex="-1">
-      <div class="section-heading">
-        <h2>Stories from our parental leave.</h2>
-      </div>
-      <div class="toolbar">
-        <label for="search" class="eyebrow">Search the journal</label>
-        <input class="search" id="search" type="search" placeholder="Place, country, tag or text …" autocomplete="off">
-        <div class="filters" id="filters" aria-label="Filter by status">
-          <button class="filter" type="button" data-filter="alle" aria-pressed="true">All</button>
-          <button class="filter" type="button" data-filter="idee" aria-pressed="false">Ideas</button>
-          <button class="filter" type="button" data-filter="geplant" aria-pressed="false">Planned</button>
-          <button class="filter" type="button" data-filter="unterwegs" aria-pressed="false">On the road</button>
-          <button class="filter" type="button" data-filter="besucht" aria-pressed="false">Visited</button>
+    <section class="journal" id="journal" aria-labelledby="journal-title" tabindex="-1">
+      <div class="journal-controls">
+        <h2 id="journal-title" data-reveal style="--i:0">Stories from our parental leave.</h2>
+        <div class="toolbar" data-reveal style="--i:1">
+          <label for="search">Search the journal</label>
+          <input class="search" id="search" type="search" placeholder="Place, country, tag or text …" autocomplete="off">
+          <div class="filters" id="filters" role="group" aria-label="Filter by status">
+            <button class="filter" type="button" data-filter="alle" aria-pressed="true">All</button>
+            <button class="filter" type="button" data-filter="idee" aria-pressed="false">Ideas</button>
+            <button class="filter" type="button" data-filter="geplant" aria-pressed="false">Planned</button>
+            <button class="filter" type="button" data-filter="unterwegs" aria-pressed="false">On the road</button>
+            <button class="filter" type="button" data-filter="besucht" aria-pressed="false">Visited</button>
+          </div>
         </div>
+
+        <div class="summary-row" role="group" aria-label="Travel statistics" data-reveal style="--i:2">
+          <div class="summary-item"><strong class="summary-value" id="place-count">-</strong><span class="summary-label">Places</span></div>
+          <div class="summary-item"><strong class="summary-value" id="country-count">-</strong><span class="summary-label">Countries</span></div>
+          <div class="summary-item"><strong class="summary-value" id="entry-count">-</strong><span class="summary-label">Entries</span></div>
+        </div>
+
+        <p class="visually-hidden" id="results-status" role="status"></p>
+        <div class="entry-list" id="entry-list" aria-busy="true">
+          <div class="loading-placeholder" role="status" aria-label="Loading entries">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+        <noscript><p class="error">The journal entries are loaded by a script. Please enable JavaScript to read them.</p></noscript>
       </div>
 
-      <div class="summary-row" aria-label="Travel statistics">
-        <div class="summary-item"><strong class="summary-value" id="place-count">-</strong><span class="summary-label">Places</span></div>
-        <div class="summary-item"><strong class="summary-value" id="country-count">-</strong><span class="summary-label">Countries</span></div>
-        <div class="summary-item"><strong class="summary-value" id="entry-count">-</strong><span class="summary-label">Entries</span></div>
-      </div>
-
-      <p class="visually-hidden" id="results-status" role="status"></p>
-      <div class="entry-list" id="entry-list" aria-busy="true">
-        <div class="loading-placeholder" role="status" aria-label="Loading entries">
-          <div class="loading-photo" aria-hidden="true"></div>
-          <div class="loading-copy" aria-hidden="true"><span></span><span></span><span></span></div>
+      <aside class="preview" id="preview" aria-hidden="true" data-reveal style="--i:2" hidden>
+        <div class="preview-media">
+          <img id="preview-image" alt="" hidden>
+          <p class="preview-place" id="preview-place" lang="de"></p>
         </div>
-      </div>
+        <div class="preview-text">
+          <p class="preview-meta" id="preview-meta"></p>
+          <h3 class="preview-title" id="preview-title" lang="de"></h3>
+          <p class="preview-summary" id="preview-summary" lang="de"></p>
+        </div>
+      </aside>
     </section>
 
-    <aside class="map-shell" id="trip-map" aria-label="Interactive map of the trip">
-      <div class="map-title"><span class="map-badge" id="map-badge">Map & places</span></div>
-      <div id="map"></div>
+    <aside class="map-shell" id="trip-map" aria-labelledby="map-title">
+      <div class="map-title">
+        <h2 id="map-title" data-reveal style="--i:0">The trip on the map</h2>
+        <p class="map-badge" id="map-badge" data-reveal style="--i:1">Map &amp; places</p>
+      </div>
+      <div id="map" data-reveal style="--i:2"></div>
     </aside>
   </main>
+
+  <section class="showcase" id="road" aria-labelledby="road-title">
+    <img class="showcase-photo" src="./assets/found/cadiz-playa-de-la-caleta.jpg" width="1700" height="1133" loading="lazy"
+      alt="Playa de la Caleta in Cádiz: green surf rolling onto a brown beach below the old town">
+    <div class="showcase-copy">
+      <h2 id="road-title" data-reveal style="--i:0">The road, stop by stop</h2>
+      <p data-reveal style="--i:1">Munich to Tarifa is a long way, so we take it in short stages: a night in Bern, a night in Lyon, then down the Mediterranean coast to Andalusia.</p>
+      <p data-reveal style="--i:2">Tarifa for a week in March, Cádiz over Easter, the Algarve in April, and home to Munich on 25 April.</p>
+    </div>
+    <div class="slips" role="region" aria-label="The stages of the route" tabindex="0">
+      <article class="slip" style="--lift:44svh; --i:0" data-reveal>
+        <img src="./assets/found/lavaux-switzerland.jpg" width="1000" height="562" loading="lazy"
+          alt="Vineyard terraces and old houses above Lake Geneva in Lavaux, Switzerland">
+        <h3>Alps and France</h3>
+        <p class="slip-dates">8 – 12 Feb</p>
+        <p>Bern, Lyon, Montpellier, Girona.</p>
+      </article>
+      <article class="slip is-tilted-a" style="--lift:30svh; --i:1" data-reveal>
+        <h3>Spanish coast</h3>
+        <p class="slip-dates">12 Feb – 20 Mar</p>
+        <p>Peñíscola, Alicante, Almería, Nerja, Sevilla.</p>
+      </article>
+      <article class="slip" style="--lift:38svh; --i:2" data-reveal>
+        <h3>Tarifa</h3>
+        <p class="slip-dates">20 – 27 Mar</p>
+        <p>The kite week, at the southern tip of Spain.</p>
+      </article>
+      <article class="slip is-tilted-b" style="--lift:27svh; --i:3" data-reveal>
+        <h3>Cádiz</h3>
+        <p class="slip-dates">27 Mar – 3 Apr</p>
+        <p>Cádiz and El Puerto de Santa María, over Easter.</p>
+      </article>
+      <article class="slip" style="--lift:41svh; --i:4" data-reveal>
+        <h3>Algarve</h3>
+        <p class="slip-dates">3 – 11 Apr</p>
+        <p>Tavira and the eastern Algarve, in Portugal.</p>
+      </article>
+      <article class="slip is-tilted-a" style="--lift:33svh; --i:5" data-reveal>
+        <h3>The way home</h3>
+        <p class="slip-dates">11 – 25 Apr</p>
+        <p>Nerja, Cartagena, Valencia, Girona, Montpellier, Lyon, Bern, Munich.</p>
+      </article>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="postcard" data-reveal>
+      <svg class="scallops scallops-wide" viewBox="0 0 1200 30" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 30 a50 30 0 0 1 100 0 a50 30 0 0 1 100 0 a50 30 0 0 1 100 0 a50 30 0 0 1 100 0 a50 30 0 0 1 100 0 a50 30 0 0 1 100 0 a50 30 0 0 1 100 0 a50 30 0 0 1 100 0 a50 30 0 0 1 100 0 a50 30 0 0 1 100 0 a50 30 0 0 1 100 0 a50 30 0 0 1 100 0 V30 H0 Z"/></svg>
+      <svg class="scallops scallops-narrow" viewBox="0 0 1200 30" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 30 a100 30 0 0 1 200 0 a100 30 0 0 1 200 0 a100 30 0 0 1 200 0 a100 30 0 0 1 200 0 a100 30 0 0 1 200 0 a100 30 0 0 1 200 0 V30 H0 Z"/></svg>
+      <div class="postcard-body">
+        <div class="postcard-message">
+          <h2>See you on the road</h2>
+          <p>New entries appear in the journal as the trip happens. Until then, the route plan has every station and its dates.</p>
+        </div>
+        <div class="postcard-address">
+          <img class="stamp" src="./assets/found/ponta-da-piedade-lagos.jpg" width="520" height="346" loading="lazy"
+            alt="Sandstone rock stacks and kayaks at Ponta da Piedade, Algarve">
+          <ul>
+            <li><a href="#journal" data-view-link="journal">Read the journal</a></li>
+            <li><a href="#trip-map" data-view-link="map">Open the map</a></li>
+            <li><a href="./plan.html">See the route plan</a></li>
+            <li><a href="#top">Back to the top</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="imprint"><span>Pictures from Wikimedia Commons, not ours: Playa de los Lances by <a href="https://commons.wikimedia.org/wiki/File:Playa_de_los_Lances_(Tarifa)_(3).jpg">Olivier Bruchez</a> (CC BY-SA 2.0), Playa de la Caleta by <a href="https://commons.wikimedia.org/wiki/File:C%C3%A1diz_-_Playa_de_la_Caleta.jpg">Benjamin Smith</a> (CC BY-SA 4.0), Lavaux by <a href="https://commons.wikimedia.org/wiki/File:Lavaux_Switzerland.jpg">Lorenz Poffet</a> (CC BY-SA 4.0), Ponta da Piedade by <a href="https://commons.wikimedia.org/wiki/File:Ponta_da_Piedade,_Lagos_(20083809934).jpg">Paul Wilkinson</a> (CC BY 2.0).</span></p>
+    </div>
+  </footer>
 
   <dialog id="entry-dialog" aria-labelledby="article-title">
     <div class="dialog-toolbar">
@@ -361,13 +233,16 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     let tileLayer = null;
+    let routeLine = null;
     const tileUrl = theme => `https://{s}.basemaps.cartocdn.com/${theme === 'dark' ? 'dark_all' : 'rastertiles/voyager'}/{z}/{x}/{y}.png?key=cb1_2htp_1_41c93b5f35f255820048b038`;
     const themeButton = document.getElementById('theme-toggle');
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const accentColor = () => getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#4f6238';
     function applyTheme(theme) {
       document.documentElement.dataset.theme = theme;
       themeButton.setAttribute('aria-pressed', String(theme === 'dark'));
       tileLayer?.setUrl(tileUrl(theme));
+      routeLine?.setStyle({ color: accentColor() });
     }
     applyTheme(document.documentElement.dataset.theme || (systemTheme.matches ? 'dark' : 'light'));
     themeButton.addEventListener('click', () => {
@@ -381,13 +256,31 @@
       if (savedTheme !== 'light' && savedTheme !== 'dark') applyTheme(event.matches ? 'dark' : 'light');
     });
 
+    // The one live thing: where we are on the trip, worked out from the dates in this browser.
+    const TRIP_START = Date.UTC(2027, 1, 8);
+    const TRIP_END = Date.UTC(2027, 3, 25);
+    const TRIP_DAYS = 76;
+    function tripStatus(now = new Date()) {
+      const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+      const dayMs = 86400000;
+      if (today < TRIP_START) {
+        const days = Math.round((TRIP_START - today) / dayMs);
+        return `Departure in ${days} ${days === 1 ? 'day' : 'days'}`;
+      }
+      if (today < TRIP_END) return `Day ${Math.round((today - TRIP_START) / dayMs) + 1} of ${TRIP_DAYS}`;
+      return 'Home again';
+    }
+    const liveStatus = document.getElementById('trip-live');
+    function updateLive() { liveStatus.textContent = tripStatus(); }
+    updateLive();
+    setInterval(updateLive, 60000);
+
     const state = { data: null, entries: [], filter: 'alle', query: '', markers: new Map() };
     const statusLabels = { idee: 'Idea', geplant: 'Planned', unterwegs: 'On the road', besucht: 'Visited' };
     const dateFormatter = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
 
     let map = null;
     let markerLayer = null;
-    let routeLine = null;
     if (window.L) {
       map = L.map('map', { zoomControl: false, scrollWheelZoom: false }).setView([47, 10], 5);
       L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -432,10 +325,56 @@
       });
     }
 
-    function createCard(entry) {
+    // The preview shows the open card for whichever spine is pointed at or focused.
+    const preview = {
+      root: document.getElementById('preview'),
+      image: document.getElementById('preview-image'),
+      place: document.getElementById('preview-place'),
+      meta: document.getElementById('preview-meta'),
+      title: document.getElementById('preview-title'),
+      summary: document.getElementById('preview-summary')
+    };
+    let previewTimer = null;
+    function showPreview(entry, card) {
+      for (const item of document.querySelectorAll('.entry-card.is-active')) item.classList.remove('is-active');
+      card?.classList.add('is-active');
+      preview.root.hidden = false;
+      preview.root.classList.add('is-swapping');
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(() => {
+        if (entry.cover_image) {
+          preview.image.src = entry.cover_image;
+          preview.image.alt = `${entry.location.name} - cover image`;
+          preview.image.hidden = false;
+          preview.place.hidden = true;
+        } else {
+          preview.image.hidden = true;
+          preview.image.removeAttribute('src');
+          preview.place.textContent = entry.location.name;
+          preview.place.hidden = false;
+        }
+        preview.meta.textContent = `${statusLabels[entry.status] || entry.status} · ${entry.location.name}, ${entry.location.country} · ${formatDate(entry.date)}`;
+        preview.title.textContent = entry.title;
+        preview.summary.textContent = entry.summary;
+        preview.root.classList.remove('is-swapping');
+      }, preview.root.dataset.ready ? 120 : 0);
+      preview.root.dataset.ready = 'true';
+    }
+
+    // Entry pictures carry no size in the data, so record the real size once loaded to keep the layout stable.
+    function keepSize(image) {
+      image.addEventListener('load', () => {
+        image.setAttribute('width', image.naturalWidth);
+        image.setAttribute('height', image.naturalHeight);
+      });
+    }
+    keepSize(preview.image);
+
+    function createCard(entry, index) {
       const card = document.createElement('button');
       card.type = 'button';
       card.className = 'entry-card';
+      card.style.setProperty('--i', Math.min(index, 8));
       card.setAttribute('aria-label', `Open ${entry.title} in ${entry.location.name}`);
 
       if (entry.cover_image) {
@@ -444,13 +383,19 @@
         image.src = entry.cover_image;
         image.alt = `${entry.location.name} - cover image`;
         image.loading = 'lazy';
+        keepSize(image);
         card.append(image);
       }
 
-      const body = document.createElement('div');
+      const body = document.createElement('span');
       body.className = 'card-body';
 
-      const meta = document.createElement('div');
+      const title = document.createElement('span');
+      title.className = 'card-title';
+      title.lang = 'de';
+      title.textContent = entry.title;
+
+      const meta = document.createElement('span');
       meta.className = 'card-meta';
       const status = document.createElement('span');
       status.className = `status status-${entry.status}`;
@@ -462,17 +407,11 @@
       date.textContent = formatDate(entry.date);
       meta.append(status, where, date);
 
-      const title = document.createElement('h3');
-      title.className = 'card-title';
-      title.lang = 'de';
-      title.textContent = entry.title;
-      const summary = document.createElement('p');
+      const summary = document.createElement('span');
       summary.className = 'card-summary';
       summary.lang = 'de';
       summary.textContent = entry.summary;
 
-      const footer = document.createElement('div');
-      footer.className = 'card-footer';
       const tags = document.createElement('span');
       tags.className = 'tags';
       for (const tag of (entry.tags || []).slice(0, 3)) {
@@ -481,13 +420,17 @@
         item.textContent = `#${tag}`;
         tags.append(item);
       }
+
       const read = document.createElement('span');
-      read.textContent = 'Read →';
-      footer.append(tags, read);
-      body.append(meta, title, summary, footer);
-      card.append(body);
+      read.className = 'card-read';
+      read.textContent = 'Read';
+
+      body.append(title, meta, summary, tags);
+      card.append(body, read);
 
       card.addEventListener('click', () => openEntry(entry));
+      card.addEventListener('mouseenter', () => showPreview(entry, card));
+      card.addEventListener('focus', () => showPreview(entry, card));
       return card;
     }
 
@@ -516,8 +459,10 @@
         });
         empty.append(message, reset);
         list.append(empty);
+        preview.root.hidden = true;
       } else {
-        for (const entry of entries) list.append(createCard(entry));
+        entries.forEach((entry, index) => list.append(createCard(entry, index)));
+        showPreview(entries[0], list.firstElementChild);
       }
 
       const uniquePlaces = new Set(entries.map(entry => `${entry.location.lat},${entry.location.lng}`));
@@ -547,7 +492,6 @@
         title.type = 'button';
         title.className = 'popup-title';
         title.lang = 'de';
-        title.style.cssText = 'border:0;background:none;padding:0;cursor:pointer;text-align:left';
         title.textContent = entry.title;
         title.addEventListener('click', () => openEntry(entry));
         const meta = document.createElement('span');
@@ -563,7 +507,7 @@
       }
 
       if (coordinates.length > 1) {
-        routeLine = L.polyline(coordinates, { color: '#7c3aed', weight: 4, opacity: .78, dashArray: '2 10', lineCap: 'round' }).addTo(map);
+        routeLine = L.polyline(coordinates, { color: accentColor(), weight: 4, opacity: .85, dashArray: '2 10', lineCap: 'round' }).addTo(map);
       }
       fitMap(entries);
     }
@@ -696,6 +640,15 @@
       button.addEventListener('click', () => selectView(button.dataset.view));
     }
 
+    // Folder tabs and footer links that point at the journal or the map also switch the phone view.
+    for (const link of document.querySelectorAll('[data-view-link]')) {
+      link.addEventListener('click', event => {
+        if (!mobileView.matches) return;
+        event.preventDefault();
+        selectView(link.dataset.viewLink);
+      });
+    }
+
     document.querySelector('.skip-link').addEventListener('click', () => selectView('journal', { scroll: false }));
     if (map && typeof ResizeObserver === 'function') {
       new ResizeObserver(() => {
@@ -742,6 +695,20 @@
       render();
     });
 
+    // Entrances: each part of a section rises in once as it scrolls into view. Without script nothing is hidden.
+    (function revealOnScroll() {
+      const items = [...document.querySelectorAll('[data-reveal]')];
+      if (!('IntersectionObserver' in window)) { for (const item of items) item.classList.add('in'); return; }
+      const observer = new IntersectionObserver(entries => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add('in');
+          observer.unobserve(entry.target);
+        }
+      }, { threshold: 0.12 });
+      for (const item of items) observer.observe(item);
+    })();
+
     async function init() {
       try {
         const response = await fetch('./data/entries.json', { cache: 'no-store' });
@@ -751,7 +718,7 @@
         document.documentElement.lang = state.data.trip.locale?.split('-')[0] || 'en';
         document.title = state.data.trip.title;
         document.getElementById('trip-title').textContent = state.data.trip.title;
-        document.getElementById('trip-subtitle').textContent = state.data.trip.subtitle.replace(/[—–]/g, '-');
+        document.getElementById('trip-subtitle').textContent = state.data.trip.subtitle;
         const { lat, lng } = state.data.trip.home;
         map?.setView([lat, lng], 6);
         render();

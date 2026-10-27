@@ -2,46 +2,36 @@
 
 ## Brief and scope
 
-Family travel journal for friends and relatives. Refine the existing playful, editorial style using the [taste skill](https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/SKILL.md), with native HTML and CSS.
+Family travel journal for friends and relatives, plus a draft route plan. Redesigned with the [taste skill](https://github.com/Leonxlnx/taste-skill) (v2) using native HTML and CSS, no build step.
 
-Redesign mode: preserve. The journal and map, search, status filters, article viewer, anchor IDs, original posts and photos remain the foundation.
+Everything functional is kept: journal and map, search, status filters, article viewer, anchor IDs, original posts and photos, and the route plan with its validated `ROUTE` data. `scripts/validate-content.mjs` and `scripts/validate-plan.mjs` still gate deployment.
 
-Design settings: variation 6/10, motion 3/10, density 3/10. The asymmetric journal/map composition supplies variation. Motion supplies control feedback only; reading and photographs supply the visual content.
+## Direction: "The page is the object"
 
-## Audit
+- Idea: the route and its numbers (21 stations, 76 nights, 5 countries, 2 buffer days) become a roadbook folder. Its tabs are the destinations: Journal, Map and Route plan.
+- Live detail: a countdown to departure, "Day N of 76" during the trip and "Home again" afterwards.
+- Type: Bebas Neue for display capitals, EB Garamond for text. Both are self-hosted from `assets/fonts/` under the SIL OFL.
+- Colour, "Sand and moss": sand surfaces, one moss accent (`#4f6238` light, `#a3bb78` dark), tone-stepped surfaces instead of lines.
+- Shape: square corners, no gradients, shadows, pills, emoji, eyebrow labels or hairline rules. The old purple accent, rounded panels and pill controls are retired.
+- Tokens live in `tokens.css` and are shared by `index.html` (`design-system.css`) and `plan.html` (`plan.css`).
 
-- Existing identity: Outfit headings, Plus Jakarta Sans body, warm light background, purple controls, rounded containers.
-- Functional content: actual travel posts, photographs, route markers, search and statistics.
-- Repeated decoration: confetti, dotted background, hero text strip, repeated section labels, photo-overlay arrow, and competing colored shadows.
-- Accessibility to retain: keyboard focus, skip link, modal semantics, scroll locking, clear empty/error states, and full portrait photographs.
-- SEO baseline: one public index page; title and description remain intact. No route migration or post slug changes.
+## Accessibility and behaviour retained
 
-## Refinement
+- Keyboard focus, skip link, modal semantics, scroll locking, clear empty and error states, full portrait photographs.
+- Light/dark theme: system preference, a toggle on both pages, and a saved choice (`journal-theme`) applied before first paint. CARTO tiles switch between Voyager and Dark Matter with the theme.
+- Reduced motion is respected.
+- Mobile: the journal has a Journal/Map switch (the map is hidden until selected and resized when shown). The itinerary slips stack in a column below the tablet breakpoint and do not scroll sideways. This is covered by a regression test in `scripts/seo.test.mjs`.
+- The route plan opens stop details in a side drawer on desktop and a bottom sheet on phones.
 
-- Keep the font pairing and purple accent. Use one semantic accent across controls, links and markers.
-- Simplify decorative elements and display statistics without separate colored cards.
-- Use a consistent shape scale: panels 24px, inputs/media 12px, status and filter controls pills.
-- Provide coordinated light/dark tokens, an accessible theme toggle, system preference detection, and a saved browser preference. Apply the theme before first paint.
-- Match CARTO's map style to the theme using its [documented tile styles](https://github.com/CartoDB/basemap-styles/blob/master/README.md).
-- Self-host the existing fonts with `font-display: swap`, Latin/Latin Extended subsets, two font preloads, and included SIL-OFL licenses.
-- Use a static loading placeholder with the card's image proportions. Keep reduced-motion support and avoid automatic animations.
-- Keep the user's real travel photograph. Generated travel imagery would misrepresent this factual journal.
+## Verification
 
-## Pre-flight
+- Taste-skill `lint.mjs`: 0 FAIL, 0 WARN on source. `inspect.mjs --app` on the planner: 0 FAIL, 0 WARN.
+- The journal inspector reports a few WARNs (footage, ragged edges). Treat them as open polish items rather than defects.
+- Headless Chrome at 1440, 768 and 390 px: no horizontal page overflow, no broken images, Leaflet tiles and markers render on both pages, and the journal map renders on mobile after switching to the Map view.
+- SEO metadata, crawl files and their tests are documented in [`seo.tdd.md`](seo.tdd.md).
 
-Applicable checks cover hierarchy, theme/palette/shape consistency, keyboard controls, placeholder and button contrast, original content, real imagery, stable IDs, responsive single-column rules, loading/empty/error states, and local assets.
+## Known limits
 
-Measured token contrast ratios:
-
-| Pair | Light | Dark |
-| --- | ---: | ---: |
-| Body text / page | 14.17:1 | 14.62:1 |
-| Muted text / input surface | 6.30:1 | 8.35:1 |
-| Selected button text / accent | 6.85:1 | 8.05:1 |
-| Input boundary / input surface | 3.78:1 | 5.54:1 |
-
-Landing-page-only checks for pricing, social proof, bento grids, product previews, and marketing CTAs do not apply. Framework/animation-library checks do not apply to this static implementation. Existing factual prose is preserved.
-
-The content validator, JavaScript syntax check, font-path validation, whitespace check, and DOM interaction checks cover code and state behavior. Live browser checks cover rendered desktop behavior in both themes after deployment.
-
-Limitations: local Chromium could not start in this execution environment and cloud-browser device previews are blocked. Rendered mobile layouts and Lighthouse/Core Web Vitals are therefore unverified; no Lighthouse score or performance result is claimed.
+- Copy written for the design (folder strip notes, route-slip labels, showcase and footer prose) is sample text and should be reviewed by the author.
+- Photos in `assets/found/` are Wikimedia Commons images; see `credits.json` for authors and licences.
+- On desktop the itinerary row can overflow its container by about 4 px because of the tilted slips. It is not visible in screenshots.
