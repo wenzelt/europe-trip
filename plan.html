@@ -101,6 +101,9 @@
         <div class="p-progress-fill" id="p-prog-bar" style="width:0%"></div>
       </div>
     </div>
+    <h2 class="itinerary-title">Ideen vor Ort</h2>
+    <ul class="p-activities" id="p-activities"></ul>
+    <p class="plan-note">Unverbindliche Vorschläge, kein festes Programm. Öffnungszeiten, Tickets, Zugänglichkeit und Wetter vorab prüfen.</p>
     <a class="btn wiki-btn" id="p-wiki" href="#" target="_blank" rel="noopener noreferrer">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
       Mehr zum Ort
@@ -120,6 +123,10 @@
 const ROUTE = [
   {
     "n": 1,
+    "activities": [
+      "Vor der Abfahrt eine kurze Runde durch den Hofgarten drehen, falls der Zeitplan Luft lässt.",
+      "Am Viktualienmarkt Proviant für die erste Fahretappe besorgen."
+    ],
     "name": "München",
     "lat": 48.1375,
     "lng": 11.575,
@@ -134,6 +141,10 @@ const ROUTE = [
   },
   {
     "n": 2,
+    "activities": [
+      "Unter den Altstadtlauben bis zum Zytglogge spazieren – eine kurze Pause nach der Fahrt.",
+      "Von der Münsterplattform auf die Aareschlaufe schauen."
+    ],
     "name": "Bern",
     "lat": 46.94806,
     "lng": 7.4475,
@@ -148,6 +159,10 @@ const ROUTE = [
   },
   {
     "n": 3,
+    "activities": [
+      "Durch Vieux Lyon und am Ufer der Saône eine kleine Abendrunde drehen.",
+      "In einer Boulangerie in der Altstadt eine Pause mit Gebäck einlegen."
+    ],
     "name": "Lyon",
     "lat": 45.7675,
     "lng": 4.835,
@@ -162,6 +177,10 @@ const ROUTE = [
   },
   {
     "n": 4,
+    "activities": [
+      "Vom Place de la Comédie durch die Gassen des Écusson bummeln.",
+      "Auf der Promenade du Peyrou eine ruhige Pause im Freien machen."
+    ],
     "name": "Montpellier",
     "lat": 43.6119,
     "lng": 3.8772,
@@ -176,6 +195,10 @@ const ROUTE = [
   },
   {
     "n": 5,
+    "activities": [
+      "Die bunten Häuser am Onyar von den Brücken in Girona aus ansehen.",
+      "Durch das jüdische Viertel El Call schlendern; für die engen Gassen eine Trage erwägen."
+    ],
     "name": "Girona / Costa Brava",
     "lat": 41.98444,
     "lng": 2.82111,
@@ -190,6 +213,10 @@ const ROUTE = [
   },
   {
     "n": 6,
+    "activities": [
+      "An der Playa Norte entlanggehen und den Blick auf die Burg von Peñíscola genießen.",
+      "Bei genügend Zeit in die Altstadt hinaufspazieren; mit Steigungen und Kopfsteinpflaster rechnen."
+    ],
     "name": "Peñíscola",
     "lat": 40.35917,
     "lng": 0.4075,
@@ -204,6 +231,10 @@ const ROUTE = [
   },
   {
     "n": 7,
+    "activities": [
+      "Auf der Explanada de España in Alicante einen Spaziergang mit Café-Pause machen.",
+      "An der Playa de San Juan am Meer entlanglaufen, ohne einen Badetag einzuplanen."
+    ],
     "name": "Alicante / Playa de San Juan",
     "lat": 38.34528,
     "lng": -0.48306,
@@ -218,6 +249,10 @@ const ROUTE = [
   },
   {
     "n": 8,
+    "activities": [
+      "In Almería durch die Altstadt rund um die Kathedrale spazieren.",
+      "Bei ruhigem Wetter einen kurzen Abstecher zur Strandpromenade von San José im Cabo de Gata machen."
+    ],
     "name": "Almería / Cabo de Gata",
     "lat": 36.8417,
     "lng": -2.4639,
@@ -232,6 +267,12 @@ const ROUTE = [
   },
   {
     "n": 9,
+    "activities": [
+      "An der Promenade von Torrox Costa bis zum Leuchtturm spazieren und regelmäßige Pausen einbauen.",
+      "In Nerja den Balcón de Europa und die benachbarten Altstadtgassen erkunden.",
+      "Einen halben Tag für Frigiliana reservieren; die steilen Gassen eher mit Trage erkunden.",
+      "Für einen ruhigen Tag am Strand von Burriana sitzen und das Meer beobachten."
+    ],
     "name": "Torrox Costa / Nerja",
     "lat": 36.75,
     "lng": -3.95,
@@ -246,6 +287,12 @@ const ROUTE = [
   },
   {
     "n": 10,
+    "activities": [
+      "Die Plaza de España und den Parque de María Luisa in kleinen Spaziergängen erkunden.",
+      "Durch Triana bummeln und am Guadalquivir eine Pause machen.",
+      "Einen Besuch im Real Alcázar erwägen; Eintrittszeiten und Tickets vorab prüfen.",
+      "Die Gassen von Santa Cruz früh am Tag und ohne volles Tagesprogramm entdecken."
+    ],
     "name": "Sevilla",
     "lat": 37.38861,
     "lng": -5.995,
@@ -260,6 +307,12 @@ const ROUTE = [
   },
   {
     "n": 11,
+    "activities": [
+      "Durch Tarifas Altstadt zur Puerta de Jerez spazieren und in einem Café pausieren.",
+      "An der Playa Chica auf die Straße von Gibraltar schauen, wenn der Wind es angenehm macht.",
+      "Einen Ausflug zur römischen Ausgrabungsstätte Baelo Claudia bei Bolonia erwägen; Öffnungszeiten prüfen.",
+      "An der Playa de Los Lances einen kurzen Strandspaziergang machen; bei starkem Wind in der Stadt bleiben."
+    ],
     "name": "Tarifa",
     "lat": 36.014,
     "lng": -5.606,
@@ -274,6 +327,12 @@ const ROUTE = [
   },
   {
     "n": 12,
+    "activities": [
+      "In Cádiz durch den Parque Genovés und am Meer entlang spazieren.",
+      "Die Altstadt von Cádiz rund um die Kathedrale erkunden; rund um Ostern mit vollen Gassen rechnen.",
+      "In El Puerto de Santa María am Río Guadalete bummeln und eine Tapas-Pause einlegen.",
+      "Bei passendem Wetter an der Playa de La Puntilla einen ruhigen Nachmittag verbringen."
+    ],
     "name": "Cádiz / El Puerto de Santa María",
     "lat": 36.535,
     "lng": -6.2975,
@@ -288,6 +347,12 @@ const ROUTE = [
   },
   {
     "n": 13,
+    "activities": [
+      "In Tavira am Gilão entlang und über die alte Brücke spazieren.",
+      "Einen Ausflug zur Ilha de Tavira erwägen; Fährbetrieb und Wetter für den Reisetag prüfen.",
+      "In Santa Luzia am Hafen sitzen und die Boote der Ria Formosa beobachten.",
+      "Durch Cacela Velha schlendern und vom Ort auf die Lagune schauen."
+    ],
     "name": "Tavira / östliche Algarve",
     "lat": 37.117,
     "lng": -7.65,
@@ -302,6 +367,10 @@ const ROUTE = [
   },
   {
     "n": 14,
+    "activities": [
+      "Nach der langen Fahrt nur eine kleine Abendrunde am Balcón de Europa machen.",
+      "An der Playa de Burriana eine Essenspause mit Meerblick einlegen."
+    ],
     "name": "Nerja",
     "lat": 36.74694,
     "lng": -3.87889,
@@ -316,6 +385,10 @@ const ROUTE = [
   },
   {
     "n": 15,
+    "activities": [
+      "Am Hafen von Cartagena und durch die Fußgängerzone Calle Mayor spazieren.",
+      "Bei genügend Zeit das Museum des römischen Theaters besuchen; Öffnungszeiten vorab prüfen."
+    ],
     "name": "Cartagena / Umgebung",
     "lat": 37.6019,
     "lng": -0.9842,
@@ -330,6 +403,11 @@ const ROUTE = [
   },
   {
     "n": 16,
+    "activities": [
+      "Im Turia-Park in Valencia eine grüne Pause zwischen den Fahretappen einlegen.",
+      "Die Markthalle Mercado Central besuchen, sofern sie am Aufenthaltstag geöffnet ist.",
+      "Bei gutem Wetter an der Strandpromenade der Malvarrosa spazieren."
+    ],
     "name": "Valencia / Umgebung",
     "lat": 39.47,
     "lng": -0.37639,
@@ -344,6 +422,10 @@ const ROUTE = [
   },
   {
     "n": 17,
+    "activities": [
+      "Im Parc de la Devesa in Girona eine ruhige Runde unter den Bäumen drehen.",
+      "Falls ihr an der Küste übernachtet, an der Strandpromenade von Sant Feliu de Guíxols spazieren."
+    ],
     "name": "Girona / Costa Brava",
     "lat": 41.98444,
     "lng": 2.82111,
@@ -358,6 +440,10 @@ const ROUTE = [
   },
   {
     "n": 18,
+    "activities": [
+      "Den Jardin des Plantes in Montpellier für eine ruhige Pause besuchen; Öffnungszeiten prüfen.",
+      "Durch das Viertel Antigone bis zum Lez spazieren und den Tag bewusst locker halten."
+    ],
     "name": "Montpellier",
     "lat": 43.6119,
     "lng": 3.8772,
@@ -372,6 +458,10 @@ const ROUTE = [
   },
   {
     "n": 19,
+    "activities": [
+      "Im Parc de la Tête d’Or eine kurze Runde am See drehen.",
+      "Am Rhône-Ufer die Beine vertreten, bevor es am nächsten Tag weiter Richtung Schweiz geht."
+    ],
     "name": "Lyon",
     "lat": 45.7675,
     "lng": 4.835,
@@ -386,6 +476,10 @@ const ROUTE = [
   },
   {
     "n": 20,
+    "activities": [
+      "Vom Rosengarten auf die Berner Altstadt schauen; den Anstieg bei der Tagesplanung berücksichtigen.",
+      "Auf dem Bundesplatz und der Bundesterrasse eine letzte kleine Stadtrunde machen."
+    ],
     "name": "Bern",
     "lat": 46.94806,
     "lng": 7.4475,
@@ -400,6 +494,10 @@ const ROUTE = [
   },
   {
     "n": 21,
+    "activities": [
+      "Nach dem Ankommen höchstens einen kurzen Spaziergang an der Isar einplanen.",
+      "Die Rückkehr mit einer entspannten Brotzeit zu Hause feiern und die Puffertage frei halten."
+    ],
     "name": "München",
     "lat": 48.1375,
     "lng": 11.575,
@@ -658,6 +756,11 @@ function openPanel(idx) {
   document.getElementById('p-name').textContent    = stop.name;
   document.getElementById('p-country').textContent = d.country;
   document.getElementById('p-desc').textContent    = d.desc;
+  document.getElementById('p-activities').replaceChildren(...stop.activities.map(activity => {
+    const item = document.createElement('li');
+    item.textContent = activity;
+    return item;
+  }));
   document.getElementById('p-arrival').textContent = formatDate(stop.arrival);
   document.getElementById('p-departure').textContent = formatDate(stop.departure);
   const nights = nightsAt(stop);

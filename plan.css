@@ -201,6 +201,8 @@ body.panel-open #tools { right: calc(var(--panel-w) + var(--margin)); }
 .p-type { display: flex; align-items: center; gap: 4px; margin: 0 0 12px -6px; font-weight: 500; }
 .p-glyph { display: block; flex-shrink: 0; }
 .p-desc { margin-bottom: 8px; }
+.p-activities { margin: 0 0 20px; padding-left: 20px; }
+.p-activities li + li { margin-top: 8px; }
 #p-nights { margin-bottom: 20px; font-weight: 500; }
 
 .p-dates { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
