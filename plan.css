@@ -12,8 +12,8 @@
   --route: var(--field);
   --primary-hover: var(--field);
 
-  --t-s: 14px;
-  --t-b: 17px;
+  --t-s: 15px;
+  --t-b: 18px;
   --t-l: 24px;
   --t-h: 32px;
   --tap: 44px;
@@ -250,17 +250,18 @@ body.panel-open #tools { right: calc(var(--panel-w) + var(--margin)); }
 .nav-btn { flex: 1; }
 
 /* ── Markers: shape and tone carry the type ── */
-.marker-wrap { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.marker-pin { display: block; width: 44px; height: 44px; transition: transform .2s var(--ease); }
+.marker-wrap { width: var(--mk-size, 44px); height: var(--mk-size, 44px); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.marker-pin { display: block; width: var(--mk-size, 44px); height: var(--mk-size, 44px); transition: transform .2s var(--ease); }
 .marker-pin svg { display: block; overflow: visible; }
 .mk-shape { fill: var(--mk-fill); stroke: var(--halo); stroke-width: 3; }
-.mk-num { fill: var(--mk-ink); font-family: var(--font-display); font-size: 17px; text-anchor: middle; dominant-baseline: central; }
+.mk-num { fill: var(--mk-ink); font-family: var(--font-display); font-size: 19px; text-anchor: middle; dominant-baseline: central; }
 .type-start { --mk-fill: var(--accent); --mk-ink: var(--accent-ink); --mk-active: var(--ink); }
 .type-stay  { --mk-fill: var(--accent); --mk-ink: var(--accent-ink); --mk-active: var(--ink); }
 .type-end   { --mk-fill: var(--ink); --mk-ink: var(--bg); --mk-active: var(--accent); }
 .type-drive { --mk-fill: var(--ink); --mk-ink: var(--bg); --mk-active: var(--accent); }
 .type-cluster { --mk-fill: var(--paper); --mk-ink: var(--ink); --mk-active: var(--accent); }
-.type-cluster .mk-shape { stroke: var(--ink); }
+.type-cluster .mk-shape { stroke: var(--ink); stroke-width: 2.5; }
+.type-cluster .mk-stack { fill: var(--tone-2); }
 .marker-pin.active { transform: scale(1.3); }
 .marker-pin.active .mk-shape { stroke: var(--mk-active); stroke-width: 4; }
 .leaflet-marker-icon:focus-visible { outline: 3px solid var(--ink); outline-offset: -4px; }

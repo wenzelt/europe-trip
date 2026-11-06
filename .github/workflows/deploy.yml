@@ -32,6 +32,8 @@ jobs:
         run: node --test scripts/seo.test.mjs
       - name: Test journal page
         run: node --test scripts/journal.test.mjs
+      - name: Test readability and map markers
+        run: node --test scripts/design.test.mjs
 
   deploy:
     if: github.event_name != 'pull_request'

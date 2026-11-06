@@ -61,7 +61,7 @@ Prioritäten: möglichst sonnige, regenarme Küstenorte, lange Basen zum Kochen/
 
 ### Kartenansicht und überlappende Orte
 
-Die Leaflet-Karte zeichnet Verbindungen zwischen den tatsächlichen Gemeinde-/Stadtkoordinaten. Sie zeigt keine berechnete Fahrstrecke. Beim Herauszoomen liegen sowohl wiederholte Orte (München, Bern, Lyon, Montpellier, Girona) als auch nahe Stationen übereinander. Statt Marker zu verdecken, **gruppiert die Karte überlappende Marker bei der jeweils aktuellen Zoomstufe** zu einem Marker mit „2×“ (oder mehr). Durch Anklicken lässt sich jede Fahrt/Station mitsamt Datum einzeln wählen; beim Hineinzoomen werden räumlich getrennte Marker wieder aufgelöst. Linien und Routenfolge behalten die echten Referenzkoordinaten.
+Die Leaflet-Karte zeichnet Verbindungen zwischen den tatsächlichen Gemeinde-/Stadtkoordinaten. Sie zeigt keine berechnete Fahrstrecke. Beim Herauszoomen liegen sowohl wiederholte Orte (München, Bern, Lyon, Montpellier, Girona) als auch nahe Stationen übereinander. Statt Marker zu verdecken, **gruppiert die Karte überlappende Marker bei der jeweils aktuellen Zoomstufe** zu einem gestapelten Punkt, der die erste Stationsnummer der Gruppe trägt. Auf dem Handy sind die Marker kleiner und die Route nutzt die volle Bildschirmbreite, sodass weniger Stationen zusammenfallen. Durch Anklicken lässt sich jede Fahrt/Station mitsamt Datum einzeln wählen; beim Hineinzoomen werden räumlich getrennte Marker wieder aufgelöst. Linien und Routenfolge behalten die echten Referenzkoordinaten.
 
 Neue, öffentlich verifizierbare Stadtreferenzpunkte:
 - [Almería](https://en.wikipedia.org/wiki/Almer%C3%ADa): 36.8417, -2.4639.
@@ -85,6 +85,7 @@ node scripts/validate-content.mjs
 node scripts/validate-plan.mjs
 node --test scripts/seo.test.mjs
 node --test scripts/journal.test.mjs
+node --test scripts/design.test.mjs
 ```
 
 Die SEO-Checkliste, RED/GREEN-Nachweise und offenen Punkte stehen in [`docs/seo.tdd.md`](docs/seo.tdd.md).
@@ -101,4 +102,4 @@ Die Seite nutzt statisches HTML, CSS und Leaflet. Die Schriftarten Bebas Neue (�
 
 Das Farbschema des Journals folgt zunächst der Systemeinstellung. Der Schalter „Dark theme“ speichert die eigene Auswahl lokal im Browser. Die Kartendarstellung wechselt passend zwischen CARTO Voyager und Dark Matter. Der Reiseplan hat ein eigenes dunkles Design.
 
-Die gestalterischen Entscheidungen und Prüfgrenzen sind in [`docs/design-review.md`](docs/design-review.md) dokumentiert.
+Die gestalterischen Entscheidungen und Prüfgrenzen sind in [`docs/design-review.md`](docs/design-review.md) dokumentiert. Lesbarkeit (Kontrast nach WCAG AA, Mindestschriftgrößen, Zeilenabstände) und die Kartenmarker auf dem Handy prüft `scripts/design.test.mjs`; Nachweise stehen in [`docs/design.tdd.md`](docs/design.tdd.md).

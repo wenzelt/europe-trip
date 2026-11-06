@@ -9,7 +9,7 @@
   --surface: #d2cab8;
   --paper: #efe9da;
   --ink: #2a2a26;
-  --muted: #59574e;
+  --muted: #45433b;
   --accent: #4f6238;
   --accent-ink: #ffffff;
   --field: #3f5a2a;
@@ -22,8 +22,8 @@
   /* Type */
   --font-display: "Bebas Neue", "Arial Narrow", Impact, sans-serif;
   --font-text: "EB Garamond", Georgia, "Times New Roman", serif;
-  --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
-  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --step-small: clamp(0.9375rem, 0.91rem + 0.1vw, 1rem);
+  --step-body: clamp(1.125rem, 1.06rem + 0.3vw, 1.3125rem);
   --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
   --step-head: clamp(2.5rem, 1.2rem + 5vw, 5.5rem);
 

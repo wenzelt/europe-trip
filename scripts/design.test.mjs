@@ -37,7 +37,8 @@ const contrast = (a, b) => {
   return (hi + 0.05) / (lo + 0.05);
 };
 const extract = (source, name) => {
-  const match = source.match(new RegExp(`function ${name}\\([\\s\\S]*?\\n\\s*}\\n`));
+  // The closing brace sits at the same indentation as the function keyword.
+  const match = source.match(new RegExp(`^([ \\t]*)function ${name}\\([\\s\\S]*?\\n\\1}\\n`, 'm'));
   assert.ok(match, `function ${name} missing`);
   return match[0];
 };
@@ -102,7 +103,7 @@ test('journal map marker is centred on its location and stands off the tiles', (
   const icon = markerIcon(4);
   const [w, h] = icon.iconSize;
   assert.ok(w >= 28 && h >= 28, `marker ${w}×${h} is too small to tap`);
-  assert.deepEqual(icon.iconAnchor, [w / 2, h / 2], 'a square marker must be anchored at its centre');
+  assert.deepEqual(Array.from(icon.iconAnchor), [w / 2, h / 2], 'a square marker must be anchored at its centre');
   assert.ok(icon.popupAnchor[1] <= -h / 2, 'popup must open above the marker');
   assert.match(block(journalCss, '.route-marker'), /(outline|border):\s*\d+px solid var\(--paper\)/);
 });
@@ -175,4 +176,12 @@ test('grouped markers show the first station number on a stacked dot, not a coun
   assert.equal(planFns.markerLabel([{ n: 20 }, { n: 2 }]), '2');
   const shapes = planFns.MARKER_SHAPES.cluster ?? '';
   assert.ok((shapes.match(/<circle/g) ?? []).length >= 2, 'cluster should be two stacked circles');
+});
+
+test('journal zoom buttons keep a 44px touch target on touch devices too', () => {
+  // Leaflet's own .leaflet-touch rule shrinks them to 30px unless the journal overrides it.
+  const rule = strip(journalCss).match(/[^}]*\.leaflet-touch \.leaflet-bar a[^{]*{([^}]*)}/);
+  assert.ok(rule, '.leaflet-touch .leaflet-bar a is not styled');
+  assert.match(rule[1], /width:\s*44px/);
+  assert.match(rule[1], /height:\s*44px/);
 });

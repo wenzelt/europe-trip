@@ -22,6 +22,8 @@ Everything functional is kept: journal and map, search, status filters, article 
 - Reduced motion is respected.
 - Mobile: the journal has a Journal/Map switch (the map is hidden until selected and resized when shown). The itinerary slips stack in a column below the tablet breakpoint and do not scroll sideways. This is covered by a regression test in `scripts/seo.test.mjs`.
 - The route plan opens stop details in a side drawer on desktop and a bottom sheet on phones.
+- Readability: secondary text meets WCAG AA (4.5:1) on every surface in both themes; the smallest text is 15px and running text 18px with 1.55 leading; display capitals use a line-height of at least .95. All of this is covered by `scripts/design.test.mjs`.
+- Map markers: the journal marker is centred on its place and has a paper ring so it stands off the tiles. On phones the route plan uses 32px markers, 20px side padding and a 36px grouping distance, so the overview shows 10 markers instead of 6 and no marker hides more than 3 stops. Grouped stops show as two stacked dots labelled with their first station number.
 
 ## Verification
 

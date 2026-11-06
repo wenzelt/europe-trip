@@ -563,6 +563,7 @@ const markerObjs  = [];
 let   animIndex   = 0;
 let   animTimer   = null;
 let   activePanelIdx = -1;
+let   markerSize  = 0;
 let   returnFocus = null;
 
 // ── Theme ─────────────────────────────────────────────────────
@@ -611,26 +612,45 @@ function clusterStopsByPixelDistance(stops, project, minimumGap = 48) {
 }
 
 // Shape carries the type: square = start and return, circle = stop on the way,
-// diamond = long stay, wide block = several stops merged at this zoom.
+// diamond = long stay, two stacked dots = several stops sharing a spot at this zoom.
 const MARKER_SHAPES = {
   start:   '<rect class="mk-shape" x="8" y="8" width="28" height="28"/>',
   end:     '<rect class="mk-shape" x="8" y="8" width="28" height="28"/>',
   drive:   '<circle class="mk-shape" cx="22" cy="22" r="14"/>',
   stay:    '<polygon class="mk-shape" points="22,3 41,22 22,41 3,22"/>',
-  cluster: '<rect class="mk-shape" x="3" y="9" width="38" height="26"/>',
+  cluster: '<circle class="mk-shape mk-stack" cx="26" cy="18" r="14"/><circle class="mk-shape" cx="19" cy="25" r="14"/>',
 };
-const markerSvg = (type, label, size = 44) =>
-  `<svg width="${size}" height="${size}" viewBox="0 0 44 44" aria-hidden="true" focusable="false">${MARKER_SHAPES[type]}<text class="mk-num" x="22" y="23">${label}</text></svg>`;
+const MARKER_TEXT = { cluster: [19, 26] };
+const markerSvg = (type, label, size = 44) => {
+  const [x, y] = MARKER_TEXT[type] || [22, 23];
+  return `<svg width="${size}" height="${size}" viewBox="0 0 44 44" aria-hidden="true" focusable="false">${MARKER_SHAPES[type]}<text class="mk-num" x="${x}" y="${y}">${label}</text></svg>`;
+};
 
-function buildIcon(group) {
-  const multiple = group.length > 1;
-  const label = multiple ? `${group.length}×` : group[0].n;
-  const type = multiple ? 'cluster' : group[0].type;
+// Phones get smaller markers so neighbouring cities stay apart; the gap keeps them from touching.
+function markerMetrics(viewportWidth) {
+  return viewportWidth <= 600 ? { size: 32, gap: 36 } : { size: 44, gap: 48 };
+}
+
+// A group reads as the first station it contains; the stacked dot says there is more behind it.
+function markerLabel(group) {
+  return String(Math.min(...group.map(stop => stop.n)));
+}
+
+// Keep the route clear of the title card (top, phone) and the figures (bottom),
+// but let it use the full phone width.
+function routeFitPadding(viewportWidth, headerHeight) {
+  return viewportWidth <= 600
+    ? { paddingTopLeft: [20, headerHeight + 24], paddingBottomRight: [20, 130] }
+    : { paddingTopLeft: [70, 70], paddingBottomRight: [70, 110] };
+}
+
+function buildIcon(group, size) {
+  const type = group.length > 1 ? 'cluster' : group[0].type;
   return L.divIcon({
     className: '',
-    html: `<div class="marker-wrap"><div class="marker-pin type-${type}">${markerSvg(type, label)}</div></div>`,
-    iconSize: [44, 44],
-    iconAnchor: [22, 22],
+    html: `<div class="marker-wrap" style="--mk-size:${size}px"><div class="marker-pin type-${type}">${markerSvg(type, markerLabel(group), size)}</div></div>`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
   });
 }
 
@@ -668,8 +688,10 @@ function refreshMarkers() {
   markerObjs.forEach(item => map.removeLayer(item.marker));
   markerObjs.length = 0;
   const visibleStops = STOPS.slice(0, animIndex);
+  const { size, gap } = markerMetrics(window.innerWidth);
+  markerSize = size;
   const groups = clusterStopsByPixelDistance(
-    visibleStops, stop => map.latLngToLayerPoint([stop.lat, stop.lng])
+    visibleStops, stop => map.latLngToLayerPoint([stop.lat, stop.lng]), gap
   );
   for (const group of groups) {
     // The route line always uses the actual coordinates; only the marker
@@ -677,8 +699,8 @@ function refreshMarkers() {
     const lat = group.reduce((sum, stop) => sum + stop.lat, 0) / group.length;
     const lng = group.reduce((sum, stop) => sum + stop.lng, 0) / group.length;
     const marker = L.marker([lat, lng], {
-      icon: buildIcon(group),
-      title: group.length > 1 ? `${group.length} Etappen – klicken, um auszuwählen` : `Etappe ${group[0].n}: ${group[0].name}`,
+      icon: buildIcon(group, size),
+      title: group.length > 1 ? `Etappen ${group.map(stop => stop.n).join(', ')} – klicken, um auszuwählen` : `Etappe ${group[0].n}: ${group[0].name}`,
       zIndexOffset: group.length > 1 ? 2000 : group[0].n,
     }).addTo(map);
     if (group.length === 1) {
@@ -692,6 +714,10 @@ function refreshMarkers() {
 }
 
 map.on('zoomend', refreshMarkers);
+// Crossing the phone breakpoint changes the marker size, so regroup.
+map.on('resize', () => {
+  if (animIndex && markerMetrics(window.innerWidth).size !== markerSize) refreshMarkers();
+});
 
 function drawNextStep() {
   if (animIndex >= STOPS.length) {
@@ -722,11 +748,8 @@ function onAnimComplete() {
   animTimer = null;
   document.getElementById('night-counter').textContent = TOTAL_NIGHTS;
   const bounds = L.latLngBounds(STOPS.map(s => [s.lat, s.lng]));
-  // Keep the whole route clear of the title card (top, phone) and the figures (bottom).
-  const phone = window.innerWidth <= 600;
   const fit = {
-    paddingTopLeft: [70, phone ? document.getElementById('header').offsetHeight + 24 : 70],
-    paddingBottomRight: [70, phone ? 130 : 110],
+    ...routeFitPadding(window.innerWidth, document.getElementById('header').offsetHeight),
     animate: !reduceMotion, duration: 1.2,
   };
   setTimeout(() => map.fitBounds(bounds, fit), reduceMotion ? 0 : 300);
